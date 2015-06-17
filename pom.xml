@@ -13,11 +13,11 @@
     </parent>
 
     <groupId>gin.mElec</groupId>
-    <artifactId>Open_obj_format</artifactId>
+    <artifactId>Stack_Object_Combiner</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
-    <name>Open_obj_format</name>
-    <description>A plugin that add the possibility to open .obj files</description>
+    <name>Stack_Object_Combiner</name>
+    <description>A plugin that merge object from different parts of a same stack</description>
 
     <developers>
         <developer>
@@ -35,14 +35,14 @@
     </developers>
 
     <scm>
-            <connection>scm:git:git://github.com/Tom-TBT/fijiPlugin_objReader</connection>
-            <developerConnection>scm:git:git@github.com:Tom-TBT/fijiPlugin_objReader</developerConnection>
+            <connection>scm:git:git://github.com/Tom-TBT/StackObjectCombiner</connection>
+            <developerConnection>scm:git:git@github.com:Tom-TBT/StackObjectCombiner</developerConnection>
             <tag>HEAD</tag>
-            <url>https://github.com/Tom-TBT/fijiPlugin_objReader.git</url>
+            <url>https://github.com/Tom-TBT/StackObjectCombiner.git</url>
     </scm>
 
     <properties>
-        <main-class>Open_obj_format</main-class>
+        <main-class>Stack_Object_Combiner</main-class>
     </properties>
 
     <dependencies>
@@ -59,7 +59,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Open_obj_format</mainClass>
+                            <mainClass>Stack_Object_Combiner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
