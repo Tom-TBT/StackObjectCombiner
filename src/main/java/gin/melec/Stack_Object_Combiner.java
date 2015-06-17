@@ -17,8 +17,13 @@
 
 package gin.melec;
 
+// Basics import of imageJ
 import ij.IJ;
 import ij.plugin.PlugIn;
+
+// Import of this project's classes
+import gin.melec.Scene;
+
 
 /**
  *
@@ -28,23 +33,25 @@ public class Stack_Object_Combiner implements PlugIn {
 
     /**
      * Run method called when an .obj file is opened.
-     * @param arg
+     * @param arg , parameter for the plugin.
      */
     @Override
     public final void run(String arg) {
         IJ.showMessage("Ma boite", arg);
-
+        Scene scene = new Scene9Part(IJ.getDirectory("Give the file containing the "
+                + ".obj file to combine"),290,560,100,200,1000,800,500);
+        scene.shiftMeshes();
 
     }
 
     /**
      * Ma méthode main.
      *
-     * @param args, arguments passés à main
+     * @param args ,arguments passés à main.
      */
     public static void main(String[] args) {
         new ij.ImageJ();
-        new Stack_Object_Combiner().run("Plugin appelé par main");
+        new Stack_Object_Combiner().run("");
     }
 
 }
