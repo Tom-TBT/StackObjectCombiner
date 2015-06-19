@@ -17,7 +17,6 @@
 package gin.melec;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  *
@@ -25,6 +24,17 @@ import java.util.List;
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
 public class Shifter {
+
+    private Shifter() {
+    }
+
+    public static Shifter getInstance() {
+        return ShifterHolder.INSTANCE;
+    }
+
+    private static class ShifterHolder {
+        private static final Shifter INSTANCE = new Shifter();
+    }
 
     /**
      * Translate the mesh given by its path by a shift given in the x direction.
@@ -34,14 +44,10 @@ public class Shifter {
      */
     public static void xTranslation(final String meshPath, final int shift)
             throws IOException {
-        final List mesh = ObjReader.readMesh(meshPath);
-        for (int i = 0; i < mesh.size(); i++) {
-            String[] currentMesh = (String[]) mesh.get(i);
-            if (currentMesh[0].equals("v")) {
-                final float currentValue = Float.parseFloat(currentMesh[1]);
-                currentMesh[1] = Float.toString(currentValue + shift);
-                mesh.set(i, currentMesh);
-            }
+        final Mesh mesh = ObjReader.readMesh(meshPath);
+        for (Object object : mesh.vertices) {
+            final Vertex vertex = (Vertex) object;
+            vertex.x = vertex.x + shift;
         }
         ObjWriter.replaceMesh(meshPath, mesh);
     }
@@ -54,14 +60,10 @@ public class Shifter {
      */
     public static void yTranslation(final String meshPath, final int shift)
             throws IOException {
-        final List mesh = ObjReader.readMesh(meshPath);
-        for (int i = 0; i < mesh.size(); i++) {
-            String[] currentMesh = (String[]) mesh.get(i);
-            if (currentMesh[0].equals("v")) {
-                final float currentValue = Float.parseFloat(currentMesh[2]);
-                currentMesh[2] = Float.toString(currentValue + shift);
-                mesh.set(i, currentMesh);
-            }
+        final Mesh mesh = ObjReader.readMesh(meshPath);
+        for (Object object : mesh.vertices) {
+            final Vertex vertex = (Vertex) object;
+            vertex.x = vertex.y + shift;
         }
         ObjWriter.replaceMesh(meshPath, mesh);
     }
@@ -77,16 +79,11 @@ public class Shifter {
     public static void xYTranslation(final String meshPath, final int shiftX,
             final int shiftY)
             throws IOException {
-        final List mesh = ObjReader.readMesh(meshPath);
-        for (int i = 0; i < mesh.size(); i++) {
-            String[] currentMesh = (String[]) mesh.get(i);
-            if (currentMesh[0].equals("v")) {
-                float currentValue = Float.parseFloat(currentMesh[1]);
-                currentMesh[1] = Float.toString(currentValue + shiftX);
-                currentValue = Float.parseFloat(currentMesh[2]);
-                currentMesh[2] = Float.toString(currentValue + shiftY);
-                mesh.set(i, currentMesh);
-            }
+        final Mesh mesh = ObjReader.readMesh(meshPath);
+        for (Object object : mesh.vertices) {
+            final Vertex vertex = (Vertex) object;
+            vertex.x = vertex.x + shiftX;
+            vertex.x = vertex.y + shiftY;
         }
         ObjWriter.replaceMesh(meshPath, mesh);
     }

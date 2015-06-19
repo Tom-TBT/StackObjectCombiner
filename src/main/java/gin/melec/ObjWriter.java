@@ -29,26 +29,34 @@ import java.util.List;
  */
 public class ObjWriter {
 
+    private ObjWriter() {
+    }
+
+    public static ObjWriter getInstance() {
+        return ObjWriterHolder.INSTANCE;
+    }
+
+    private static class ObjWriterHolder {
+        private static final ObjWriter INSTANCE = new ObjWriter();
+    }
+
     /**
      * Replace the given mesh by the new mesh contained in the array.
      * @param meshPath , the path of the old mesh.
      * @param mesh , the array containing the new mesh.
      * @throws IOException , thrown by the writer.
      */
-    public static void replaceMesh(final String meshPath, final List mesh)
+    public static void replaceMesh(final String meshPath, final Mesh mesh)
             throws IOException {
         final FileWriter fiW = new FileWriter(meshPath);
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
 
-        for (Object mesh1 : mesh) {
-            final String[] content = (String[]) mesh1;
-            String line = "";
-            for (String word : content) {
-                line += word + " ";
-            }
-            line += "\n";
-            prW.write(line);
+        for (Object element : mesh.vertices) {
+            prW.write(element.toString() + "\n");
+        }
+        for (Object element : mesh.faces) {
+            prW.write(element.toString() + "\n");
         }
         prW.close();
     }

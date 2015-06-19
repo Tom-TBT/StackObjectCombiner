@@ -88,13 +88,10 @@ public class Scene9Part extends Scene {
      * @param rightSplit , the coordonate(x) of the right vertical split.
      * @param upperSplit , the coordonate(y) of the upper horizontal split.
      * @param lowerSplit , the coordonate(y) of the upper horizontal split.
-     * @param width , the width of the scene.
-     * @param height , the height of the scene.
-     * @param depth , the depth of the scene.
      */
-    public Scene9Part(String pathname, int leftSplit, int rightSplit,
-            int upperSplit, int lowerSplit, int width, int height, int depth){
-        super(pathname, width, height, depth);
+    public Scene9Part(final String pathname, final int leftSplit,
+            final int rightSplit, final int upperSplit, final int lowerSplit) {
+        super(pathname);
 
         this.leftSplit = leftSplit;
         this.rightSplit = rightSplit;
@@ -160,68 +157,175 @@ public class Scene9Part extends Scene {
     }
 
     @Override
-    public void shiftMeshes() {
+    void shiftMeshes() {
+        final String dirPath = this.workingDirectory + "/";
         // The upperLeftMeshes are not shifted because they are already in place
         for (Object upperMiddleMeshe : this.upperMiddleMeshes) {
             try {
-                Shifter.xTranslation(this.workingDirectory + "/" + (String)
-                        upperMiddleMeshe, leftSplit);
+                Shifter.xTranslation(dirPath + (String) upperMiddleMeshe,
+                        leftSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
         }
         for (Object upperRightMeshe : this.upperRightMeshes) {
             try {
-                Shifter.xTranslation(this.workingDirectory + "/" + (String)
-                        upperRightMeshe, rightSplit);
+                Shifter.xTranslation(dirPath + (String) upperRightMeshe,
+                        rightSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
         }
         for (Object leftMeshe : this.leftMeshes) {
             try {
-                Shifter.yTranslation(this.workingDirectory + "/" + (String)
-                        leftMeshe, upperSplit);
+                Shifter.yTranslation(dirPath + (String) leftMeshe, upperSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
         }
         for (Object middleMeshe : this.middleMeshes) {
             try {
-                Shifter.xYTranslation(this.workingDirectory + "/" + (String)
-                        middleMeshe, leftSplit, upperSplit);
+                Shifter.xYTranslation(dirPath + (String) middleMeshe, leftSplit,
+                        upperSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
         }
         for (Object rightMeshe : this.rightMeshes) {
             try {
-                Shifter.xYTranslation(this.workingDirectory + "/" + (String)
-                        rightMeshe, rightSplit, upperSplit);
+                Shifter.xYTranslation(dirPath + (String) rightMeshe, rightSplit,
+                        upperSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
         }
         for (Object lowerLeftMeshe : this.lowerLeftMeshes) {
             try {
-                Shifter.yTranslation(this.workingDirectory + "/" + (String)
-                        lowerLeftMeshe, lowerSplit);
+                Shifter.yTranslation(dirPath + (String) lowerLeftMeshe,
+                        lowerSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
         }
         for (Object lowerMiddleMeshe : this.lowerMiddleMeshes) {
             try {
-                Shifter.xYTranslation(this.workingDirectory + "/" + (String)
-                        lowerMiddleMeshe, leftSplit, lowerSplit);
+                Shifter.xYTranslation(dirPath + (String) lowerMiddleMeshe,
+                        leftSplit, lowerSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
         }
         for (Object lowerRightMeshe : this.lowerRightMeshes) {
             try {
-                Shifter.xYTranslation(this.workingDirectory + "/" + (String)
-                        lowerRightMeshe, rightSplit, lowerSplit);
+                Shifter.xYTranslation(dirPath + (String) lowerRightMeshe,
+                        rightSplit, lowerSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+    }
+
+    @Override
+    void createLimit() {
+        final String dirPath = this.workingDirectory + "/";
+        for (Object upperLeftMeshe : this.upperLeftMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) upperLeftMeshe,
+                        leftSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) upperLeftMeshe,
+                        upperSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+        for (Object upperMiddleMeshe : this.upperMiddleMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) upperMiddleMeshe,
+                        leftSplit);
+                Limiter.findVerticalBorder(dirPath + (String) upperMiddleMeshe,
+                        rightSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) upperMiddleMeshe,
+                        upperSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+        for (Object upperRightMeshe : this.upperRightMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) upperRightMeshe,
+                        rightSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) upperRightMeshe,
+                        upperSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+        for (Object leftMeshe : this.leftMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) leftMeshe,
+                        leftSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) leftMeshe,
+                        lowerSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) leftMeshe,
+                        upperSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+        for (Object middleMeshe : this.middleMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) middleMeshe,
+                        leftSplit);
+                Limiter.findVerticalBorder(dirPath + (String) middleMeshe,
+                        rightSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) middleMeshe,
+                        lowerSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) middleMeshe,
+                        upperSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+        for (Object rightMeshe : this.rightMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) rightMeshe,
+                        rightSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) rightMeshe,
+                        lowerSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) rightMeshe,
+                        upperSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+        for (Object lowerLeftMeshe : this.lowerLeftMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) lowerLeftMeshe,
+                        leftSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) lowerLeftMeshe,
+                        lowerSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+        for (Object lowerMiddleMeshe : this.lowerMiddleMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) lowerMiddleMeshe,
+                        rightSplit);
+                Limiter.findVerticalBorder(dirPath + (String) lowerMiddleMeshe,
+                        leftSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) lowerMiddleMeshe,
+                        lowerSplit);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+        }
+        for (Object lowerRightMeshe : this.lowerRightMeshes) {
+            try {
+                Limiter.findVerticalBorder(dirPath + (String) lowerRightMeshe,
+                        rightSplit);
+                Limiter.findHorizontalBorder(dirPath + (String) lowerRightMeshe,
+                        lowerSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }

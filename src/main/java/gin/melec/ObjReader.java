@@ -18,6 +18,7 @@ package gin.melec;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -33,19 +34,100 @@ import java.util.List;
  */
 public class ObjReader {
 
-    public static List readMesh(final String meshName)
-            throws IOException {
+    private ObjReader() {
+    }
+
+    public static ObjReader getInstance() {
+        return ObjReaderHolder.INSTANCE;
+    }
+
+    private static class ObjReaderHolder {
+        private static final ObjReader INSTANCE = new ObjReader();
+    }
+
+    /**
+     * The variation of the position to the border allowed.
+     */
+    private static int DELTA_LIMIT = 2;
+
+    public static Mesh readMesh(final String meshName) throws IOException{
         final InputStream ips = new FileInputStream(meshName);
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);
 
         String currentLine;
-        final ArrayList meshes = new ArrayList();
+        String[] splitedLine;
+        int id = 1;
+        final Mesh mesh = new Mesh();
         while ((currentLine = buR.readLine()) != null) {
-            meshes.add(currentLine.split(" "));
+            splitedLine = currentLine.split(" ");
+            if (splitedLine[0].equals("v")) {
+                mesh.addVertex(new Vertex(id, Float.parseFloat(splitedLine[1]),
+                        Float.parseFloat(splitedLine[2]),
+                        Float.parseFloat(splitedLine[3])));
+                id++;
+            }
+            else if (splitedLine[0].equals("f")) {
+                mesh.addFace(new Face(Integer.parseInt(splitedLine[1]),
+                        Integer.parseInt(splitedLine[2]),
+                        Integer.parseInt(splitedLine[3])));
+            }
         }
         buR.close();
-        return meshes;
+        return mesh;
+    }
+
+    public static Mesh readBorderMesh(final String meshName,
+            final int borderPos, final int orientation) throws IOException {
+        final InputStream ips = new FileInputStream(meshName);
+        final InputStreamReader ipsr = new InputStreamReader(ips);
+        final BufferedReader buR = new BufferedReader(ipsr);
+
+        String currentLine;
+        String[] splitedLine;
+        int id = 1;
+        final Mesh mesh = new Mesh();
+        while ((currentLine = buR.readLine()) != null) {
+            splitedLine = currentLine.split(" ");
+            if (splitedLine[0].equals("v")) {
+                if (Float.parseFloat(splitedLine[orientation]) < borderPos + DELTA_LIMIT
+                        && Float.parseFloat(splitedLine[orientation])
+                        > borderPos - DELTA_LIMIT) {
+                    mesh.addVertex(new Vertex(id,
+                            Float.parseFloat(splitedLine[1]),
+                            Float.parseFloat(splitedLine[2]),
+                            Float.parseFloat(splitedLine[3])));
+                }
+                id++;
+            }
+            else if (splitedLine[0].equals("f")) {
+                final int vertexId1 = Integer.parseInt(splitedLine[1]);
+                final int vertexId2 = Integer.parseInt(splitedLine[3]);
+                final int vertexId3 = Integer.parseInt(splitedLine[3]);
+
+                if (mesh.vertices.isEmpty()) {
+                    break;
+                }
+                Vertex firstVertex = (Vertex) mesh.vertices.get(0);
+
+                // If one vertexId can be in the list of vertex
+                if ( vertexId1 >= firstVertex.id || vertexId2 >= firstVertex.id ||
+                        vertexId3 >= firstVertex.id) {
+                    for (Object object : mesh.vertices) {
+                        final Vertex currentVertex = (Vertex) object;
+                        if (vertexId1 == currentVertex.id
+                                || vertexId2 == currentVertex.id
+                                || vertexId3 == currentVertex.id) {
+                            mesh.addFace(new Face(vertexId1,
+                                    vertexId2, vertexId3));
+                        }
+                    }
+                }
+
+            }
+        }
+        buR.close();
+        return mesh;
     }
 
 }

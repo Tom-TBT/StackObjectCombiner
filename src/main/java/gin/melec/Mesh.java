@@ -16,6 +16,9 @@
  */
 package gin.melec;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Tom Boissonnet
@@ -23,4 +26,29 @@ package gin.melec;
  */
 public class Mesh {
 
+    List vertices;
+
+    List faces;
+
+
+    public Mesh() {
+        this.faces = new ArrayList<Face>();
+        this.vertices = new ArrayList<Vertex>();
+    }
+
+    /**
+     * Add a vertex to the mesh.
+     * @param vertex , the vertex to add
+     */
+    public void addVertex(final Vertex vertex) {
+        this.vertices.add(vertex);
+    }
+
+    /**
+     * Add a face to the mesh.
+     * @param face , the face to add
+     */
+    public void addFace(final Face face) {
+        this.faces.add(face);
+    }
 }

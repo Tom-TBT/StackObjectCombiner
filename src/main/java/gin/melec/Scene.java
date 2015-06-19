@@ -26,34 +26,66 @@ import java.io.File;
 public abstract class Scene {
 
     /**
+     * Code the upper part of the left split.
+     */
+    protected char UP_LEFT_SPLIT = '0';
+    /**
+     * Code the left part of the upper split.
+     */
+    protected char LEFT_UPPER_SPLIT = '1';
+    /**
+     * Code the middle part of the upper split.
+     */
+    protected char MIDDLE_UPPER_SPLIT = '2';
+    /**
+     * Code the middle part of the left split.
+     */
+    protected char MIDDLE_LEFT_SPLIT = '3';
+    /**
+     * Code the upper part of the right split.
+     */
+    protected char UPPER_RIGHT_SPLIT = '4';
+    /**
+     * Code the right part of the upper split.
+     */
+    protected char RIGHT_UPPER_SPLIT = '5';
+    /**
+     * Code the middle part of the right split.
+     */
+    protected char MIDDLE_RIGHT_SPLIT = '6';
+    /**
+     * Code the left part of the lower split.
+     */
+    protected char LEFT_LOWER_SPLIT = '7';
+    /**
+     * Code the middle part of the lower split.
+     */
+    protected char MIDDLE_LOWER_SPLIT = '8';
+    /**
+     * Code the right part of the lower split.
+     */
+    protected char RIGHT_LOWER_SPLIT = '9';
+    /**
+     * Code the lower part of the left split.
+     */
+    protected char LOWER_LEFT_SPLIT = 'A';
+    /**
+     * Code the lower part of the right split.
+     */
+    protected char LOWER_RIGHT_SPLIT = 'B';
+
+    /**
      * The scene concern only one directory.
      */
     protected File workingDirectory;
 
-    /**
-     * The width of the scene.
-     */
-    protected int width;
-
-    /**
-     * The height of the scene.
-     */
-    protected int height;
-
-    /**
-     * The depth of the scene.
-     */
-    protected int depth;
 
     /**
      * Build a scene by opening the given directory and list all the file in it.
      * @param pathname , the pathname of the file.
      */
-    public Scene(final String pathname, int width, int height, int depth) {
+    public Scene(final String pathname) {
         this.workingDirectory = new File(pathname);
-        this.width = width;
-        this.height = height;
-        this.depth = depth;
     }
 
     /**
@@ -65,33 +97,14 @@ public abstract class Scene {
     }
 
     /**
-     * Getter for the width of the scene.
-     * @return the width of the scene.
-     */
-    public final int getWidth() {
-        return width;
-    }
-
-    /**
-     * Getter for the height of the scene.
-     * @return the height of the scene.
-     */
-    public final int getHeight() {
-        return height;
-    }
-
-    /**
-     * Getter for the depth of the scene.
-     * @return the depth of the scene.
-     */
-    public final int getDepth() {
-        return depth;
-    }
-
-    /**
      * Method called to shift the meshes of the scene.
      */
-    public abstract void shiftMeshes();
+    abstract void shiftMeshes();
+
+    /**
+     * Create for each object separated a list of the limit vertex.
+     */
+    abstract void createLimit();
 
 
 

@@ -23,4 +23,38 @@ package gin.melec;
  */
 public class Face {
 
+    /**
+     * The id of the first vertex of this face.
+     */
+    int idVertex1;
+
+    /**
+     * The id of the second vertex of this face.
+     */
+    int idVertex2;
+
+    /**
+     * The id of the third vertex of this face.
+     */
+    int idVertex3;
+
+    /**
+     * Public constructor of a face, taking id of three vertex.
+     * @param idVertex1
+     * @param idVertex2
+     * @param idVertex3
+     */
+    public Face (final int idVertex1, final int idVertex2, final int idVertex3) {
+        this.idVertex1 = idVertex1;
+        this.idVertex2 = idVertex2;
+        this.idVertex3 = idVertex3;
+    }
+
+    @Override
+    public String toString() {
+        return "f" + " " + idVertex1 + " " + idVertex2 + " " + idVertex3;
+    }
+
+
+
 }

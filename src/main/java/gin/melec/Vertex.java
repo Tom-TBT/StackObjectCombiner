@@ -23,4 +23,53 @@ package gin.melec;
  */
 public class Vertex {
 
+    /**
+     * The id number of the vertex.
+     */
+    int id;
+    /**
+     * The x coordonate of the vertex.
+     */
+    float x;
+
+    /**
+     * The y coordonate of the vertex.
+     */
+    float y;
+
+    /**
+     * The z coordonate of the vertex.
+     */
+    float z;
+
+    /**
+     * The previous vertex on the edge of the object.
+     */
+    Vertex previousVertex;
+
+    /**
+     * The next vertex on the edge of the object.
+     */
+    Vertex nextVertex;
+
+    /**
+     * Public constructor of a vertex.
+     * @param x , x coordonate for the vertex.
+     * @param y , y coordonate for the vertex.
+     * @param z , z coordonate for the vertex.
+     */
+    public Vertex(final int id, final float x, final float y, final float z) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    @Override
+    public String toString() {
+        return "v " + this.x + " " + this.y + " " + this.z;
+    }
+
+
+
 }
