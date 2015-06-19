@@ -26,55 +26,6 @@ import java.io.File;
 public abstract class Scene {
 
     /**
-     * Code the upper part of the left split.
-     */
-    protected char UP_LEFT_SPLIT = '0';
-    /**
-     * Code the left part of the upper split.
-     */
-    protected char LEFT_UPPER_SPLIT = '1';
-    /**
-     * Code the middle part of the upper split.
-     */
-    protected char MIDDLE_UPPER_SPLIT = '2';
-    /**
-     * Code the middle part of the left split.
-     */
-    protected char MIDDLE_LEFT_SPLIT = '3';
-    /**
-     * Code the upper part of the right split.
-     */
-    protected char UPPER_RIGHT_SPLIT = '4';
-    /**
-     * Code the right part of the upper split.
-     */
-    protected char RIGHT_UPPER_SPLIT = '5';
-    /**
-     * Code the middle part of the right split.
-     */
-    protected char MIDDLE_RIGHT_SPLIT = '6';
-    /**
-     * Code the left part of the lower split.
-     */
-    protected char LEFT_LOWER_SPLIT = '7';
-    /**
-     * Code the middle part of the lower split.
-     */
-    protected char MIDDLE_LOWER_SPLIT = '8';
-    /**
-     * Code the right part of the lower split.
-     */
-    protected char RIGHT_LOWER_SPLIT = '9';
-    /**
-     * Code the lower part of the left split.
-     */
-    protected char LOWER_LEFT_SPLIT = 'A';
-    /**
-     * Code the lower part of the right split.
-     */
-    protected char LOWER_RIGHT_SPLIT = 'B';
-
-    /**
      * The scene concern only one directory.
      */
     protected File workingDirectory;
@@ -105,6 +56,11 @@ public abstract class Scene {
      * Create for each object separated a list of the limit vertex.
      */
     abstract void createLimit();
+
+    /**
+     * List and put in the appropriate Array the names of the files.
+     */
+    public abstract void sortFiles();
 
 
 

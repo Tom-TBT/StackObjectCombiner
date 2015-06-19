@@ -31,15 +31,15 @@ public class Scene2Part extends Scene{
     /**
      * The meshes in the upper left corner of the stack.
      */
-    private List upperLeftMeshes;
+    protected List upperLeftMeshes;
     /**
      * The meshes in the upper middle part of the stack.
      */
-    private List upperMiddleMeshes;
+    protected List upperMiddleMeshes;
     /**
      * The coordonate (x) of the left split.
      */
-    private int leftSplit;
+    protected int leftSplit;
 
     /**
      * Constructor for a scene divide in 9 parts.
@@ -53,25 +53,22 @@ public class Scene2Part extends Scene{
 
         this.upperLeftMeshes = new ArrayList();
         this.upperMiddleMeshes = new ArrayList();
-
-        this.sortFiles(this.workingDirectory.list());
     }
 
     /**
      * Class the file in the list where they belong to.
-     * @param fileList , the list of the file to class.
      */
-    private void sortFiles(final String[] fileList) {
-        for (String fileList1 : fileList) {
+    public void sortFiles() {
+        for (String fileList : this.workingDirectory.list()) {
         /* The position of the object is coded by a capital letter and
             an underscore.*/
-            if (fileList1.charAt(1) == '_') {
-                switch (fileList1.charAt(0)) {
+            if (fileList.charAt(1) == '_') {
+                switch (fileList.charAt(0)) {
                     case 'A':
-                        this.upperLeftMeshes.add(fileList1);
+                        this.upperLeftMeshes.add(fileList);
                         break;
                     case 'B':
-                        this.upperMiddleMeshes.add(fileList1);
+                        this.upperMiddleMeshes.add(fileList);
                         break;
                     default: // The mesh is not supported
                         break;
@@ -97,16 +94,15 @@ public class Scene2Part extends Scene{
     @Override
     void createLimit() {
         final String dirPath = this.workingDirectory + "/";
-        for (int i = 0; i < upperLeftMeshes.size(); i++) {
-            final Object upperLeftMeshe = upperLeftMeshes.get(i);
+        for (Object upperLeftMeshe : upperLeftMeshes) {
             try {
-                Limiter.findVerticalBorder(dirPath + i + "A" + "0" + (String) upperLeftMeshe,
+                Limiter.findVerticalBorder(dirPath + (String) upperLeftMeshe,
                         leftSplit);
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
         }
-        for (Object upperMiddleMeshe : this.upperMiddleMeshes) {
+        for (Object upperMiddleMeshe : upperMiddleMeshes) {
             try {
                 Limiter.findVerticalBorder(dirPath + (String) upperMiddleMeshe,
                         leftSplit);

@@ -52,12 +52,15 @@ public class ObjWriter {
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
 
+        // Better than a toString function in Mesh, because of the memory this
+        // will use.
         for (Object element : mesh.vertices) {
             prW.write(element.toString() + "\n");
         }
         for (Object element : mesh.faces) {
             prW.write(element.toString() + "\n");
         }
+
         prW.close();
     }
 

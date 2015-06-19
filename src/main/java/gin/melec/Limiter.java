@@ -17,6 +17,8 @@
 package gin.melec;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -34,6 +36,55 @@ public class Limiter {
      */
     private static final int HORIZONTAL_LIMIT = 2;
 
+        /**
+     * Code the upper part of the left split.
+     */
+    private char UPPER_LEFT_SPLIT = '0';
+    /**
+     * Code the left part of the upper split.
+     */
+    private char LEFT_UPPER_SPLIT = '1';
+    /**
+     * Code the middle part of the upper split.
+     */
+    private char MIDDLE_UPPER_SPLIT = '2';
+    /**
+     * Code the middle part of the left split.
+     */
+    private char MIDDLE_LEFT_SPLIT = '3';
+    /**
+     * Code the upper part of the right split.
+     */
+    private char UPPER_RIGHT_SPLIT = '4';
+    /**
+     * Code the right part of the upper split.
+     */
+    private char RIGHT_UPPER_SPLIT = '5';
+    /**
+     * Code the middle part of the right split.
+     */
+    private char MIDDLE_RIGHT_SPLIT = '6';
+    /**
+     * Code the left part of the lower split.
+     */
+    private char LEFT_LOWER_SPLIT = '7';
+    /**
+     * Code the middle part of the lower split.
+     */
+    private char MIDDLE_LOWER_SPLIT = '8';
+    /**
+     * Code the right part of the lower split.
+     */
+    private char RIGHT_LOWER_SPLIT = '9';
+    /**
+     * Code the lower part of the left split.
+     */
+    private char LOWER_LEFT_SPLIT = 'A';
+    /**
+     * Code the lower part of the right split.
+     */
+    private char LOWER_RIGHT_SPLIT = 'B';
+
     private Limiter() {
     }
 
@@ -46,19 +97,48 @@ public class Limiter {
         private static final Limiter INSTANCE = new Limiter();
     }
 
+    /**
+     * For a given object, find his vertex close to the split postition, in X.
+     * @param meshPath , the path of the given object.
+     * @param splitPosition , the position of the split
+     * @throws IOException
+     */
     public static void findVerticalBorder(final String meshPath,
-            final int borderPosition) throws IOException {
-        final Mesh mesh = ObjReader.readBorderMesh(meshPath, borderPosition,
+            final int splitPosition) throws IOException {
+        final Mesh mesh = ObjReader.readBorderMesh(meshPath, splitPosition,
                 VERTICAL_LIMIT);
-        ObjWriter.replaceMesh(meshPath+"Bordered", mesh);
+        makeVerticalBorder(mesh, splitPosition);
     }
 
+    /**
+     * For a given object, find his vertex close to the split postition, in Y.
+     * @param meshPath , the path of the given object.
+     * @param splitPosition , the position of the split
+     * @throws IOException
+     */
     public static void findHorizontalBorder(final String meshPath,
-            final int borderPosition) throws IOException {
-        final Mesh mesh = ObjReader.readBorderMesh(meshPath, borderPosition,
+            final int splitPosition) throws IOException {
+        final Mesh mesh = ObjReader.readBorderMesh(meshPath, splitPosition,
                 HORIZONTAL_LIMIT);
         ObjWriter.replaceMesh(meshPath+"Bordered", mesh);
     }
 
 
+    public static void makeVerticalBorder(final Mesh mesh ,
+            final int splitPosition) {
+        List borderList = new ArrayList();
+        Border currentBorder;
+        while (!mesh.vertices.isEmpty()) {
+            Vertex currentVertex = mesh.takeCloserVertexX(splitPosition);
+            currentBorder = new Border(currentVertex);
+            while (currentVertex != null) {
+                currentVertex = currentBorder.addNextVertex(
+                        currentVertex.findNextX(splitPosition, mesh));
+            }
+            borderList.add(currentBorder);
+
+            // Revoir le moyen d'arret (vider la liste, OK, mais le faire autrement !
+            // Beaucoup de test à faire là dessus, on est loin du compte !!
+        }
+    }
 }

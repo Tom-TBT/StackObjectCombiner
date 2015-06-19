@@ -107,47 +107,41 @@ public class Scene9Part extends Scene {
         this.lowerLeftMeshes = new ArrayList();
         this.lowerMiddleMeshes = new ArrayList();
         this.lowerRightMeshes = new ArrayList();
-
-        this.sortFiles(this.workingDirectory.list());
-
     }
 
-    /**
-     * Class the file in the list where they belong to.
-     * @param fileList , the list of the file to class.
-     */
-    private void sortFiles(final String[] fileList) {
-        for (String fileList1 : fileList) {
+    @Override
+    public void sortFiles() {
+        for (String fileList : this.workingDirectory.list()) {
         /* The position of the object is coded by a capital letter and
             an underscore.*/
-            if (fileList1.charAt(1) == '_') {
-                switch (fileList1.charAt(0)) {
+            if (fileList.charAt(1) == '_') {
+                switch (fileList.charAt(0)) {
                     case 'A':
-                        this.upperLeftMeshes.add(fileList1);
+                        this.upperLeftMeshes.add(fileList);
                         break;
                     case 'B':
-                        this.upperMiddleMeshes.add(fileList1);
-                        break;
-                    case 'C':
-                        this.upperRightMeshes.add(fileList1);
-                        break;
-                    case 'D':
-                        this.leftMeshes.add(fileList1);
+                        this.upperMiddleMeshes.add(fileList);
                         break;
                     case 'E':
-                        this.middleMeshes.add(fileList1);
+                        this.upperRightMeshes.add(fileList);
+                        break;
+                    case 'C':
+                        this.leftMeshes.add(fileList);
+                        break;
+                    case 'D':
+                        this.middleMeshes.add(fileList);
                         break;
                     case 'F':
-                        this.rightMeshes.add(fileList1);
+                        this.rightMeshes.add(fileList);
                         break;
                     case 'G':
-                        this.lowerLeftMeshes.add(fileList1);
+                        this.lowerLeftMeshes.add(fileList);
                         break;
                     case 'H':
-                        this.lowerMiddleMeshes.add(fileList1);
+                        this.lowerMiddleMeshes.add(fileList);
                         break;
                     case 'I':
-                        this.lowerRightMeshes.add(fileList1);
+                        this.lowerRightMeshes.add(fileList);
                         break;
                     default: // The mesh is not supported
                         break;

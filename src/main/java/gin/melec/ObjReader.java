@@ -111,8 +111,8 @@ public class ObjReader {
                 Vertex firstVertex = (Vertex) mesh.vertices.get(0);
 
                 // If one vertexId can be in the list of vertex
-                if ( vertexId1 >= firstVertex.id || vertexId2 >= firstVertex.id ||
-                        vertexId3 >= firstVertex.id) {
+                if (vertexId1 >= firstVertex.id || vertexId2 >= firstVertex.id
+                        || vertexId3 >= firstVertex.id) {
                     for (Object object : mesh.vertices) {
                         final Vertex currentVertex = (Vertex) object;
                         if (vertexId1 == currentVertex.id

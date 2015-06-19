@@ -51,4 +51,17 @@ public class Mesh {
     public void addFace(final Face face) {
         this.faces.add(face);
     }
+
+    public Vertex takeCloserVertexX(int splitPosition) {
+        Vertex vertex = (Vertex)this.vertices.get(0);
+        for(Object element : this.vertices) {
+            Vertex currentVert = (Vertex) element;
+            if (vertex.distanceToBorderX(splitPosition)
+                    > currentVert.distanceToBorderX(splitPosition)) {
+                vertex = currentVert;
+            }
+        }
+        this.vertices.remove(vertex);
+        return vertex;
+    }
 }
