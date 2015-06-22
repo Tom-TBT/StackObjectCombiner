@@ -61,7 +61,29 @@ public class Mesh {
                 vertex = currentVert;
             }
         }
-        this.vertices.remove(vertex);
         return vertex;
+    }
+
+    /**
+     * Add to the neighborList of each vertex, the vertex that are connected to
+     * it. It relies now to the fact that in the mesh, id are originally ordered
+     * .
+     */
+    final void doNeighborhood() {
+        for (Object element : this.faces) {
+            final Face face = (Face) element;
+            final Vertex vertex1 = (Vertex)
+                    this.vertices.get(face.idVertex1 - 1);
+            final Vertex vertex2 = (Vertex)
+                    this.vertices.get(face.idVertex2 - 1);
+            final Vertex vertex3 = (Vertex)
+                    this.vertices.get(face.idVertex3 - 1);
+            vertex1.neighbours.add(vertex2);
+            vertex1.neighbours.add(vertex3);
+            vertex2.neighbours.add(vertex1);
+            vertex2.neighbours.add(vertex3);
+            vertex3.neighbours.add(vertex1);
+            vertex3.neighbours.add(vertex2);
+        }
     }
 }

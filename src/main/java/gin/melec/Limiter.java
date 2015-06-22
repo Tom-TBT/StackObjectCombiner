@@ -36,7 +36,7 @@ public class Limiter {
      */
     private static final int HORIZONTAL_LIMIT = 2;
 
-        /**
+    /**
      * Code the upper part of the left split.
      */
     private char UPPER_LEFT_SPLIT = '0';
@@ -85,6 +85,9 @@ public class Limiter {
      */
     private char LOWER_RIGHT_SPLIT = 'B';
 
+    /**
+     * Private constructor to let this class utilitary.
+     */
     private Limiter() {
     }
 

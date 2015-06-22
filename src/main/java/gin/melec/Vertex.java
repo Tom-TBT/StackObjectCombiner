@@ -16,7 +16,9 @@
  */
 package gin.melec;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -57,7 +59,7 @@ public class Vertex {
     /**
      * The list of the neighbours of this vertex.
      */
-    List neighbours;
+    Set neighbours;
 
     /**
      * Public constructor of a vertex.
@@ -74,6 +76,7 @@ public class Vertex {
         this.z = z;
 
         this.previousVertex = null;
+        this.neighbours = new HashSet();
     }
 
     /**
@@ -141,27 +144,59 @@ public class Vertex {
         return Math.abs(this.y - ver.y);
     }
 
+    /**
+     * Distance of this vertex to the border (vertical border).
+     * @param splitPosition , the position of the border (x).
+     * @return  , the distance between the vertex and the border.
+     */
     public float distanceToBorderX(int splitPosition) {
         return Math.abs(this.x - splitPosition);
     }
 
+    /**
+     * Distance of this vertex to the border (horizontal border).
+     * @param splitPosition , the position of the border (y).
+     * @return  , the distance between the vertex and the border.
+     */
     public float distanceToBorderY(int splitPosition) {
         return Math.abs(this.y - splitPosition);
     }
 
-    public Vertex findNextX(int splitPosition, Mesh mesh) {
+    /**
+     * Find and return the next vertex composing the border of the mesh, in the
+     * x axis.
+     * @param splitPosition , the position of the border.
+     * @return , the next vertex composing the border.
+     */
+    public Vertex findNextX(int splitPosition) {
         Vertex nextVertex = null;
         for (Object element : this.neighbours) {
             Vertex candidate = (Vertex) element;
-            mesh.vertices.remove(candidate);
-            if (nextVertex != this.previousVertex && nextVertex.distanceOnX(this)
-                < nextVertex.distanceOnYZ(this)) {
-                if(nextVertex == null) {
-                    nextVertex = candidate;
-                }
-                else if (nextVertex.distanceToBorderX(splitPosition)
+            if(this.previousVertex == null) { // First vertex in the border
+                if(candidate.distanceOnX(this) < candidate.distanceOnYZ(this)) {
+                    // An higher distance on X could indicate that the candidate
+                    // is behind the border, and is not part of it
+                    // TODO Verify this is enough
+                    if(nextVertex == null) {
+                        nextVertex = candidate;
+                    }
+                    else if (nextVertex.distanceToBorderX(splitPosition)
                         > candidate.distanceToBorderX(splitPosition)) {
-                    nextVertex = candidate;
+                        nextVertex = candidate;
+                    }
+                }
+            }
+            else if(this.previousVertex != candidate) { // Not the first vertex.
+                // We can't go back.
+                if(candidate.distanceOnX(this) < candidate.distanceOnYZ(this)) {
+                    // Same tests.
+                    if(nextVertex == null) {
+                        nextVertex = candidate;
+                    }
+                    else if (nextVertex.distanceToBorderX(splitPosition)
+                        > candidate.distanceToBorderX(splitPosition)) {
+                        nextVertex = candidate;
+                    }
                 }
             }
         }
@@ -172,6 +207,13 @@ public class Vertex {
         return nextVertex;
     }
 
+    /**
+     * Find and return the next vertex composing the border of the mesh, in the
+     * y axis.
+     * @param splitPosition , the position of the border.
+     * @param mesh , the mesh to seek limit for.
+     * @return , the next vertex composing the border.
+     */
     public Vertex findNextY(int splitPosition, Mesh mesh) {
         Vertex nextVertex = null;
         for (Object element : this.neighbours) {

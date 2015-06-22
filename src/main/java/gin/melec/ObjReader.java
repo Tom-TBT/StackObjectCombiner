@@ -50,7 +50,13 @@ public class ObjReader {
      */
     private static int DELTA_LIMIT = 2;
 
-    public static Mesh readMesh(final String meshName) throws IOException{
+    /**
+     * Read a .obj file and make from it a mesh (vertices + faces).
+     * @param meshName , the name of the file .obj
+     * @return , a mesh made from the file.
+     * @throws IOException , when their is an error with the lecture of the file
+     */
+    public static Mesh readMesh(final String meshName) throws IOException {
         final InputStream ips = new FileInputStream(meshName);
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);

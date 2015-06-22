@@ -32,6 +32,12 @@ public class Border {
 
     List vertexSequence;
 
+    int length;
+
+    int centre; // TODO change center to x/y/z coordonnates system.
+
+    boolean isCircular;
+
     public Border(Vertex firstVertex) {
         this.firstVertex = firstVertex;
         this.vertexSequence = new ArrayList();
