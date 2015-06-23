@@ -48,7 +48,7 @@ public class ObjReader {
     /**
      * The variation of the position to the border allowed.
      */
-    private static int DELTA_LIMIT = 2;
+    private static int DELTA_LIMIT = 4;
 
     /**
      * Read a .obj file and make from it a mesh (vertices + faces).
@@ -108,7 +108,7 @@ public class ObjReader {
             }
             else if (splitedLine[0].equals("f")) {
                 final int vertexId1 = Integer.parseInt(splitedLine[1]);
-                final int vertexId2 = Integer.parseInt(splitedLine[3]);
+                final int vertexId2 = Integer.parseInt(splitedLine[2]);
                 final int vertexId3 = Integer.parseInt(splitedLine[3]);
 
                 if (mesh.vertices.isEmpty()) {
@@ -117,8 +117,8 @@ public class ObjReader {
                 Vertex firstVertex = (Vertex) mesh.vertices.get(0);
 
                 // If one vertexId can be in the list of vertex
-                if (vertexId1 >= firstVertex.id || vertexId2 >= firstVertex.id
-                        || vertexId3 >= firstVertex.id) {
+                //if (vertexId1 >= firstVertex.id || vertexId2 >= firstVertex.id
+                 //       || vertexId3 >= firstVertex.id) {
                     for (Object object : mesh.vertices) {
                         final Vertex currentVertex = (Vertex) object;
                         if (vertexId1 == currentVertex.id
@@ -128,7 +128,7 @@ public class ObjReader {
                                     vertexId2, vertexId3));
                         }
                     }
-                }
+                //}
 
             }
         }

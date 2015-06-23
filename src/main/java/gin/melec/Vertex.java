@@ -47,16 +47,6 @@ public class Vertex {
     float z;
 
     /**
-     * The previous vertex on the edge of the object.
-     */
-    Vertex previousVertex;
-
-    /**
-     * The next vertex on the edge of the object.
-     */
-    Vertex nextVertex;
-
-    /**
      * The list of the neighbours of this vertex.
      */
     Set neighbours;
@@ -75,7 +65,6 @@ public class Vertex {
         this.y = y;
         this.z = z;
 
-        this.previousVertex = null;
         this.neighbours = new HashSet();
     }
 
@@ -166,75 +155,84 @@ public class Vertex {
      * Find and return the next vertex composing the border of the mesh, in the
      * x axis.
      * @param splitPosition , the position of the border.
+     * @param mesh , the mesh of the vertex.
      * @return , the next vertex composing the border.
      */
-    public Vertex findNextX(int splitPosition) {
+    public final Vertex findNextX(final int splitPosition, final Mesh mesh) {
         Vertex nextVertex = null;
+        mesh.garbage.add(this);
+
+        boolean firstVertexPresent = false;
+        // Serve to detect if the border is circular, without "go back"
+
+        // The vertex is add to the garbage so he won't be part of the border
+        // more than once.
         for (Object element : this.neighbours) {
-            Vertex candidate = (Vertex) element;
-            if(this.previousVertex == null) { // First vertex in the border
-                if(candidate.distanceOnX(this) < candidate.distanceOnYZ(this)) {
-                    // An higher distance on X could indicate that the candidate
-                    // is behind the border, and is not part of it
-                    // TODO Verify this is enough
-                    if(nextVertex == null) {
-                        nextVertex = candidate;
+            final Vertex candidate = (Vertex) element;
+            if (!mesh.garbage.contains(candidate)) {
+                // Once a vertex is in the garbage, it means that he has already
+                // been checked and shouldn't be checked anymore.
+                // Exception for the first vertex, because he could be in the
+                // middle of a border.
+                if (this.equals(mesh.currentBorder.firstVertex)) {
+                    // First vertex in the border
+                    if (candidate.distanceOnX(this)*3
+                            < candidate.distanceOnYZ(this)) {
+                        // An higher distance on X could indicate that the
+                        // candidate is behind the border, and is not part of it
+                        // TODO Verify this is enough
+                        if (nextVertex == null) {
+                            // This is the first candidate to pass.
+                            nextVertex = candidate;
+                        }
+                        else if (nextVertex.distanceToBorderX(splitPosition)
+                            > candidate.distanceToBorderX(splitPosition)) {
+                            // Check if the new candidate is better than the
+                            // previous one.
+                            nextVertex = candidate;
+                        }
                     }
-                    else if (nextVertex.distanceToBorderX(splitPosition)
-                        > candidate.distanceToBorderX(splitPosition)) {
-                        nextVertex = candidate;
+                }
+                else { // Not the first vertex of the border.
+                    mesh.garbage.add(candidate);
+                    if (candidate.distanceOnX(this)*3
+                            < candidate.distanceOnYZ(this)) {
+                        // Same tests.
+                        if (nextVertex == null) {
+                            nextVertex = candidate;
+                        }
+                        else if (nextVertex.distanceToBorderX(splitPosition)
+                            > candidate.distanceToBorderX(splitPosition)) {
+                            nextVertex = candidate;
+                        }
                     }
                 }
             }
-            else if(this.previousVertex != candidate) { // Not the first vertex.
-                // We can't go back.
-                if(candidate.distanceOnX(this) < candidate.distanceOnYZ(this)) {
-                    // Same tests.
-                    if(nextVertex == null) {
-                        nextVertex = candidate;
-                    }
-                    else if (nextVertex.distanceToBorderX(splitPosition)
-                        > candidate.distanceToBorderX(splitPosition)) {
-                        nextVertex = candidate;
-                    }
-                }
+            else if (candidate.equals(mesh.currentBorder.firstVertex)) {
+                firstVertexPresent = true;
             }
         }
-        this.nextVertex = nextVertex;
-        if (nextVertex != null) {
-            nextVertex.previousVertex = this;
+        if (nextVertex == null && firstVertexPresent) {
+            // If no other vertex than the first of the border is present,
+            // it's a circle
+            nextVertex = mesh.currentBorder.firstVertex;
         }
         return nextVertex;
     }
 
     /**
-     * Find and return the next vertex composing the border of the mesh, in the
-     * y axis.
-     * @param splitPosition , the position of the border.
-     * @param mesh , the mesh to seek limit for.
-     * @return , the next vertex composing the border.
+     * Recursive function to add every neighbor and their neighbor
+     * to the garbage of the mesh the vertices belong to.
+     * @param garbage , the garbage where vertices are added.
      */
-    public Vertex findNextY(int splitPosition, Mesh mesh) {
-        Vertex nextVertex = null;
+    final void addNeighborToGarbage(final Set garbage) {
+        garbage.add(this);
         for (Object element : this.neighbours) {
-            Vertex candidate = (Vertex) element;
-            mesh.vertices.remove(candidate);
-            if (nextVertex != this.previousVertex && nextVertex.distanceOnY(this)
-                < nextVertex.distanceOnXZ(this)) {
-                if(nextVertex == null) {
-                    nextVertex = candidate;
-                }
-                else if (nextVertex.distanceToBorderY(splitPosition)
-                        > candidate.distanceToBorderY(splitPosition)) {
-                    nextVertex = candidate;
-                }
+            final Vertex neighbor = (Vertex) element;
+            if (!garbage.contains(neighbor)) {
+                neighbor.addNeighborToGarbage(garbage);
             }
         }
-        this.nextVertex = nextVertex;
-        if (nextVertex != null) {
-            nextVertex.previousVertex = this;
-        }
-        return nextVertex;
     }
 
 }

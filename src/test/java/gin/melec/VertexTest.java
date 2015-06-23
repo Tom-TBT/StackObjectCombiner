@@ -16,6 +16,8 @@
  */
 package gin.melec;
 
+import java.io.IOException;
+import java.util.Set;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -136,92 +138,29 @@ public class VertexTest {
      * Test of findNextX method, of class Vertex.
      */
     @org.junit.Test
-    public void testFindNextX() {
-
-        // Initialization of the mesh : 5 vertex for the border, 5 just behind
-        // and 4 other behind.
-
-        Vertex border1, border2, border3, border4, border5;
-        Vertex close1, close2, close3, close4, close5;
-        Vertex behind1, behind2, behind3, behind4;
-        border1 = new Vertex(1, 299.08f, 15, 64);
-        border2 = new Vertex(2, 299.52f, 12, 61);
-        border3 = new Vertex(3, 299.32f, 9, 64);
-        border4 = new Vertex(4, 299.18f, 6, 67);
-        border5 = new Vertex(5, 299.24f, 3, 71);
-        close1 = new Vertex(6, 298.70f, 14, 64);
-        close2 = new Vertex(7, 298.90f, 11.5f, 62);
-        close3 = new Vertex(8, 299.10f, 8.8f, 63); // Closer
-        close4 = new Vertex(9, 298.99f, 6, 66);
-        close5 = new Vertex(10, 299.10f, 3, 70);
-        behind1 = new Vertex(10, 298.10f, 13, 63);
-        behind2 = new Vertex(10, 298.05f, 12.5f, 61);
-        behind3 = new Vertex(10, 297.13f, 9, 65);
-        behind4 = new Vertex(10, 297.50f, 5, 69);
-
-        // Constructing the neighborhood.
-        border1.neighbours.add(border2); border1.neighbours.add(close1);
-        border2.neighbours.add(border1); border2.neighbours.add(close1);
-        border2.neighbours.add(border3); border2.neighbours.add(close2);
-        border3.neighbours.add(border2); border3.neighbours.add(border4);
-        border3.neighbours.add(close2); border3.neighbours.add(close3);
-        border4.neighbours.add(border3); border4.neighbours.add(border5);
-        border4.neighbours.add(close3); border4.neighbours.add(close4);
-        border4.neighbours.add(close5);
-        border5.neighbours.add(border4); border5.neighbours.add(close5);
-        close1.neighbours.add(border1); close1.neighbours.add(border2);
-        close1.neighbours.add(close2); close1.neighbours.add(behind1);
-        close2.neighbours.add(close1); close2.neighbours.add(close3);
-        close2.neighbours.add(border2); close2.neighbours.add(border3);
-        close2.neighbours.add(behind1); close2.neighbours.add(behind2);
-        close3.neighbours.add(close2); close3.neighbours.add(close4);
-        close3.neighbours.add(border3); close3.neighbours.add(border4);
-        close3.neighbours.add(behind2); close3.neighbours.add(behind3);
-        close4.neighbours.add(close3); close4.neighbours.add(close5);
-        close4.neighbours.add(border4); close4.neighbours.add(behind3);
-        close4.neighbours.add(behind4);
-        close5.neighbours.add(close4); close5.neighbours.add(border4);
-        close5.neighbours.add(border5); close5.neighbours.add(behind4);
-        behind1.neighbours.add(close1); behind1.neighbours.add(close2);
-        behind1.neighbours.add(behind2);
-        behind2.neighbours.add(behind1); behind2.neighbours.add(close2);
-        behind2.neighbours.add(close3); behind2.neighbours.add(behind3);
-        behind2.neighbours.add(close3); behind2.neighbours.add(close4);
-        behind2.neighbours.add(behind2); behind2.neighbours.add(behind4);
-        behind4.neighbours.add(close4); behind4.neighbours.add(close5);
-        behind4.neighbours.add(behind3);
+    public void testFindNextX() throws IOException {
 
         System.out.println("findNextX");
-        int splitPosition = 300;
+        int splitPosition = 291;
         // Test in the starting conditions : This is the first vertex, he have
         // no previousVertex. This vertex is on top.
-        Vertex instance = border1;
-        Vertex expResult = border2;
-        Vertex result = instance.findNextX(splitPosition);
-        assertEquals(expResult, result);
+        Mesh mesh = ObjReader.readMesh(
+                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj");
+        mesh.doNeighborhood();
+        mesh.newBorderX(splitPosition);
+        Vertex vertex = mesh.currentBorder.firstVertex;
+        // Normaly vertex is the vertex with id 1.
+        Vertex expResult;
+        // The next vertex is the one with id 2
+        boolean flag = true;
 
-        // Test in the starting conditions : This is the first vertex, he have
-        // no previousVertex. This vertex is on middle.
-        instance = border3;
-        expResult = border2;
-        result = instance.findNextX(splitPosition);
-        assertEquals(expResult, result);
+        for (int i = 1; i < 12; i++) {
+            expResult = (Vertex) mesh.vertices.get(i);
+            vertex = vertex.findNextX(splitPosition, mesh);
+            flag = flag && vertex.equals(expResult);
+        }
+        assertTrue(flag);
 
-        // Test in the routine. The vertex has a previousVertex.
-        border3.previousVertex = border2;
-        instance = border3;
-        expResult = border4;
-        result = instance.findNextX(splitPosition);
-        assertEquals(expResult, result);
-        border3.previousVertex = null;
-
-        // Test at the end. We have reach the end and their should be no next.
-        border5.previousVertex = border4;
-        instance = border5;
-        expResult = null;
-        result = instance.findNextX(splitPosition);
-        assertEquals(expResult, result);
-        border5.previousVertex = null;
     }
 
     /**
@@ -229,15 +168,25 @@ public class VertexTest {
      */
     @org.junit.Test
     public void testFindNextY() {
-        System.out.println("findNextY");
-        int splitPosition = 0;
-        Mesh mesh = null;
-        Vertex instance = null;
-        Vertex expResult = null;
-        Vertex result = instance.findNextY(splitPosition, mesh);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        // No test for the moment
+    }
+    /**
+     * Test of addNeighborToGarbage, of class Vertex.
+     * @throws java.io.IOException
+     */
+    @org.junit.Test
+    public void testAddNeighborToGarbage() throws IOException {
+        final Mesh mesh = ObjReader.readMesh(
+                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj");
+        mesh.doNeighborhood();
+        // One vertex is put in the garbage
+        mesh.garbage.add(mesh.vertices.get(0));
+        mesh.completeGarbage();
+
+        int expectedResult = 36;
+        int result = mesh.garbage.size();
+
+        assertEquals(expectedResult, result);
     }
 
 }

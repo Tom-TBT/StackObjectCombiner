@@ -17,6 +17,7 @@
 package gin.melec;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -26,28 +27,72 @@ import java.util.List;
  */
 public class Border {
 
+    /**
+     * The first vertex of the border's sequence.
+     */
     Vertex firstVertex;
 
+    /**
+     * The last vertex of the border's sequence. Can be equal to the first and
+     * so the border will be consider as a circle
+     */
     Vertex lastVertex;
 
+    /**
+     * The sequence of vertex forming the border.
+     */
     List vertexSequence;
 
-    int length;
+    /**
+     * The lenght of the border. Equals to the sum of all distances between
+     * vertices.
+     */
+    float lengthSum;
 
-    int centre; // TODO change center to x/y/z coordonnates system.
+    /**
+     * The lenght of the border between the first and the last vertex.
+     */
+    float lenght;
 
+    /**
+     * Coordonates of the centre.
+     */
+    float centre; // TODO change center to x/y/z coordonnates system.
+
+    /**
+     * This flag is up when the border form a circle.
+     */
     boolean isCircular;
 
-    public Border(Vertex firstVertex) {
+    /**
+     * Public constructor for the border.
+     * @param firstVertex , the first vertex of the border.
+     */
+    public Border(final Vertex firstVertex) {
         this.firstVertex = firstVertex;
-        this.vertexSequence = new ArrayList();
+        this.vertexSequence = new LinkedList();
         this.vertexSequence.add(firstVertex);
     }
 
-    public Vertex addNextVertex(Vertex vertex) {
+    /**
+     * Add the given vertex to the border.
+     * @param vertex , the vertex to add.
+     */
+    public final void addNextVertex(final Vertex vertex) {
         if (vertex != null) {
             this.vertexSequence.add(vertex);
         }
-        return vertex;
+        // TODO add change for the circular flag
+    }
+
+    /**
+     * Add the given vertex to the border, in first position.
+     * @param vertex , the vertex to add.
+     */
+    public final void addPreviousVertex(final Vertex vertex) {
+        if (vertex != null) {
+            this.vertexSequence.add(0, vertex);
+        }
+        // TODO add change for the circular flag
     }
 }

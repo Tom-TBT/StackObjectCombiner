@@ -129,19 +129,18 @@ public class Limiter {
 
     public static void makeVerticalBorder(final Mesh mesh ,
             final int splitPosition) {
-        List borderList = new ArrayList();
-        Border currentBorder;
-        while (!mesh.vertices.isEmpty()) {
-            Vertex currentVertex = mesh.takeCloserVertexX(splitPosition);
-            currentBorder = new Border(currentVertex);
+        // TODO traitement garbage, multi border,...  while (!mesh.vertices.isEmpty()) {
+            Vertex currentVertex = mesh.newBorderX(splitPosition);
             while (currentVertex != null) {
-                currentVertex = currentBorder.addNextVertex(
-                        currentVertex.findNextX(splitPosition, mesh));
+                currentVertex = currentVertex.findNextX(splitPosition, mesh);
+                mesh.currentBorder.addNextVertex(currentVertex);
             }
-            borderList.add(currentBorder);
-
-            // Revoir le moyen d'arret (vider la liste, OK, mais le faire autrement !
-            // Beaucoup de test à faire là dessus, on est loin du compte !!
-        }
+            currentVertex = mesh.currentBorder.firstVertex;
+            while (currentVertex != null) {
+                currentVertex = currentVertex.findNextX(splitPosition, mesh);
+                mesh.currentBorder.addPreviousVertex(currentVertex);
+            }
+            //Traitement garbage ...
+        //}
     }
 }

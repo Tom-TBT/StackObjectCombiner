@@ -64,15 +64,17 @@ public class MeshTest {
     public void testTakeCloserVertexX() throws IOException {
         System.out.println("takeCloserVertexX");
         int splitPosition = 291;
-        Mesh instance = ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/MeshTest_line.obj");
+        Mesh mesh = ObjReader.readMesh(
+                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj");
         int expVertices = 36;
         int expFaces = 44;
-        int result = instance.vertices.size();
+        int result = mesh.vertices.size();
         assertEquals(expVertices, result);
-        result = instance.faces.size();
+        result = mesh.faces.size();
         assertEquals(expFaces, result);
 
-        Vertex closerV = instance.takeCloserVertexX(splitPosition);
+        mesh.newBorderX(splitPosition);
+        Vertex closerV = mesh.currentBorder.firstVertex;
         int expResult = 1;
         result = closerV.id;
         assertEquals(expResult, result);
@@ -84,7 +86,8 @@ public class MeshTest {
     @Test
     public void doNeighborhood() throws IOException {
         System.out.println("doNeighborhood");
-        Mesh mesh = ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/MeshTest_line.obj");
+        Mesh mesh = ObjReader.readMesh(
+                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj");
         mesh.doNeighborhood();
         Vertex vertex = (Vertex) mesh.vertices.get(0);
         int result = vertex.neighbours.size();
