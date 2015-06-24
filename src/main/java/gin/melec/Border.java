@@ -33,10 +33,14 @@ public class Border {
     Vertex firstVertex;
 
     /**
-     * The last vertex of the border's sequence. Can be equal to the first and
-     * so the border will be consider as a circle
+     * The last vertex added to the border.
      */
-    Vertex lastVertex;
+    Vertex lastVertexAdded;
+
+    /**
+     * The last vertex added to the border.
+     */
+    Vertex scndLastVertexAdded;
 
     /**
      * The sequence of vertex forming the border.
@@ -70,8 +74,9 @@ public class Border {
      */
     public Border(final Vertex firstVertex) {
         this.firstVertex = firstVertex;
+        this.lastVertexAdded = null;
         this.vertexSequence = new LinkedList();
-        this.vertexSequence.add(firstVertex);
+        this.addNextVertex(firstVertex);
     }
 
     /**
@@ -81,6 +86,8 @@ public class Border {
     public final void addNextVertex(final Vertex vertex) {
         if (vertex != null) {
             this.vertexSequence.add(vertex);
+            scndLastVertexAdded = lastVertexAdded;
+            lastVertexAdded = vertex;
         }
         // TODO add change for the circular flag
     }
@@ -92,6 +99,8 @@ public class Border {
     public final void addPreviousVertex(final Vertex vertex) {
         if (vertex != null) {
             this.vertexSequence.add(0, vertex);
+            scndLastVertexAdded = lastVertexAdded;
+            lastVertexAdded = vertex;
         }
         // TODO add change for the circular flag
     }

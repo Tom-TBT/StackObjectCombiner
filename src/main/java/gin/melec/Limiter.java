@@ -132,12 +132,12 @@ public class Limiter {
         // TODO traitement garbage, multi border,...  while (!mesh.vertices.isEmpty()) {
             Vertex currentVertex = mesh.newBorderX(splitPosition);
             while (currentVertex != null) {
-                currentVertex = currentVertex.findNextX(splitPosition, mesh);
+                currentVertex = currentVertex.findNextVertexX(splitPosition, mesh);
                 mesh.currentBorder.addNextVertex(currentVertex);
             }
             currentVertex = mesh.currentBorder.firstVertex;
             while (currentVertex != null) {
-                currentVertex = currentVertex.findNextX(splitPosition, mesh);
+                currentVertex = currentVertex.findNextVertexX(splitPosition, mesh);
                 mesh.currentBorder.addPreviousVertex(currentVertex);
             }
             //Traitement garbage ...

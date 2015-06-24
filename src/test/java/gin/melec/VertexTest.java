@@ -156,7 +156,7 @@ public class VertexTest {
 
         for (int i = 1; i < 12; i++) {
             expResult = (Vertex) mesh.vertices.get(i);
-            vertex = vertex.findNextX(splitPosition, mesh);
+            vertex = vertex.findNextVertexX(splitPosition, mesh);
             flag = flag && vertex.equals(expResult);
         }
         assertTrue(flag);

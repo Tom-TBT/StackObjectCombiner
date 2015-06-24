@@ -210,6 +210,4 @@ public class Mesh {
         return currentBorder;
     }
 
-
-
 }
