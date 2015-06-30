@@ -159,6 +159,15 @@ public class Vertex {
         // The angle of the selected vertex
         Double angleVertex = 360.0;
         boolean firstVertexPresent = false;
+        AngleSystem system = null;
+        
+        mesh.garbage.add(this);
+        
+        if (mesh.currentBorder.scndLastVertexAdded != null) {
+            system = new AngleSystem(this, 
+                    mesh.currentBorder.scndLastVertexAdded);
+        }
+
 
         for (Object element : this.neighbours) {
             final Vertex candidate = (Vertex) element;
@@ -170,6 +179,7 @@ public class Vertex {
                 if (this.equals(mesh.currentBorder.firstVertex)) {
                     // If it is the first vertex of the Border, the next vertex
                     // is the closest vertex in the neighborhood to the split(x)
+                    // and no add to the garbage
                     if (nextVertex == null) {
                         // This is the first candidate to pass.
                         nextVertex = candidate;
@@ -182,14 +192,15 @@ public class Vertex {
                     }
                 }
                 else {
-                    double currentAngle = AngleDistance.getAngle(this, mesh.currentBorder.scndLastVertexAdded, candidate);
+                    mesh.garbage.add(candidate);
+                    double angleCandidate = system.getAngle(candidate);
                     if (nextVertex == null) {
                         nextVertex = candidate;
-                        angleVertex = currentAngle;
+                        angleVertex = angleCandidate;
                     }
-                    else if (currentAngle < angleVertex) {
+                    else if (angleCandidate < angleVertex) {
                         nextVertex = candidate;
-                        angleVertex = currentAngle;
+                        angleVertex = angleCandidate;
                     }
                 }
             }
