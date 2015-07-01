@@ -31,32 +31,6 @@ public class LimiterTest {
     }
 
     /**
-     * Test of findVerticalBorder method, of class Limiter.
-     */
-//    @Test
-//    public void testFindVerticalBorder() throws Exception {
-//        System.out.println("findVerticalBorder");
-//        String meshPath = "";
-//        int splitPosition = 0;
-//        Limiter.findVerticalBorder(meshPath, splitPosition);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
-    /**
-     * Test of findHorizontalBorder method, of class Limiter.
-     */
-//    @Test
-//    public void testFindHorizontalBorder() throws Exception {
-//        System.out.println("findHorizontalBorder");
-//        String meshPath = "";
-//        int splitPosition = 0;
-//        Limiter.findHorizontalBorder(meshPath, splitPosition);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
-
-    /**
      * Test of makeVerticalBorder method, of class Limiter.
      */
     @Test
@@ -67,9 +41,12 @@ public class LimiterTest {
                 "./src/test/java/gin/melec/MeshForTests/A_Mito_Gauche.obj", splitPosition, 1);
         mesh.doNeighborhood();
         Limiter.makeVerticalBorder(mesh, splitPosition);
-        System.out.println(mesh.currentBorder.vertexSequence);
-        System.out.println(mesh.currentBorder.firstVertex);
-        // TODO review the generated test code and remove the default call to fail.
+        int i;
+        for (i = 0; i < mesh.currentBorder.vertexSequence.size(); i++) {
+            Vertex v = (Vertex) mesh.currentBorder.vertexSequence.get(i);
+            System.out.println(v.toString());
+        }
+        System.out.println(i);
     }
 
 }
