@@ -27,26 +27,6 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 public class AngleSystem {
 
     /**
-     * Constante which indicate that the border is an X border, on the left
-     * side.
-     */
-    private static final char ORI_X_LEFT = 'A';
-    /**
-     * Constante which indicate that the border is an X border, on the right
-     * side.
-     */
-    private static final char ORI_X_RIGHT = 'B';
-    /**
-     * Constante which indicate that the border is an X border, on the upper
-     * side.
-     */
-    private static final char ORI_Y_UP = 'C';
-    /**
-     * Constante which indicate that the border is an X border, on the lower
-     * side.
-     */
-    private static final char ORI_Y_DOWN = 'D';
-    /**
      * Tolerance is the value for the plane and line for which, under this
      * value, two points are the same.
      */
@@ -108,33 +88,12 @@ public class AngleSystem {
      * @param orientation , the orientation of the system.
      */
     public AngleSystem(final Vertex origin, final Vertex reference,
-            final char orientation) {
+            final Vertex virtual) {
         this.vectOrig = new Vector3D(origin.x, origin.y, origin.z);
         final Vector3D vectRef = new Vector3D(reference.x, reference.y,
                 reference.z);
 
-        Vector3D vectVirt = null;
-        // Switch orientation, the virtual point won't be the same.
-        switch (orientation) {
-            case ORI_X_LEFT:
-                vectVirt = new Vector3D(origin.x + 1, origin.y,
-                origin.z);
-                break;
-            case ORI_X_RIGHT:
-                vectVirt = new Vector3D(origin.x - 1, origin.y,
-                origin.z);
-                break;
-            case ORI_Y_UP:
-                vectVirt = new Vector3D(origin.x, origin.y + 1,
-                origin.z);
-                break;
-            case ORI_Y_DOWN:
-                vectVirt = new Vector3D(origin.x, origin.y - 1,
-                origin.z);
-                break;
-            default:
-                // TODO Problem here !
-        }
+        final Vector3D vectVirt = new Vector3D(virtual.x, virtual.y, virtual.z);
 
         // Ref and virtual point coordonates are changed to correspond with the
         // origin point as... origin.

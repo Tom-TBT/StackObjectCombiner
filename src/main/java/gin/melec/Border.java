@@ -16,7 +16,6 @@
  */
 package gin.melec;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,9 +58,9 @@ public class Border {
     float lenght;
 
     /**
-     * Coordonates of the centre.
+     * The voxel in the center of the border..
      */
-    float centre; // TODO change center to x/y/z coordonnates system.
+    Vertex centre;
 
     /**
      * This flag is up when the border form a circle.
@@ -72,24 +71,28 @@ public class Border {
      * Public constructor for the border.
      * @param firstVertex , the first vertex of the border.
      */
-    public Border(final Vertex firstVertex) {
-        this.firstVertex = firstVertex;
-        this.lastVertexAdded = null;
+    public Border() {
         this.vertexSequence = new LinkedList();
-        this.addNextVertex(firstVertex);
+        isCircular = false;
     }
 
     /**
-     * Add the given vertex to the border.
+     * Add the given vertex to the end of the border.
      * @param vertex , the vertex to add.
      */
     public final void addNextVertex(final Vertex vertex) {
         if (vertex != null) {
+            if (this.vertexSequence.isEmpty()) {
+                this.firstVertex = vertex;
+            }
             this.vertexSequence.add(vertex);
             scndLastVertexAdded = lastVertexAdded;
             lastVertexAdded = vertex;
+
+            if (this.lastVertexAdded.equals(this.firstVertex)) {
+                this.isCircular = true;
+            }
         }
-        // TODO add change for the circular flag
     }
 
     /**
@@ -102,6 +105,6 @@ public class Border {
             scndLastVertexAdded = lastVertexAdded;
             lastVertexAdded = vertex;
         }
-        // TODO add change for the circular flag
     }
+
 }

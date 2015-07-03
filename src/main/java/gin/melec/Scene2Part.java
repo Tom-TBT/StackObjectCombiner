@@ -26,7 +26,7 @@ import java.util.List;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Scene2Part extends Scene{
+public class Scene2Part extends Scene {
 
     /**
      * The meshes in the upper left corner of the stack.
@@ -37,9 +37,13 @@ public class Scene2Part extends Scene{
      */
     protected List upperMiddleMeshes;
     /**
-     * The coordonate (x) of the left split.
+     * The left side of the left split.
      */
-    protected int leftSplit;
+    protected Split leftSplitLeftSide;
+    /**
+     * The right side of the left split.
+     */
+    protected Split leftSplitRightSide;
 
     /**
      * Constructor for a scene divide in 9 parts.
@@ -49,7 +53,8 @@ public class Scene2Part extends Scene{
     public Scene2Part(final String pathname, final int leftSplit) {
         super(pathname);
 
-        this.leftSplit = leftSplit;
+        this.leftSplitLeftSide = new SplitLeft(leftSplit);
+        this.leftSplitRightSide = new SplitRight(leftSplit);
 
         this.upperLeftMeshes = new ArrayList();
         this.upperMiddleMeshes = new ArrayList();

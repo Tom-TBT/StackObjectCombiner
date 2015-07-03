@@ -29,6 +29,8 @@ import java.util.Set;
  */
 public class Mesh {
 
+    private static int ANGLE_LIMIT = 230;
+
     /**
      * Contain the vertices composing this mesh.
      */
@@ -54,15 +56,22 @@ public class Mesh {
      */
     Border currentBorder;
 
+    /**
+     * Switch the position of the mesh and switch the type of scene, meshes can
+     * have up to 6 different splits.
+     */
+    List splits;
+
 
     /**
      * Public constructor for a mesh.
      */
-    public Mesh() {
+    public Mesh(List splits) {
         this.faces = new ArrayList<Face>();
         this.vertices = new ArrayList<Vertex>();
         this.garbage = new HashSet();
         this.borders = new ArrayList();
+        this.splits = splits;
     }
 
     /**
@@ -79,48 +88,6 @@ public class Mesh {
      */
     public final void addFace(final Face face) {
         this.faces.add(face);
-    }
-
-    /**
-     * Search in the mesh the closest vertex to the split. This is usefull to
-     * start a border because a new border comport obviously the closest vertex
-     * to the border.
-     * @param splitPosition , the position of the split.
-     * @return vertex, the closest one in the mesh.
-     */
-    private final Vertex takeCloserVertexX(final int splitPosition) {
-        Vertex vertex = (Vertex) this.vertices.get(0);
-        for (final Iterator it = this.vertices.iterator(); it.hasNext();) {
-            final Object element = it.next();
-            final Vertex currentVert = (Vertex) element;
-            if (vertex.distanceToBorderX(splitPosition)
-                    > currentVert.distanceToBorderX(splitPosition)) {
-                vertex = currentVert;
-            }
-        }
-        this.garbage.add(vertex);
-        return vertex;
-    }
-
-    /**
-     * Search in the mesh the closest vertex to the split. This is usefull to
-     * start a border because a new border comport obviously the closest vertex
-     * to the border.
-     * @param splitPosition , the position of the split.
-     * @return vertex, the closest one in the mesh.
-     */
-    private final Vertex takeCloserVertexY(final int splitPosition) {
-        Vertex vertex = (Vertex) this.vertices.get(0);
-        for (final Iterator it = this.vertices.iterator(); it.hasNext();) {
-            final Object element = it.next();
-            final Vertex currentVert = (Vertex) element;
-            if (vertex.distanceToBorderY(splitPosition)
-                    > currentVert.distanceToBorderY(splitPosition)) {
-                vertex = currentVert;
-            }
-        }
-        this.garbage.add(vertex); // TODO Maybe remove this line
-        return vertex;
     }
 
     /**
@@ -151,17 +118,18 @@ public class Mesh {
 
     /**
      * Find the vertex with the given id.
-     * @param id , the id of the vertex to find.
+     * @param vertexID , the id of the vertex to find.
      * @return vertex with the given id.
      */
-    public Vertex findVertex(final int id) {
+    public final Vertex findVertex(final int vertexID) {
+        Vertex result = null;
         for (Object element : this.vertices) {
             final Vertex vertex = (Vertex) element;
-            if (vertex.id == id) {
-                return vertex;
+            if (vertex.id == vertexID) {
+                result = vertex;
             }
         }
-        return null; // TODO Should never came here, but ugly
+        return result;
     }
 
     /**
@@ -177,37 +145,96 @@ public class Mesh {
     }
 
     /**
-     * Create a new border for this mesh, and initialize it with the closest
-     * vertex to the split.
-     * @param splitPosition , the position of the split.
-     * @return the first vertex.
-     */
-    public final Vertex newBorderX(final int splitPosition) {
-        final Border border = new Border(this.takeCloserVertexX(splitPosition));
-        this.borders.add(border);
-        this.currentBorder = border;
-        return currentBorder.firstVertex;
-    }
-
-    /**
-     * Create a new border for this mesh, and initialize it with the closest
-     * vertex to the split.
-     * @param splitPosition , the position of the split.
-     * @return the first vertex.
-     */
-    public final Vertex newBorderY(final int splitPosition) {
-        final Border border = new Border(this.takeCloserVertexY(splitPosition));
-        this.borders.add(border);
-        this.currentBorder = border;
-        return currentBorder.firstVertex;
-    }
-
-    /**
      * Accessor to the current border.
      * @return , the current border.
      */
     public final Border getCurrentBorder() {
         return currentBorder;
+    }
+
+    /**
+     * Find and return the next vertex of the current border.
+     * @param split
+     * @return
+     */
+    public final Vertex findNextVertex(final Split split) {
+        Vertex nextVertex = null;
+        AngleSystem system;
+        double angleVertex = 360.0;
+
+        system = new AngleSystem(this.currentBorder.lastVertexAdded,
+                this.currentBorder.scndLastVertexAdded,
+                split.createVirtual(this.currentBorder.lastVertexAdded));
+
+        if (this.currentBorder.firstVertex
+                .equals(this.currentBorder.lastVertexAdded)) {
+            return null;
+        }
+        for (final Iterator it =
+                this.currentBorder.lastVertexAdded.neighbours.iterator();
+                it.hasNext();) {
+            final Vertex candidate = (Vertex) it.next();
+            if (!this.garbage.contains(candidate)) {
+                this.garbage.add(candidate);
+
+                final double angleCandidate = system.getAngle(candidate);
+                if (nextVertex == null || (angleCandidate < angleVertex
+                        && angleCandidate < ANGLE_LIMIT)) {
+                    nextVertex = candidate;
+                    angleVertex = angleCandidate;
+                }
+                // TODO Ajouter condition arret pour bordure linéaire
+            }
+            else if (candidate.equals(this.currentBorder.firstVertex)
+                    && !this.currentBorder.scndLastVertexAdded
+                            .equals(this.currentBorder.firstVertex)) {
+                nextVertex = candidate;
+                break;
+            }
+        }
+        return nextVertex;
+    }
+
+    /**
+     * Create all the borders of a mesh and put it in the list of borders.
+     */
+    public void createBorders() {
+        for (final Iterator it = this.splits.iterator(); it.hasNext();) {
+            final Split split = (Split) it.next();
+            final List borderVertices = split.findBorderVertices(this.vertices);
+
+            while (!borderVertices.isEmpty()) {
+                searchBorder(split, borderVertices);
+            }
+        }
+    }
+
+    /**
+     * Search in the list of vertices a border and add it to the list of
+     * borders. Once the border is added, remove from the list of vertices the
+     * one who belong to the border.
+     * @param split
+     * @param borderVertices
+     */
+    public final void searchBorder(final Split split,
+            final List borderVertices) {
+        this.currentBorder = new Border();
+        this.borders.add(currentBorder);
+
+        split.initiateBorder(this);
+        Vertex nextVertex = this.currentBorder.lastVertexAdded;
+        while (nextVertex != null) {
+            nextVertex = this.findNextVertex(split);
+            this.currentBorder.addNextVertex(nextVertex);
+        }
+        nextVertex = this.currentBorder.firstVertex;
+        while (nextVertex != null && !currentBorder.isCircular) {
+            nextVertex = this.findNextVertex(split);
+            this.currentBorder.addPreviousVertex(nextVertex);
+        }
+        this.completeGarbage();
+        borderVertices.removeAll(this.garbage);
+        this.garbage.clear();
     }
 
 }

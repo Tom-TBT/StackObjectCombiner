@@ -125,22 +125,4 @@ public class Limiter {
                 HORIZONTAL_LIMIT);
         ObjWriter.replaceMesh(meshPath+"Bordered", mesh);
     }
-
-
-    public static void makeVerticalBorder(final Mesh mesh ,
-            final int splitPosition) {
-        // TODO traitement garbage, multi border,...  while (!mesh.vertices.isEmpty()) {
-            Vertex currentVertex = mesh.newBorderX(splitPosition);
-            while (currentVertex != null) {
-                currentVertex = currentVertex.findNextVertexX(splitPosition, mesh);
-                mesh.currentBorder.addNextVertex(currentVertex);
-            }
-            currentVertex = mesh.currentBorder.firstVertex;
-            while (currentVertex != null) {
-                currentVertex = currentVertex.findNextVertexX(splitPosition, mesh);
-                mesh.currentBorder.addPreviousVertex(currentVertex);
-            }
-            //Traitement garbage ...
-        //}
-    }
 }
