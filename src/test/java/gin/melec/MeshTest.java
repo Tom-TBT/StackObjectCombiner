@@ -5,10 +5,10 @@
  */
 package gin.melec;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -115,27 +115,33 @@ public class MeshTest {
      * Test of findNextVertex method, of class Mesh.
      */
     @Test
-    public void testFindNextVertex() {
+    public void testCreateBorders() throws IOException {
         System.out.println("findNextVertex");
-        Split split = null;
-        Mesh instance = null;
-        Vertex expResult = null;
-        Vertex result = instance.findNextVertex(split);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Split rightSplit = new SplitRight(102);
+        List splits = new ArrayList(); splits.add(rightSplit);
+        Mesh circularMesh = new Mesh(splits);
+        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_Mito_Gauche.obj"
+                , circularMesh.vertices, circularMesh.faces);
+        circularMesh.doNeighborhood();
+
+        circularMesh.createBorders();
+
+        Border border = (Border)circularMesh.borders.get(0);
+        for(Object o: border.vertexSequence) {
+            Vertex v = (Vertex) o;
+            System.out.println(v.toString());
+        }
+
+        circularMesh.exportBorders("./src/test/java/gin/melec/MeshForTests/A_Mito_Gauche_borders.obj");
     }
 
-    /**
-     * Test of createBorders method, of class Mesh.
-     */
-    @Test
-    public void testCreateBorders() {
-        System.out.println("createBorders");
-        Mesh instance = null;
-        instance.createBorders();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testReadBorders() throws IOException {
+        List borders = ObjReader.readBorders("./src/test/java/gin/melec/MeshForTests/A_Mito_Gauche_borders.obj");
+        Border border = (Border) borders.get(0);
+        for(Object o: border.vertexSequence) {
+            Vertex v = (Vertex) o;
+            System.out.println(v.toString());
+        }
     }
 
 

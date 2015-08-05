@@ -18,9 +18,11 @@ package gin.melec;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,9 +49,9 @@ public class ObjReader {
      * @return , a mesh made from the file.
      * @throws IOException , when their is an error with the lecture of the file
      */
-    public static void readMesh(final String pathName, final List vertices,
+    public static void readMesh(final String path, final List vertices,
             final List faces) throws IOException {
-        final InputStream ips = new FileInputStream(pathName);
+        final InputStream ips = new FileInputStream(path);
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);
 
@@ -72,5 +74,43 @@ public class ObjReader {
             }
         }
         buR.close();
+    }
+
+    public static List readBorders(String path) throws FileNotFoundException, IOException {
+        List borders = new ArrayList();
+
+        final InputStream ips = new FileInputStream(path);
+        final InputStreamReader ipsr = new InputStreamReader(ips);
+        final BufferedReader buR = new BufferedReader(ipsr);
+
+        String currentLine;
+        String[] splitedLine;
+        boolean isFirstLine = true;
+        Border border = new Border();
+
+        while ((currentLine = buR.readLine()) != null) {
+            splitedLine = currentLine.split(" ");
+            if (splitedLine[0].equals("b") && isFirstLine) {
+                border.isCircular = splitedLine[2].equals("circular");
+            }
+            else if (splitedLine[0].equals("b") && !isFirstLine) {
+                borders.add(border);
+                border = new Border();
+                border.isCircular = splitedLine[2].equals("circular");
+            }
+            else if(splitedLine[0].equals("v")) {
+                Vertex v = new Vertex(Integer.parseInt(splitedLine[4]),
+                Float.parseFloat(splitedLine[1]),
+                Float.parseFloat(splitedLine[2]),
+                Float.parseFloat(splitedLine[3]));
+                if(isFirstLine) {
+                    border.firstVertex = v;
+                }
+                border.vertexSequence.add(v);
+                isFirstLine = false;
+            }
+        }
+        borders.add(border);
+        return borders;
     }
 }

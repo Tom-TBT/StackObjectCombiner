@@ -16,11 +16,14 @@
  */
 package gin.melec;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -200,7 +203,7 @@ public class Mesh {
      * @param split
      * @param borderVertices
      */
-    private void searchBorder(final Split split,
+    public void searchBorder(final Split split,
             final List borderVertices) {
         this.currentBorder = new Border();
         this.borders.add(currentBorder);
@@ -240,6 +243,15 @@ public class Mesh {
             vertex.x += deltaX;
             vertex.y += deltaY;
         }
+    }
+
+    void exportBorders(String filePath) {
+        try {
+            ObjWriter.writeBorders(filePath, this.borders);
+        } catch (IOException ex) {
+            Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        borders.clear();
     }
 
 }

@@ -64,4 +64,31 @@ public class ObjWriter {
         prW.close();
     }
 
+    static void writeBorders(String filePath, List borders) throws IOException {
+
+        final FileWriter fiW = new FileWriter(filePath);
+        final BufferedWriter bfW = new BufferedWriter(fiW);
+        final PrintWriter prW = new PrintWriter(bfW);
+
+        int numBorder = 1;
+
+        for(Object o : borders) {
+            Border border = (Border) o;
+            prW.write("b " + numBorder);
+            if(border.isCircular) {
+                prW.write(" circular");
+            }
+            else {
+                prW.write(" linear");
+            }
+            prW.write("\n");
+            for (Object ob : border.vertexSequence) {
+                Vertex vertex = (Vertex) ob;
+                prW.write(vertex.toIdString() + "\n");
+            }
+            numBorder++;
+        }
+        prW.close();
+    }
+
 }
