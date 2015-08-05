@@ -16,10 +16,11 @@
  */
 package gin.melec;
 
-import ij.IJ;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -58,6 +59,8 @@ public class Scene2Part extends Scene {
 
         this.upperLeftMeshes = new ArrayList();
         this.upperMiddleMeshes = new ArrayList();
+
+        this.sortFiles();
     }
 
     /**
@@ -82,38 +85,56 @@ public class Scene2Part extends Scene {
         }
     }
 
+    Mesh loadMesh(final String meshName, List splits) {
+        Mesh mesh = new Mesh(splits);
+        try {
+            ObjReader.readMesh(this.workingDirectory + "/" + meshName, mesh.vertices, mesh.faces);
+        } catch (IOException ex) {
+            Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return mesh;
+    }
+
+    void writeMesh(final String meshName, final Mesh mesh) {
+        try {
+                ObjWriter.replaceMesh(this.workingDirectory + "/" +
+                        meshName, mesh);
+            } catch (IOException ex) {
+                Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }
+
     @Override
     void shiftMeshes() {
         // The upperLeftMeshes are not shifted because they are already in place
+        Mesh mesh;
+        List splits = new ArrayList();
         for (Object upperMiddleMeshe : this.upperMiddleMeshes) {
-            try {
-                Shifter.xTranslation(this.workingDirectory + "/"
-                        + (String) upperMiddleMeshe,
-                        leftSplit);
-            } catch (IOException ex) {
-                IJ.handleException(ex);
-            }
+            splits.add(leftSplitLeftSide);
+            mesh = loadMesh((String) upperMiddleMeshe, splits);
+            mesh.shift();
+            writeMesh((String) upperMiddleMeshe, mesh);
         }
     }
 
     @Override
     void createLimit() {
-        final String dirPath = this.workingDirectory + "/";
+        Mesh mesh;
+
+        List splits = new ArrayList();
+        splits.add(leftSplitRightSide);
         for (Object upperLeftMeshe : upperLeftMeshes) {
-            try {
-                Limiter.findVerticalBorder(dirPath + (String) upperLeftMeshe,
-                        leftSplit);
-            } catch (IOException ex) {
-                IJ.handleException(ex);
-            }
+            mesh = loadMesh((String) upperLeftMeshe, splits);
+            mesh.createBorders();
         }
-        for (Object upperMiddleMeshe : upperMiddleMeshes) {
-            try {
-                Limiter.findVerticalBorder(dirPath + (String) upperMiddleMeshe,
-                        leftSplit);
-            } catch (IOException ex) {
-                IJ.handleException(ex);
-            }
+
+        splits = new ArrayList();
+        splits.add(leftSplitLeftSide);
+        for (Object upperMiddleMeshe : this.upperMiddleMeshes) {
+            mesh = loadMesh((String) upperMiddleMeshe, splits);
+            mesh.createBorders();
         }
+
     }
 }

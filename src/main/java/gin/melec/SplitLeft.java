@@ -65,4 +65,14 @@ public class SplitLeft extends Split {
         return chosenOne;
     }
 
+    @Override
+    protected final int xPosition() {
+        return position;
+    }
+
+    @Override
+    protected final int yPosition() {
+        return 0;
+    }
+
 }

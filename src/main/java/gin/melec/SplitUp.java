@@ -65,4 +65,14 @@ public class SplitUp extends Split {
         return chosenOne;
     }
 
+    @Override
+    protected final int xPosition() {
+        return 0;
+    }
+
+    @Override
+    protected final int yPosition() {
+        return position;
+    }
+
 }

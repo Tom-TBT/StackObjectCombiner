@@ -75,22 +75,6 @@ public class Mesh {
     }
 
     /**
-     * Add a vertex to the mesh.
-     * @param vertex , the vertex to add
-     */
-    public final void addVertex(final Vertex vertex) {
-        this.vertices.add(vertex);
-    }
-
-    /**
-     * Add a face to the mesh.
-     * @param face , the face to add
-     */
-    public final void addFace(final Face face) {
-        this.faces.add(face);
-    }
-
-    /**
      * Add to the neighborList of each vertex, the vertex that are connected to
      * it. It relies now to the fact that in the mesh, id are originally ordered
      * .
@@ -216,7 +200,7 @@ public class Mesh {
      * @param split
      * @param borderVertices
      */
-    public final void searchBorder(final Split split,
+    private void searchBorder(final Split split,
             final List borderVertices) {
         this.currentBorder = new Border();
         this.borders.add(currentBorder);
@@ -235,6 +219,27 @@ public class Mesh {
         this.completeGarbage();
         borderVertices.removeAll(this.garbage);
         this.garbage.clear();
+    }
+
+    /**
+     * This method shift the mesh, depending of its own splits.
+     */
+    final void shift() {
+        int deltaX = 0, deltaY = 0;
+        for (final Iterator it = splits.iterator(); it.hasNext();) {
+            final Split split = (Split) it.next();
+            if (split.xPosition() > deltaX) {
+                deltaX = split.xPosition();
+            }
+            if (split.yPosition() > deltaY) {
+                deltaY = split.yPosition();
+            }
+        }
+        for (final Iterator it = vertices.iterator(); it.hasNext();) {
+            final Vertex vertex = (Vertex) it.next();
+            vertex.x += deltaX;
+            vertex.y += deltaY;
+        }
     }
 
 }

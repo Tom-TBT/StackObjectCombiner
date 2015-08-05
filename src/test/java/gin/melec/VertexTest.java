@@ -17,9 +17,9 @@
 package gin.melec;
 
 import java.io.IOException;
-import java.util.Set;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.List;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -135,49 +135,18 @@ public class VertexTest {
     }
 
     /**
-     * Test of findNextX method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testFindNextX() throws IOException {
-
-        System.out.println("findNextX");
-        int splitPosition = 291;
-        // Test in the starting conditions : This is the first vertex, he have
-        // no previousVertex. This vertex is on top.
-        Mesh mesh = ObjReader.readMesh(
-                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj");
-        mesh.doNeighborhood();
-        mesh.newBorderX(splitPosition);
-        Vertex vertex = mesh.currentBorder.firstVertex;
-        // Normaly vertex is the vertex with id 1.
-        Vertex expResult;
-        // The next vertex is the one with id 2
-        boolean flag = true;
-
-        for (int i = 1; i < 12; i++) {
-            expResult = (Vertex) mesh.vertices.get(i);
-            vertex = vertex.findNextVertexX(splitPosition, mesh);
-            flag = flag && vertex.equals(expResult);
-        }
-        assertTrue(flag);
-
-    }
-
-    /**
-     * Test of findNextY method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testFindNextY() {
-        // No test for the moment
-    }
-    /**
      * Test of addNeighborToGarbage, of class Vertex.
      * @throws java.io.IOException
      */
     @org.junit.Test
     public void testAddNeighborToGarbage() throws IOException {
-        final Mesh mesh = ObjReader.readMesh(
-                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj");
+        int splitPosition = 291;
+        List splits = new ArrayList();
+        splits.add(new SplitRight(splitPosition));
+        Mesh mesh = new Mesh(splits);
+        ObjReader.readMesh(
+                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj",
+                mesh.vertices, mesh.faces);
         mesh.doNeighborhood();
         // One vertex is put in the garbage
         mesh.garbage.add(mesh.vertices.get(0));

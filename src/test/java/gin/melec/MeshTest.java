@@ -1,132 +1,142 @@
 /*
- * Copyright (C) 2015 ImageJ
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package gin.melec;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
- * @author Tom Boissonnet
- * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
+ * @author tom
  */
 public class MeshTest {
 
+    public MeshTest() {
+    }
 
-    /**
-     * Test of addVertex method, of class Mesh.
-     */
-    @Test
-    public void testAddVertex() {
-        System.out.println("addVertex");
-        Vertex vertex = null;
-        Mesh instance = new Mesh();
-        instance.addVertex(vertex);
-        int numberOfVertices = instance.vertices.size();
-        int expResult = 1;
-        assertEquals(expResult, numberOfVertices);
+    Mesh meshTest;
 
+    @Before
+    public void setUp() {
+        Vertex v1 = new Vertex(1, 99.5f, 1, 1);
+        Vertex v2 = new Vertex(2, 99.4f, 2, 1);
+        Vertex v3 = new Vertex(3, 99.3f, 3, 1);
+        Vertex v4 = new Vertex(4, 99.3f, 3, 2);
+        Vertex v5 = new Vertex(5, 99.3f, 3, 3);
+
+        Vertex v6 = new Vertex(6, 98f, 1.5f, 1);
+        Vertex v7 = new Vertex(7, 98f, 2.5f, 1);
+        Vertex v8 = new Vertex(8, 98f, 3f, 1.5f);
+        Vertex v9 = new Vertex(9, 98f, 3f, 2.5f);
+
+        Vertex v10 = new Vertex(10, 98f, 100, 100);
+        Vertex v11 = new Vertex(10, 98f, 101, 100);
+        Vertex v12 = new Vertex(10, 98f, 102, 100);
+
+        Face f1 = new Face(1,2,6);
+        Face f2 = new Face(2,3,7);
+        Face f3 = new Face(3,4,8);
+        Face f4 = new Face(4,5,9);
+
+        Face f5 = new Face(2,6,7);
+        Face f6 = new Face(3,7,8);
+        Face f7 = new Face(4,8,9);
+
+        Face f8 = new Face(10,11,12);
+
+        List splits = new ArrayList();
+        splits.add(new SplitRight(100));
+        meshTest = new Mesh(splits);
+
+        meshTest.vertices.add(v1);meshTest.vertices.add(v2);meshTest.vertices.add(v3);
+        meshTest.vertices.add(v4);meshTest.vertices.add(v5);meshTest.vertices.add(v6);
+        meshTest.vertices.add(v7);meshTest.vertices.add(v8);meshTest.vertices.add(v9);
+        meshTest.vertices.add(v10);meshTest.vertices.add(v11);meshTest.vertices.add(v12);
+
+        meshTest.faces.add(f1);meshTest.faces.add(f2);meshTest.faces.add(f3);
+        meshTest.faces.add(f4);meshTest.faces.add(f5);meshTest.faces.add(f6);
+        meshTest.faces.add(f7);meshTest.faces.add(f8);
     }
 
     /**
-     * Test of addFace method, of class Mesh.
+     * Test of findVertex method, of class Mesh.
      */
     @Test
-    public void testAddFace() {
-        System.out.println("addFace");
-        Face face = null;
-        Mesh instance = new Mesh();
-        instance.addFace(face);
-        int numberOfFaces = instance.faces.size();
-        int expResult = 1;
-        assertEquals(expResult, numberOfFaces);
-    }
-
-    /**
-     * Test of takeCloserVertexX method, of class Mesh.
-     */
-    @Test
-    public void testTakeCloserVertexX() throws IOException {
-        System.out.println("takeCloserVertexX");
-        int splitPosition = 291;
-        Mesh mesh = ObjReader.readMesh(
-                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj");
-        int expVertices = 36;
-        int expFaces = 44;
-        int result = mesh.vertices.size();
-        assertEquals(expVertices, result);
-        result = mesh.faces.size();
-        assertEquals(expFaces, result);
-
-        mesh.newBorderX(splitPosition);
-        Vertex closerV = mesh.currentBorder.firstVertex;
-        int expResult = 1;
-        result = closerV.id;
-        assertEquals(expResult, result);
+    public void testFindVertex() {
+        System.out.println("findVertex");
+        int vertexID = 5;
+        Vertex expResult = (Vertex)meshTest.vertices.get(4);
+        Vertex result = meshTest.findVertex(vertexID);
+        assertEquals(expResult.id, result.id);
     }
 
     /**
      * Test of doNeighborhood method, of class Mesh.
      */
     @Test
-    public void doNeighborhood() throws IOException {
+    public void testDoNeighborhood() {
         System.out.println("doNeighborhood");
-        Mesh mesh = ObjReader.readMesh(
-                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj");
-        mesh.doNeighborhood();
-        Vertex vertex = (Vertex) mesh.vertices.get(0);
-        int result = vertex.neighbours.size();
-        int expResult = 2;
-        assertEquals(expResult, result);
-        vertex = (Vertex) mesh.vertices.get(15);
-        result = vertex.neighbours.size();
-        expResult = 6;
-        assertEquals(expResult, result);
-
-        boolean isHere1 = false, isHere2 = false, isHere3 = false,
-                isHere4 = false, isHere5 = false, isHere6 = false;
-        for (Object element : vertex.neighbours) {
-            System.out.println(element);
-            if (element.equals(mesh.vertices.get(4))) {
-                isHere2 = true;
-            }
-            if (element.equals(mesh.vertices.get(3))) {
-                isHere1 = true;
-            }
-            if (element.equals(mesh.vertices.get(14))) {
-                isHere3 = true;
-            }
-            if (element.equals(mesh.vertices.get(26))) {
-                isHere4 = true;
-            }
-            if (element.equals(mesh.vertices.get(27))) {
-                isHere5 = true;
-            }
-            if (element.equals(mesh.vertices.get(16))) {
-                isHere6 = true;
-            }
-        }
-        assertTrue("Vertex 4 isn't in da hood", isHere1);
-        assertTrue("Vertex 5 isn't in da hood", isHere2);
-        assertTrue("Vertex 15 isn't in da hood", isHere3);
-        assertTrue("Vertex 27 isn't in da hood", isHere4);
-        assertTrue("Vertex 28 isn't in da hood", isHere5);
-        assertTrue("Vertex 17 isn't in da hood", isHere6);
+        meshTest.doNeighborhood();
+        Vertex v = (Vertex) meshTest.vertices.get(0);
+        assertEquals(2, v.neighbours.size());
     }
+    /**
+     * Test of completeGarbage method, of class Mesh.
+     */
+    @Test
+    public void testCompleteGarbage() {
+        System.out.println("completeGarbage");
+        meshTest.garbage.add(meshTest.vertices.get(0));
+        meshTest.doNeighborhood();
+        meshTest.completeGarbage();
+        assertEquals(9, meshTest.garbage.size());
+    }
+
+
+    /**
+     * Test of shift method, of class Mesh.
+     */
+    @Test
+    public void testShift() {
+        System.out.println("shift");
+        meshTest.shift();
+        Vertex result = (Vertex) meshTest.vertices.get(0);
+        assertEquals(199.5, result.x, 0);
+    }
+
+    /**
+     * Test of findNextVertex method, of class Mesh.
+     */
+    @Test
+    public void testFindNextVertex() {
+        System.out.println("findNextVertex");
+        Split split = null;
+        Mesh instance = null;
+        Vertex expResult = null;
+        Vertex result = instance.findNextVertex(split);
+        assertEquals(expResult, result);
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of createBorders method, of class Mesh.
+     */
+    @Test
+    public void testCreateBorders() {
+        System.out.println("createBorders");
+        Mesh instance = null;
+        instance.createBorders();
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
 
 }

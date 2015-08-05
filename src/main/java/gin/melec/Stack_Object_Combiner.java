@@ -37,7 +37,6 @@ public class Stack_Object_Combiner implements PlugIn {
     public final void run(String arg) {
         Scene scene = new Scene2Part(IJ.getDirectory("Give the file containing the "
                 + ".obj file to combine"),291);
-        scene.sortFiles();
         IJ.showProgress(0.0);
         scene.shiftMeshes();
         IJ.showProgress(50.0);

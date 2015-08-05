@@ -94,4 +94,16 @@ public abstract class Split {
      * @return the closer vertex to the split.
      */
     protected abstract Vertex findCloserVertex(final Collection collection);
+
+    /**
+     * Give the position of the split in his x Position.
+     * @return the position of the split.
+     */
+    protected abstract int xPosition();
+
+    /**
+     * Give the position of the split in his y Position.
+     * @return the position of the split.
+     */
+    protected abstract int yPosition();
 }

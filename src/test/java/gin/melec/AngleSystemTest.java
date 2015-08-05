@@ -26,26 +26,10 @@ import org.junit.Test;
  */
 public class AngleSystemTest {
 
-    /**
-     * Constante which indicate that the border is an X border, on the left
-     * side.
-     */
-    private static final char ORI_X_LEFT = 'A';
-    /**
-     * Constante which indicate that the border is an X border, on the right
-     * side.
-     */
-    private static final char ORI_X_RIGHT = 'B';
-    /**
-     * Constante which indicate that the border is an X border, on the upper
-     * side.
-     */
-    private static final char ORI_Y_UP = 'C';
-    /**
-     * Constante which indicate that the border is an X border, on the lower
-     * side.
-     */
-    private static final char ORI_Y_DOWN = 'D';
+    Split splitLeft = new SplitLeft(20);
+    Split splitUp = new SplitUp(20);
+    Split splitRight = new SplitRight(20);
+    Split splitDown = new SplitDown(20);
 
     public AngleSystemTest() {
     }
@@ -56,76 +40,75 @@ public class AngleSystemTest {
     public void testGetAngle() {
         System.out.println("getAngle");
 
-        // First test : really easy
         Vertex origin = new Vertex(0, 0f, 0f, 0f);
         Vertex reference = new Vertex(1, 0f, -2f, 0f);
         Vertex unknown = new Vertex(2, 0f, 1f, 0f);
-        AngleSystem system = new AngleSystem(origin, reference, ORI_X_LEFT);
+        AngleSystem system = new AngleSystem(origin, reference, splitLeft.createVirtual(origin));
         double expResult = 180.0;
         double result = system.getAngle(unknown);
-        assertEquals(expResult, result, 0);
+        assertEquals(expResult, result, 0.001);
 
-        // Second test : really easy too
         origin = new Vertex(0, 0f, 0f, 0f);
         reference = new Vertex(1, 0f, -2f, 0f);
-        unknown = new Vertex(2, -1f, 0f, 0f);
-        system = new AngleSystem(origin, reference, ORI_X_LEFT);
+        unknown = new Vertex(0, 1f, 0f, 0f);
+        system = new AngleSystem(origin, reference, splitLeft.createVirtual(origin));
         expResult = 270.0;
         result = system.getAngle(unknown);
-        assertEquals(expResult, result, 0);
+        assertEquals(expResult, result, 0.001);
 
-        // Third test : the unknown vertex is not on the same plan.
         origin = new Vertex(0, 0f, 0f, 0f);
         reference = new Vertex(1, 0f, -2f, 0f);
-        unknown = new Vertex(2, -1f, 0f, 2f);
-        system = new AngleSystem(origin, reference, ORI_X_LEFT);
-        expResult = 270.0;
+        unknown = new Vertex(2, 1f, 1f, 0f);
+        system = new AngleSystem(origin, reference, splitLeft.createVirtual(origin));
+        expResult = 225.0;
         result = system.getAngle(unknown);
-        assertEquals(expResult, result, 0);
+        assertEquals(expResult, result, 0.001);
 
-        // Fourth test : the reference vertex don't have same x and z than the
-        // origin.
         origin = new Vertex(0, 0f, 0f, 0f);
-        reference = new Vertex(1, 1f, 2f, 0f);
-        unknown = new Vertex(2, -2f, 1f, 5f);
-        system = new AngleSystem(origin, reference, ORI_X_LEFT);
-        expResult = 270.0;
+        reference = new Vertex(1, 0f, -2f, 0f);
+        unknown = new Vertex(2, 1f, -1f, 0f);
+        system = new AngleSystem(origin, reference, splitLeft.createVirtual(origin));
+        expResult = 315.0;
+        result = system.getAngle(unknown);
+        assertEquals(expResult, result, 0.001);
+
+        origin = new Vertex(0, 0f, 0f, 0f);
+        reference = new Vertex(1, 0f, -2f, 0f);
+        unknown = new Vertex(2, -1f, -1f, 0f);
+        system = new AngleSystem(origin, reference, splitLeft.createVirtual(origin));
+        expResult = 45.0;
+        result = system.getAngle(unknown);
+        assertEquals(expResult, result, 0.001);
+
+        origin = new Vertex(0, 0f, 0f, 0f);
+        reference = new Vertex(1, 0f, -2f, 0f);
+        unknown = new Vertex(2, -1f, 1f, 0f);
+        system = new AngleSystem(origin, reference, splitLeft.createVirtual(origin));
+        expResult = 135.0;
+        result = system.getAngle(unknown);
+        assertEquals(expResult, result, 0.001);
+
+        origin = new Vertex(0, 0f, 0f, 0f);
+        reference = new Vertex(1, 0f, -2f, 0f);
+        unknown = new Vertex(2, -1f, 1f, 0f);
+        system = new AngleSystem(origin, reference, splitRight.createVirtual(origin));
+        expResult = 225.0;
         result = system.getAngle(unknown);
         assertEquals(expResult, result, 0);
 
-        // Fifth test : the origin don't have 0,0,0 coordonates :
-        origin = new Vertex(0, 2f, 2f, 2f);
-        reference = new Vertex(1, 3f, 4f, 2f);
-        unknown = new Vertex(2, 0f, 3f, 7f);
-        system = new AngleSystem(origin, reference, ORI_X_LEFT);
-        expResult = 270.0;
+        origin = new Vertex(0, 0f, 0f, 0f);
+        reference = new Vertex(1, -2f, 0f, 0f);
+        unknown = new Vertex(2, 1f, -1f, 0f);
+        system = new AngleSystem(origin, reference, splitUp.createVirtual(origin));
+        expResult = 135.0;
         result = system.getAngle(unknown);
         assertEquals(expResult, result, 0);
 
-        // Sixth test : Orientation in the X_RIGHT
-        origin = new Vertex(0, 2f, 2f, 2f);
-        reference = new Vertex(1, 3f, 4f, 2f);
-        unknown = new Vertex(2, 0f, 3f, 7f);
-        system = new AngleSystem(origin, reference, ORI_X_RIGHT);
-        expResult = 90.0;
-        result = system.getAngle(unknown);
-        assertEquals(expResult, result, 0);
-
-        // Seventh test : Orientation in the Y_UP
-        origin = new Vertex(0, 2f, 2f, 2f);
-        reference = new Vertex(1, 4f, 2f, 2f);
-        unknown = new Vertex(2, 2f, 1f, 7f);
-        system = new AngleSystem(origin, reference, ORI_Y_UP);
-        expResult = 270.0;
-        result = system.getAngle(unknown);
-        assertEquals(expResult, result, 0);
-
-        // Seventh test : Orientation in the Y_DOWN
-        origin = new Vertex(0, 2f, 2f, 2f);
-        reference = new Vertex(1, 4f, 2f, 2f);
-        unknown = new Vertex(2, 2f, 3f, 7f);
-        system = new AngleSystem(origin, reference, ORI_Y_UP);
-        expResult = 90.0;
+        origin = new Vertex(0, 0f, 0f, 0f);
+        reference = new Vertex(1, -2f, 0f, 0f);
+        unknown = new Vertex(2, 1f, -1f, 0f);
+        system = new AngleSystem(origin, reference, splitDown.createVirtual(origin));
+        expResult = 225.0;
         result = system.getAngle(unknown);
         assertEquals(expResult, result, 0);
     }

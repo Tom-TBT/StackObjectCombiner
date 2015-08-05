@@ -67,4 +67,14 @@ final List closeVertices = new ArrayList();
         return chosenOne;
     }
 
+    @Override
+    protected final int xPosition() {
+        return position;
+    }
+
+    @Override
+    protected final int yPosition() {
+        return 0;
+    }
+
 }
