@@ -46,7 +46,7 @@ public class ObjWriter {
      * @param mesh , the array containing the new mesh.
      * @throws IOException , thrown by the writer.
      */
-    public static void replaceMesh(final String meshPath, final Mesh mesh)
+    public static void writeMesh(final String meshPath, final Mesh mesh)
             throws IOException {
         final FileWriter fiW = new FileWriter(meshPath);
         final BufferedWriter bfW = new BufferedWriter(fiW);

@@ -46,17 +46,17 @@ public class AngleSystem {
      * Vector which situate the reference of the system, relatively to the
      * origin point.
      */
-    final private Vector3D vectOrigRef;
+    final private Vector3D vectOrigToRef;
     /**
      * Vector which situate the virtual point of the system, relatively to the
      * origin point.
      */
-    final private Vector3D vectOrigVirt;
+    final private Vector3D vectOrigToVirt;
     /**
      * Vector which situate the unknown point of the system, relatively to the
      * origin point.
      */
-    private Vector3D vectOrigUnkn;
+    private Vector3D vectOrigToUnkn;
 
     /**
      * The plane created to compare the angles. It is created with the origin,
@@ -97,17 +97,17 @@ public class AngleSystem {
 
         // Ref and virtual point coordonates are changed to correspond with the
         // origin point as... origin.
-        this.vectOrigRef = new Vector3D(vectRef.getX() - vectOrig.getX(),
+        this.vectOrigToRef = new Vector3D(vectRef.getX() - vectOrig.getX(),
                                   vectRef.getY() - vectOrig.getY(),
                                   vectRef.getZ() - vectOrig.getZ());
-        this.vectOrigVirt = new Vector3D(vectVirt.getX() - vectOrig.getX(),
+        this.vectOrigToVirt = new Vector3D(vectVirt.getX() - vectOrig.getX(),
                                   vectVirt.getY() - vectOrig.getY(),
                                   vectVirt.getZ() - vectOrig.getZ());
 
-        this.plane = new Plane(new Vector3D(0, 0, 0), this.vectOrigRef,
-                this.vectOrigVirt, TOLERANCE);
+        this.plane = new Plane(new Vector3D(0, 0, 0), this.vectOrigToRef,
+                this.vectOrigToVirt, TOLERANCE);
 
-        this.angleRefVirt = Vector3D.angle(this.vectOrigRef, this.vectOrigVirt)
+        this.angleRefVirt = Vector3D.angle(this.vectOrigToRef, this.vectOrigToVirt)
                 * CONVERT_CSTE;
     }
 
@@ -118,16 +118,16 @@ public class AngleSystem {
      * @return , the angle of the unknown vertex.
      */
     final public double getAngle(final Vertex unknown) {
-        this.vectOrigUnkn = new Vector3D(unknown.x - vectOrig.getX(),
+        this.vectOrigToUnkn = new Vector3D(unknown.x - vectOrig.getX(),
                                   unknown.y - vectOrig.getY(),
                                   unknown.z - vectOrig.getZ());
 
-        this.vectOrigUnkn = this.getNormalizedVector();
+        this.vectOrigToUnkn = this.getNormalizedVector();
 
-        this.angleRefUnkn = Vector3D.angle(this.vectOrigUnkn,
-                this.vectOrigRef) * CONVERT_CSTE;
-        this.angleVirtUnkn = Vector3D.angle(this.vectOrigUnkn,
-                this.vectOrigVirt) * CONVERT_CSTE;
+        this.angleRefUnkn = Vector3D.angle(this.vectOrigToUnkn,
+                this.vectOrigToRef) * CONVERT_CSTE;
+        this.angleVirtUnkn = Vector3D.angle(this.vectOrigToUnkn,
+                this.vectOrigToVirt) * CONVERT_CSTE;
 
         double result;
         final double addAngle1 = angleVirtUnkn + angleRefVirt;
@@ -153,8 +153,8 @@ public class AngleSystem {
      */
     private Vector3D getNormalizedVector() {
         final Vector3D normal = this.plane.getNormal();
-        final Line line = new Line(this.vectOrigUnkn,
-                this.vectOrigUnkn.add(normal), TOLERANCE);
+        final Line line = new Line(this.vectOrigToUnkn,
+                this.vectOrigToUnkn.add(normal), TOLERANCE);
         return plane.intersection(line);
     }
 }

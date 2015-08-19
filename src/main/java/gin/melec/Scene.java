@@ -17,6 +17,10 @@
 package gin.melec;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -62,7 +66,25 @@ public abstract class Scene {
      */
     public abstract void sortFiles();
 
+    Mesh loadMesh(final String meshName, List splits) {
+        Mesh mesh = new Mesh(splits);
+        try {
+            ObjReader.readMesh(this.workingDirectory + "/" + meshName, mesh.vertices, mesh.faces);
+        } catch (IOException ex) {
+            Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
+        return mesh;
+    }
+
+    void saveMesh(final String meshName, final Mesh mesh) {
+        try {
+                ObjWriter.writeMesh(this.workingDirectory + "/" +
+                        meshName, mesh);
+            } catch (IOException ex) {
+                Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }
 
 
 

@@ -85,26 +85,6 @@ public class Scene2Part extends Scene {
         }
     }
 
-    Mesh loadMesh(final String meshName, List splits) {
-        Mesh mesh = new Mesh(splits);
-        try {
-            ObjReader.readMesh(this.workingDirectory + "/" + meshName, mesh.vertices, mesh.faces);
-        } catch (IOException ex) {
-            Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return mesh;
-    }
-
-    void writeMesh(final String meshName, final Mesh mesh) {
-        try {
-                ObjWriter.replaceMesh(this.workingDirectory + "/" +
-                        meshName, mesh);
-            } catch (IOException ex) {
-                Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE, null, ex);
-            }
-    }
-
     @Override
     void shiftMeshes() {
         // The upperLeftMeshes are not shifted because they are already in place
@@ -114,7 +94,7 @@ public class Scene2Part extends Scene {
             splits.add(leftSplitLeftSide);
             mesh = loadMesh((String) upperMiddleMeshe, splits);
             mesh.shift();
-            writeMesh((String) upperMiddleMeshe, mesh);
+            saveMesh((String) upperMiddleMeshe, mesh);
         }
     }
 
