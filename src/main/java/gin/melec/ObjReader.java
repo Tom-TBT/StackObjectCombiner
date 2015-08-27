@@ -32,6 +32,10 @@ import java.util.List;
  */
 public class ObjReader {
 
+    /**
+     * A private constructor because this is an utilitary class and it should
+     * never be instanciate.
+     */
     private ObjReader() {
     }
 
@@ -45,8 +49,9 @@ public class ObjReader {
 
     /**
      * Read a .obj file and make from it a mesh (vertices + faces).
-     * @param meshName , the name of the file .obj
-     * @return , a mesh made from the file.
+     * @param path , the path of the file .obj
+     * @param vertices , the list in which the method put the readed vertices.
+     * @param faces , the list in which the method put the readed faces.
      * @throws IOException , when their is an error with the lecture of the file
      */
     public static void readMesh(final String path, final List vertices,
@@ -76,8 +81,14 @@ public class ObjReader {
         buR.close();
     }
 
-    public static List readBorders(String path) throws FileNotFoundException, IOException {
-        List borders = new ArrayList();
+    /**
+     * Read a border file.
+     * @param path , the path of the file describing the border.
+     * @return a list of vertices making the border.
+     * @throws IOException if their is an error while reading the file.
+     */
+    public static List readBorders(final String path) throws IOException {
+        final List borders = new ArrayList();
 
         final InputStream ips = new FileInputStream(path);
         final InputStreamReader ipsr = new InputStreamReader(ips);
@@ -98,18 +109,20 @@ public class ObjReader {
                 border = new Border();
                 border.isCircular = splitedLine[2].equals("circular");
             }
-            else if(splitedLine[0].equals("v")) {
-                Vertex v = new Vertex(Integer.parseInt(splitedLine[4]),
+            else if (splitedLine[0].equals("v")) {
+                final Vertex v = new Vertex(Integer.parseInt(splitedLine[4]),
                 Float.parseFloat(splitedLine[1]),
                 Float.parseFloat(splitedLine[2]),
                 Float.parseFloat(splitedLine[3]));
-                if(isFirstLine) {
+                if (isFirstLine) {
                     border.firstVertex = v;
                 }
                 border.vertexSequence.add(v);
                 isFirstLine = false;
             }
         }
+        buR.close();
+
         borders.add(border);
         return borders;
     }

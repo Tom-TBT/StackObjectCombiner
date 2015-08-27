@@ -29,6 +29,10 @@ import java.util.List;
  */
 public class ObjWriter {
 
+    /**
+     * A private constructor because this is an utilitary class and it should
+     * never be instanciate.
+     */
     private ObjWriter() {
     }
 
@@ -64,7 +68,14 @@ public class ObjWriter {
         prW.close();
     }
 
-    static void writeBorders(String filePath, List borders) throws IOException {
+    /**
+     * A method to write borders in a file.
+     * @param filePath , the path to the file to write.
+     * @param borders , the borders to write.
+     * @throws IOException if their is an error while writing.
+     */
+    static void writeBorders(final String filePath, final List borders)
+            throws IOException {
 
         final FileWriter fiW = new FileWriter(filePath);
         final BufferedWriter bfW = new BufferedWriter(fiW);
@@ -72,10 +83,10 @@ public class ObjWriter {
 
         int numBorder = 1;
 
-        for(Object o : borders) {
-            Border border = (Border) o;
+        for (Object o : borders) {
+            final Border border = (Border) o;
             prW.write("b " + numBorder);
-            if(border.isCircular) {
+            if (border.isCircular) {
                 prW.write(" circular");
             }
             else {
@@ -83,7 +94,7 @@ public class ObjWriter {
             }
             prW.write("\n");
             for (Object ob : border.vertexSequence) {
-                Vertex vertex = (Vertex) ob;
+                final Vertex vertex = (Vertex) ob;
                 prW.write(vertex.toIdString() + "\n");
             }
             numBorder++;

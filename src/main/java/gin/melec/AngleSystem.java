@@ -85,7 +85,7 @@ public class AngleSystem {
      * in this system. The reference give a direction to this system.
      * @param origin , the origin point of the system.
      * @param reference , the reference point of the system.
-     * @param orientation , the orientation of the system.
+     * @param virtual, the virtual point of the system.
      */
     public AngleSystem(final Vertex origin, final Vertex reference,
             final Vertex virtual) {
@@ -107,8 +107,8 @@ public class AngleSystem {
         this.plane = new Plane(new Vector3D(0, 0, 0), this.vectOrigToRef,
                 this.vectOrigToVirt, TOLERANCE);
 
-        this.angleRefVirt = Vector3D.angle(this.vectOrigToRef, this.vectOrigToVirt)
-                * CONVERT_CSTE;
+        this.angleRefVirt = Vector3D.angle(this.vectOrigToRef,
+                this.vectOrigToVirt) * CONVERT_CSTE;
     }
 
     /**
@@ -117,7 +117,7 @@ public class AngleSystem {
      * @param unknown , the vertex for which we want the angle.
      * @return , the angle of the unknown vertex.
      */
-    final public double getAngle(final Vertex unknown) {
+    public final double getAngle(final Vertex unknown) {
         this.vectOrigToUnkn = new Vector3D(unknown.x - vectOrig.getX(),
                                   unknown.y - vectOrig.getY(),
                                   unknown.z - vectOrig.getZ());

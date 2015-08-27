@@ -73,7 +73,7 @@ public class Vertex {
      * @return , a string describing the vertex.
      */
     @Override
-    public String toString() {
+    public final String toString() {
         return "v " + this.x + " " + this.y + " " + this.z;
     }
 
@@ -82,7 +82,7 @@ public class Vertex {
      *
      * @return , a string describing the vertex.
      */
-    public String toIdString() {
+    public final String toIdString() {
         return "v " + this.x + " " + this.y + " " + this.z + " " + this.id;
     }
 
@@ -92,8 +92,8 @@ public class Vertex {
      * @param ver , the vertex compared to.
      * @return , the distance on the plan Y/Z.
      */
-    public float distanceOnYZ(final Vertex ver) {
-        double distance = Math.sqrt(Math.pow(Math.abs(this.y - ver.y), 2)
+    public final float distanceOnYZ(final Vertex ver) {
+        final double distance = Math.sqrt(Math.pow(Math.abs(this.y - ver.y), 2)
                 + Math.pow(Math.abs(this.z - ver.z), 2.0));
 
         return (float) distance;
@@ -105,8 +105,8 @@ public class Vertex {
      * @param ver , the vertex compared to.
      * @return , the distance on the plan X/Z.
      */
-    public float distanceOnXZ(final Vertex ver) {
-        double distance = Math.sqrt(Math.pow(Math.abs(this.x - ver.x), 2)
+    public final float distanceOnXZ(final Vertex ver) {
+        final double distance = Math.sqrt(Math.pow(Math.abs(this.x - ver.x), 2)
                 + Math.pow(Math.abs(this.z - ver.z), 2.0));
 
         return (float) distance;
@@ -118,7 +118,7 @@ public class Vertex {
      * @param ver , the vertex compared to.
      * @return , the distance on the axe X.
      */
-    public float distanceOnX(final Vertex ver) {
+    public final float distanceOnX(final Vertex ver) {
         return Math.abs(this.x - ver.x);
     }
 
@@ -128,7 +128,7 @@ public class Vertex {
      * @param ver , the vertex compared to.
      * @return , the distance on the axe Y.
      */
-    public float distanceOnY(final Vertex ver) {
+    public final float distanceOnY(final Vertex ver) {
         return Math.abs(this.y - ver.y);
     }
 
@@ -137,7 +137,7 @@ public class Vertex {
      * @param splitPosition , the position of the border (x).
      * @return  , the distance between the vertex and the border.
      */
-    public float distanceToBorderX(int splitPosition) {
+    public final float distanceToBorderX(final int splitPosition) {
         return Math.abs(this.x - splitPosition);
     }
 
@@ -146,7 +146,7 @@ public class Vertex {
      * @param splitPosition , the position of the border (y).
      * @return  , the distance between the vertex and the border.
      */
-    public float distanceToBorderY(int splitPosition) {
+    public final float distanceToBorderY(final int splitPosition) {
         return Math.abs(this.y - splitPosition);
     }
 

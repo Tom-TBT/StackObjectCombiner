@@ -32,7 +32,10 @@ import java.util.logging.Logger;
  */
 public class Mesh {
 
-    private static int ANGLE_LIMIT = 230;
+    /**
+     * The angle limit above which a vertex is considered outside the border.
+     */
+    private static final int ANGLE_LIMIT = 230;
 
     /**
      * Contain the vertices composing this mesh.
@@ -68,8 +71,9 @@ public class Mesh {
 
     /**
      * Public constructor for a mesh.
+     * @param splits , the splits of the mesh.
      */
-    public Mesh(List splits) {
+    public Mesh(final List splits) {
         this.faces = new ArrayList<Face>();
         this.vertices = new ArrayList<Vertex>();
         this.garbage = new HashSet();
@@ -141,8 +145,8 @@ public class Mesh {
 
     /**
      * Find and return the next vertex of the current border.
-     * @param split
-     * @return
+     * @param split , the vertex is find next to this split.
+     * @return the next vertex of the current border.
      */
     public final Vertex findNextVertex(final Split split) {
         Vertex nextVertex = null;
@@ -185,7 +189,7 @@ public class Mesh {
     /**
      * Create all the borders of a mesh and put it in the list of borders.
      */
-    public void createBorders() {
+    public final void createBorders() {
         for (final Iterator it = this.splits.iterator(); it.hasNext();) {
             final Split split = (Split) it.next();
             final List borderVertices = split.findBorderVertices(this.vertices);
@@ -200,10 +204,10 @@ public class Mesh {
      * Search in the list of vertices a border and add it to the list of
      * borders. Once the border is added, remove from the list of vertices the
      * one who belong to the border.
-     * @param split
-     * @param borderVertices
+     * @param split , the split close to the border we are searching.
+     * @param borderVertices , the list of the vertices close to the split.
      */
-    public void searchBorder(final Split split,
+    public final void searchBorder(final Split split,
             final List borderVertices) {
         this.currentBorder = new Border();
         this.borders.add(currentBorder);
@@ -245,7 +249,11 @@ public class Mesh {
         }
     }
 
-    void exportBorders(String filePath) {
+    /**
+     * This method is used to export in a file the borders of this mesh.
+     * @param filePath , the filename to use.
+     */
+    final void exportBorders(final String filePath) {
         try {
             ObjWriter.writeBorders(filePath, this.borders);
         } catch (IOException ex) {

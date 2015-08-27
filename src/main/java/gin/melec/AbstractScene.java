@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public abstract class Scene {
+public abstract class AbstractScene {
 
     /**
      * The scene concern only one directory.
@@ -39,7 +39,7 @@ public abstract class Scene {
      * Build a scene by opening the given directory and list all the file in it.
      * @param pathname , the pathname of the file.
      */
-    public Scene(final String pathname) {
+    public AbstractScene(final String pathname) {
         this.workingDirectory = new File(pathname);
     }
 
@@ -66,23 +66,37 @@ public abstract class Scene {
      */
     public abstract void sortFiles();
 
-    Mesh loadMesh(final String meshName, List splits) {
-        Mesh mesh = new Mesh(splits);
+    /**
+     * Load the mesh of the given name with the given splits.
+     * @param meshName , the name of the mesh.
+     * @param splits , the splits of the mesh.
+     * @return the wanted mesh.
+     */
+    final Mesh loadMesh(final String meshName, final List splits) {
+        final Mesh mesh = new Mesh(splits);
         try {
-            ObjReader.readMesh(this.workingDirectory + "/" + meshName, mesh.vertices, mesh.faces);
+            ObjReader.readMesh(this.workingDirectory + "/" + meshName,
+                    mesh.vertices, mesh.faces);
         } catch (IOException ex) {
-            Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE,
+                    null, ex);
         }
 
         return mesh;
     }
 
-    void saveMesh(final String meshName, final Mesh mesh) {
+    /**
+     * Save the mesh given at the name given.
+     * @param meshName , the name of the mesh.
+     * @param mesh , the mesh to save.
+     */
+    final void saveMesh(final String meshName, final Mesh mesh) {
         try {
-                ObjWriter.writeMesh(this.workingDirectory + "/" +
-                        meshName, mesh);
+                ObjWriter.writeMesh(this.workingDirectory + "/"
+                        + meshName, mesh);
             } catch (IOException ex) {
-                Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE,
+                        null, ex);
             }
     }
 

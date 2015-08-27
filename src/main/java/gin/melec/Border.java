@@ -69,7 +69,6 @@ public class Border {
 
     /**
      * Public constructor for the border.
-     * @param firstVertex , the first vertex of the border.
      */
     public Border() {
         this.vertexSequence = new LinkedList();

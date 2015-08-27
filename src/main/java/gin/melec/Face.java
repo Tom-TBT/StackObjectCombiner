@@ -40,18 +40,19 @@ public class Face {
 
     /**
      * Public constructor of a face, taking id of three vertex.
-     * @param idVertex1
-     * @param idVertex2
-     * @param idVertex3
+     * @param idVertex1 , first vertex of the face.
+     * @param idVertex2 , second vertex of the face.
+     * @param idVertex3 , third vertex of the face.
      */
-    public Face (final int idVertex1, final int idVertex2, final int idVertex3) {
+    public Face(final int idVertex1, final int idVertex2,
+            final int idVertex3) {
         this.idVertex1 = idVertex1;
         this.idVertex2 = idVertex2;
         this.idVertex3 = idVertex3;
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "f" + " " + idVertex1 + " " + idVertex2 + " " + idVertex3;
     }
 

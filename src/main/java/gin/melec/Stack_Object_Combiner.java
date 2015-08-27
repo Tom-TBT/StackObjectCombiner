@@ -35,7 +35,7 @@ public class Stack_Object_Combiner implements PlugIn {
      */
     @Override
     public final void run(String arg) {
-        Scene scene = new Scene2Part(IJ.getDirectory("Give the file containing the "
+        AbstractScene scene = new Scene2Part(IJ.getDirectory("Give the file containing the "
                 + ".obj file to combine"),291);
         IJ.showProgress(0.0);
         scene.shiftMeshes();

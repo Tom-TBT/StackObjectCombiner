@@ -26,7 +26,7 @@ import java.util.List;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Scene9Part extends Scene {
+public class Scene9Part extends AbstractScene {
 
     /**
      * The meshes in the upper left corner of the stack.

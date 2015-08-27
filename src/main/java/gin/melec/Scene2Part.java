@@ -16,18 +16,15 @@
  */
 package gin.melec;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Scene2Part extends Scene {
+public class Scene2Part extends AbstractScene {
 
     /**
      * The meshes in the upper left corner of the stack.
@@ -66,7 +63,8 @@ public class Scene2Part extends Scene {
     /**
      * Class the file in the list where they belong to.
      */
-    public void sortFiles() {
+    @Override
+    public final void sortFiles() {
         for (String fileList : this.workingDirectory.list()) {
         /* The position of the object is coded by a capital letter and
             an underscore.*/
@@ -86,11 +84,11 @@ public class Scene2Part extends Scene {
     }
 
     @Override
-    void shiftMeshes() {
+    final void shiftMeshes() {
         // The upperLeftMeshes are not shifted because they are already in place
         Mesh mesh;
-        List splits = new ArrayList();
         for (Object upperMiddleMeshe : this.upperMiddleMeshes) {
+            final List splits = new ArrayList();
             splits.add(leftSplitLeftSide);
             mesh = loadMesh((String) upperMiddleMeshe, splits);
             mesh.shift();
