@@ -37,11 +37,11 @@ public class Scene2Part extends AbstractScene {
     /**
      * The left side of the left split.
      */
-    protected Split leftSplitLeftSide;
+    protected AbstractSplit leftSplitLeftSide;
     /**
      * The right side of the left split.
      */
-    protected Split leftSplitRightSide;
+    protected AbstractSplit leftSplitRightSide;
 
     /**
      * Constructor for a scene divide in 9 parts.

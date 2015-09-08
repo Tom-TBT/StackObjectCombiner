@@ -26,10 +26,10 @@ import org.junit.Test;
  */
 public class AngleSystemTest {
 
-    Split splitLeft = new SplitLeft(20);
-    Split splitUp = new SplitUp(20);
-    Split splitRight = new SplitRight(20);
-    Split splitDown = new SplitDown(20);
+    AbstractSplit splitLeft = new SplitLeft(20);
+    AbstractSplit splitUp = new SplitUp(20);
+    AbstractSplit splitRight = new SplitRight(20);
+    AbstractSplit splitDown = new SplitDown(20);
 
     public AngleSystemTest() {
     }

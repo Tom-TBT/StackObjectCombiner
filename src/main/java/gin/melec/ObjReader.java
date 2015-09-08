@@ -108,6 +108,7 @@ public class ObjReader {
                 borders.add(border);
                 border = new Border();
                 border.isCircular = splitedLine[2].equals("circular");
+                isFirstLine = true;
             }
             else if (splitedLine[0].equals("v")) {
                 final Vertex v = new Vertex(Integer.parseInt(splitedLine[4]),

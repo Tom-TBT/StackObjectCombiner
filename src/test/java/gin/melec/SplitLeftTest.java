@@ -19,7 +19,7 @@ public class SplitLeftTest {
     public SplitLeftTest() {
     }
 
-    Split splitLeft = new SplitLeft(100);
+    AbstractSplit splitLeft = new SplitLeft(100);
 
     /**
      * Test of findBorderVertices method, of class SplitLeft.

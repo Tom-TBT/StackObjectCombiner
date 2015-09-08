@@ -45,18 +45,6 @@ public class VertexTest {
     }
 
     /**
-     * Test of toIdString method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testToIdString() {
-        System.out.println("toIdString");
-        final Vertex instance = new Vertex(1450, 27.9f, 45, 74.3f);
-        String expResult = "v 27.9 45.0 74.3 1450";
-        String result = instance.toIdString();
-        assertEquals(expResult, result);
-    }
-
-    /**
      * Test of distanceOnYZ method, of class Vertex.
      */
     @org.junit.Test
@@ -117,7 +105,7 @@ public class VertexTest {
         int splitPosition = 300;
         Vertex instance = new Vertex(664, 299.2f, 95, 9);
         float expResult = 0.8F;
-        float result = instance.distanceToBorderX(splitPosition);
+        float result = instance.distanceToSplitX(splitPosition);
         assertEquals(expResult, result, 0.01);
     }
 
@@ -130,7 +118,7 @@ public class VertexTest {
         int splitPosition = 200;
         Vertex instance = new Vertex(664, 299.2f, 199, 9);
         float expResult = 1.0F;
-        float result = instance.distanceToBorderY(splitPosition);
+        float result = instance.distanceToSplitY(splitPosition);
         assertEquals(expResult, result, 0.01);
     }
 

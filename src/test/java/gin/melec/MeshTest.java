@@ -40,65 +40,43 @@ public class MeshTest {
         Vertex v11 = new Vertex(10, 98f, 101, 100);
         Vertex v12 = new Vertex(10, 98f, 102, 100);
 
-        Face f1 = new Face(1,2,6);
-        Face f2 = new Face(2,3,7);
-        Face f3 = new Face(3,4,8);
-        Face f4 = new Face(4,5,9);
+        Face f1 = new Face(1, 2, 6);
+        Face f2 = new Face(2, 3, 7);
+        Face f3 = new Face(3, 4, 8);
+        Face f4 = new Face(4, 5, 9);
 
-        Face f5 = new Face(2,6,7);
-        Face f6 = new Face(3,7,8);
-        Face f7 = new Face(4,8,9);
+        Face f5 = new Face(2, 6, 7);
+        Face f6 = new Face(3, 7, 8);
+        Face f7 = new Face(4, 8, 9);
 
-        Face f8 = new Face(10,11,12);
+        Face f8 = new Face(10, 11, 12);
 
         List splits = new ArrayList();
         splits.add(new SplitRight(100));
         meshTest = new Mesh(splits);
 
-        meshTest.vertices.add(v1);meshTest.vertices.add(v2);meshTest.vertices.add(v3);
-        meshTest.vertices.add(v4);meshTest.vertices.add(v5);meshTest.vertices.add(v6);
-        meshTest.vertices.add(v7);meshTest.vertices.add(v8);meshTest.vertices.add(v9);
-        meshTest.vertices.add(v10);meshTest.vertices.add(v11);meshTest.vertices.add(v12);
+        meshTest.vertices.add(v1);
+        meshTest.vertices.add(v2);
+        meshTest.vertices.add(v3);
+        meshTest.vertices.add(v4);
+        meshTest.vertices.add(v5);
+        meshTest.vertices.add(v6);
+        meshTest.vertices.add(v7);
+        meshTest.vertices.add(v8);
+        meshTest.vertices.add(v9);
+        meshTest.vertices.add(v10);
+        meshTest.vertices.add(v11);
+        meshTest.vertices.add(v12);
 
-        meshTest.faces.add(f1);meshTest.faces.add(f2);meshTest.faces.add(f3);
-        meshTest.faces.add(f4);meshTest.faces.add(f5);meshTest.faces.add(f6);
-        meshTest.faces.add(f7);meshTest.faces.add(f8);
+        meshTest.faces.add(f1);
+        meshTest.faces.add(f2);
+        meshTest.faces.add(f3);
+        meshTest.faces.add(f4);
+        meshTest.faces.add(f5);
+        meshTest.faces.add(f6);
+        meshTest.faces.add(f7);
+        meshTest.faces.add(f8);
     }
-
-    /**
-     * Test of findVertex method, of class Mesh.
-     */
-    @Test
-    public void testFindVertex() {
-        System.out.println("findVertex");
-        int vertexID = 5;
-        Vertex expResult = (Vertex)meshTest.vertices.get(4);
-        Vertex result = meshTest.findVertex(vertexID);
-        assertEquals(expResult.id, result.id);
-    }
-
-    /**
-     * Test of doNeighborhood method, of class Mesh.
-     */
-    @Test
-    public void testDoNeighborhood() {
-        System.out.println("doNeighborhood");
-        meshTest.doNeighborhood();
-        Vertex v = (Vertex) meshTest.vertices.get(0);
-        assertEquals(2, v.neighbours.size());
-    }
-    /**
-     * Test of completeGarbage method, of class Mesh.
-     */
-    @Test
-    public void testCompleteGarbage() {
-        System.out.println("completeGarbage");
-        meshTest.garbage.add(meshTest.vertices.get(0));
-        meshTest.doNeighborhood();
-        meshTest.completeGarbage();
-        assertEquals(9, meshTest.garbage.size());
-    }
-
 
     /**
      * Test of shift method, of class Mesh.
@@ -111,38 +89,78 @@ public class MeshTest {
         assertEquals(199.5, result.x, 0);
     }
 
-    /**
-     * Test of findNextVertex method, of class Mesh.
-     */
+
+//    @Test
+//    public void testCreateBorders() throws IOException {
+//        System.out.println("createBorders");
+//        AbstractSplit rightSplit = new SplitRight(102);
+//        List splits = new ArrayList(); splits.add(rightSplit);
+//        Mesh circularMesh = new Mesh(splits);
+//        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_CircularBorder1.obj"
+//                , circularMesh.vertices, circularMesh.faces);
+//
+//        circularMesh.createBorders();
+//
+//        Border border = (Border)circularMesh.borders.get(0);
+//        for(Object o: border.vertexSequence) {
+//            Vertex v = (Vertex) o;
+//            System.out.println(v.toString());
+//        }
+//
+//        circularMesh.exportBorders("./src/test/java/gin/melec/MeshForTests/A_CircularBorder1_borders.obj");
+//    }
+//
+//
+//    @Test
+//    public void testCreateDoubleBorders() throws IOException {
+//        System.out.println("createDoubleBorders");
+//        AbstractSplit rightSplit = new SplitRight(133);
+//        List splits = new ArrayList(); splits.add(rightSplit);
+//        Mesh doubleBorder = new Mesh(splits);
+//        doubleBorder.vertices = rightSplit.findBorderVertices(doubleBorder.vertices);
+//        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1.obj"
+//                , doubleBorder.vertices, doubleBorder.faces);
+//
+//        doubleBorder.createBorders();
+//
+//        Border border = (Border)doubleBorder.borders.get(0);
+//        for(Object o: border.vertexSequence) {
+//            Vertex v = (Vertex) o;
+//            System.out.println(v.toString());
+//        }
+//        border = (Border)doubleBorder.borders.get(1);
+//        for(Object o: border.vertexSequence) {
+//            Vertex v = (Vertex) o;
+//            System.out.println(v.toString());
+//        }
+//
+//        doubleBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1_borders.obj");
+//    }
+
     @Test
-    public void testCreateBorders() throws IOException {
-        System.out.println("findNextVertex");
-        Split rightSplit = new SplitRight(102);
+    public void testCreateLinearBorders() throws IOException {
+        System.out.println("createLinearBorders");
+        AbstractSplit rightSplit = new SplitRight(247);
         List splits = new ArrayList(); splits.add(rightSplit);
-        Mesh circularMesh = new Mesh(splits);
-        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_Mito_Gauche.obj"
-                , circularMesh.vertices, circularMesh.faces);
-        circularMesh.doNeighborhood();
+        Mesh doubleBorder = new Mesh(splits);
+        doubleBorder.vertices = rightSplit.findBorderVertices(doubleBorder.vertices);
+        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_LinearBorder1.obj"
+                , doubleBorder.vertices, doubleBorder.faces);
 
-        circularMesh.createBorders();
+        doubleBorder.createBorders();
 
-        Border border = (Border)circularMesh.borders.get(0);
+        Border border = (Border)doubleBorder.borders.get(0);
+        for(Object o: border.vertexSequence) {
+            Vertex v = (Vertex) o;
+            System.out.println(v.toString());
+        }
+        border = (Border)doubleBorder.borders.get(1);
         for(Object o: border.vertexSequence) {
             Vertex v = (Vertex) o;
             System.out.println(v.toString());
         }
 
-        circularMesh.exportBorders("./src/test/java/gin/melec/MeshForTests/A_Mito_Gauche_borders.obj");
+        doubleBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_LinearBorder1_borders.obj");
     }
-
-    public void testReadBorders() throws IOException {
-        List borders = ObjReader.readBorders("./src/test/java/gin/melec/MeshForTests/A_Mito_Gauche_borders.obj");
-        Border border = (Border) borders.get(0);
-        for(Object o: border.vertexSequence) {
-            Vertex v = (Vertex) o;
-            System.out.println(v.toString());
-        }
-    }
-
 
 }

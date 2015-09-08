@@ -16,7 +16,7 @@
  */
 package gin.melec;
 
-import static gin.melec.Split.WINDOW;
+import static gin.melec.AbstractSplit.WINDOW;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -27,7 +27,7 @@ import java.util.List;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class SplitRight extends Split {
+public class SplitRight extends AbstractSplit {
 
 
     /**

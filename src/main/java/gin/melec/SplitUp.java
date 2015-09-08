@@ -26,7 +26,7 @@ import java.util.List;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class SplitUp extends Split {
+public class SplitUp extends AbstractSplit {
 
     /**
      * Public constructor for a split with a position.

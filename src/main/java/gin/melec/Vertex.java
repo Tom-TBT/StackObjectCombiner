@@ -76,11 +76,11 @@ public class Vertex {
     public final String toString() {
         return "v " + this.x + " " + this.y + " " + this.z;
     }
-
+    
     /**
-     * Like toString but add also the id of the vertex.
+     * Return the string caracterizing the vertex with it's ID.
      *
-     * @return , a string describing the vertex.
+     * @return , a string describing the vertex with it's ID.
      */
     public final String toIdString() {
         return "v " + this.x + " " + this.y + " " + this.z + " " + this.id;
@@ -137,7 +137,7 @@ public class Vertex {
      * @param splitPosition , the position of the border (x).
      * @return  , the distance between the vertex and the border.
      */
-    public final float distanceToBorderX(final int splitPosition) {
+    public final float distanceToSplitX(final int splitPosition) {
         return Math.abs(this.x - splitPosition);
     }
 
@@ -146,7 +146,7 @@ public class Vertex {
      * @param splitPosition , the position of the border (y).
      * @return  , the distance between the vertex and the border.
      */
-    public final float distanceToBorderY(final int splitPosition) {
+    public final float distanceToSplitY(final int splitPosition) {
         return Math.abs(this.y - splitPosition);
     }
 
