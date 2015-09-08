@@ -18,6 +18,7 @@ package gin.melec;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -42,37 +43,47 @@ public class Border {
     Vertex scndLastVertexAdded;
 
     /**
+     * The split that initiate this border.
+     */
+    AbstractSplit split;
+
+    /**
      * The sequence of vertex forming the border.
      */
     List vertexSequence;
 
     /**
-     * The lenght of the border. Equals to the sum of all distances between
-     * vertices.
-     */
-    float lengthSum;
-
-    /**
-     * The lenght of the border between the first and the last vertex.
-     */
-    float lenght;
-
-    /**
-     * The voxel in the center of the border..
-     */
-    Vertex centre;
-
-    /**
-     * This flag is up when the border form a circle.
-     */
-    boolean isCircular;
-
-    /**
      * Public constructor for the border.
      */
+    public Border(final Mesh mesh) {
+        this.vertexSequence = new LinkedList();
+
+        // Search the next first vertex
+        this.firstVertex = null;
+        Vertex candidat = null;
+        float distanceTmp, distanceFirstVertex = 0;
+        for (Object obj : mesh.splits) {
+            final AbstractSplit currentSplit = (AbstractSplit) obj;
+            candidat = currentSplit.findCloserVertex(mesh.primers);
+            distanceTmp = currentSplit.distanceTo(candidat);
+            if (firstVertex == null || distanceTmp < distanceFirstVertex) {
+                distanceFirstVertex = distanceTmp;
+                firstVertex = candidat;
+                this.split = currentSplit;
+            }
+        }
+        mesh.findNeighboors(firstVertex);
+        this.scndLastVertexAdded = firstVertex;
+        lastVertexAdded = this.split.findCloserVertex(firstVertex.neighbours);
+        this.vertexSequence.add(scndLastVertexAdded);
+        this.vertexSequence.add(lastVertexAdded);
+
+        mesh.garbage.add(firstVertex);
+        mesh.garbage.add(lastVertexAdded);
+    }
+
     public Border() {
         this.vertexSequence = new LinkedList();
-        isCircular = false;
     }
 
     /**
@@ -87,10 +98,6 @@ public class Border {
             this.vertexSequence.add(vertex);
             scndLastVertexAdded = lastVertexAdded;
             lastVertexAdded = vertex;
-
-            if (this.lastVertexAdded.equals(this.firstVertex)) {
-                this.isCircular = true;
-            }
         }
     }
 

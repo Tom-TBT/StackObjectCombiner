@@ -102,12 +102,12 @@ public class ObjReader {
         while ((currentLine = buR.readLine()) != null) {
             splitedLine = currentLine.split(" ");
             if (splitedLine[0].equals("b") && isFirstLine) {
-                border.isCircular = splitedLine[2].equals("circular");
+                //border.isCircular = splitedLine[2].equals("circular");
             }
             else if (splitedLine[0].equals("b") && !isFirstLine) {
                 borders.add(border);
                 border = new Border();
-                border.isCircular = splitedLine[2].equals("circular");
+                //border.isCircular = splitedLine[2].equals("circular");
                 isFirstLine = true;
             }
             else if (splitedLine[0].equals("v")) {

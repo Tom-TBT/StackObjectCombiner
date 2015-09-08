@@ -51,7 +51,7 @@ public class AngleSystem {
      * Vector which situate the virtual point of the system, relatively to the
      * origin point.
      */
-    final private Vector3D vectOrigToVirt;
+    private Vector3D vectOrigToVirt;
     /**
      * Vector which situate the unknown point of the system, relatively to the
      * origin point.
@@ -87,22 +87,25 @@ public class AngleSystem {
      * @param reference , the reference point of the system.
      * @param virtual, the virtual point of the system.
      */
-    public AngleSystem(final Vertex origin, final Vertex reference,
-            final Vertex virtual) {
+    public AngleSystem(final Vertex origin, final Vertex reference) {
         this.vectOrig = new Vector3D(origin.x, origin.y, origin.z);
         final Vector3D vectRef = new Vector3D(reference.x, reference.y,
                 reference.z);
 
-        final Vector3D vectVirt = new Vector3D(virtual.x, virtual.y, virtual.z);
+        this.vectOrigToVirt = new Vector3D(0, 0, 0);
+        for(Object obj: origin.neighbours) {
+            final Vertex neighbour = (Vertex) obj;
+            Vector3D distance = new Vector3D(origin.x - neighbour.x,
+                origin.y - neighbour.y, origin.z - neighbour.z);
+            distance = distance.normalize();
+            this.vectOrigToVirt = this.vectOrigToVirt.add(distance);
+        }
 
         // Ref and virtual point coordonates are changed to correspond with the
         // origin point as... origin.
         this.vectOrigToRef = new Vector3D(vectRef.getX() - vectOrig.getX(),
                                   vectRef.getY() - vectOrig.getY(),
                                   vectRef.getZ() - vectOrig.getZ());
-        this.vectOrigToVirt = new Vector3D(vectVirt.getX() - vectOrig.getX(),
-                                  vectVirt.getY() - vectOrig.getY(),
-                                  vectVirt.getZ() - vectOrig.getZ());
 
         this.plane = new Plane(new Vector3D(0, 0, 0), this.vectOrigToRef,
                 this.vectOrigToVirt, TOLERANCE);

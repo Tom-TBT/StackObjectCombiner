@@ -85,14 +85,7 @@ public class ObjWriter {
 
         for (Object o : borders) {
             final Border border = (Border) o;
-            prW.write("b " + numBorder);
-            if (border.isCircular) {
-                prW.write(" circular");
-            }
-            else {
-                prW.write(" linear");
-            }
-            prW.write("\n");
+            prW.write("b " + numBorder + "\n");
             for (Object ob : border.vertexSequence) {
                 final Vertex vertex = (Vertex) ob;
                 prW.write(vertex.toIdString() + "\n");

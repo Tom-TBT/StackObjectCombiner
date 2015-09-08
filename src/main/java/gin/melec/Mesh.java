@@ -57,13 +57,12 @@ public class Mesh {
      */
     Set garbage;
     /**
-     * List of vertices that can belong to the current border.
+     * Contain the vertex that can initiate a border. Once this set is empty, it
+     * means that all the borders have been detected. Else, we create a new one
+     * by taking a vertex in the set (method in split). After a detection of a
+     * border, the vertex detected are removed from this set.
      */
-    List currentBorderVertices;
-    /**
-     * Current border on which one can work with.
-     */
-    Border currentBorder;
+    Set primers;
 
     /**
      * Switch the position of the mesh and switch the type of scene, meshes can
@@ -82,49 +81,94 @@ public class Mesh {
         this.garbage = new HashSet();
         this.borders = new ArrayList();
         this.splits = splits;
+        this.primers = new HashSet();
     }
 
-    /**
-     * Add to the neighborList of each vertex, the vertex that are connected to
-     * it. It relies now to the fact that in the mesh, id are originally ordered
-     * .
-     */
-    final void doNeighborhood() {
+    private Vertex findVertexInPrimers(final int idVertex) {
+        for (Object obj : primers) {
+            final Vertex vertex = (Vertex) obj;
+            if (vertex.id == idVertex) {
+                return vertex;
+            }
+        }
+        return null;
+    }
+
+    private int findMaxIdVertex(Set primers) {
+        int idMax = 0;
+        for (Object obj : this.primers) {
+            Vertex vertex = (Vertex) obj;
+            if (vertex.id > idMax) {
+                idMax = vertex.id;
+            }
+        }
+        return idMax;
+    }
+
+    private int findMinIdVertex(Set primers) {
+        int idMin = 0;
+        for (Object obj : this.primers) {
+            Vertex vertex = (Vertex) obj;
+            if (idMin == 0 || vertex.id < idMin) {
+                idMin = vertex.id;
+            }
+        }
+        return idMin;
+    }
+
+    private void doPrimersNeighboors() {
+        int minId, maxId;
+        minId = findMinIdVertex(this.primers);
+        maxId = findMaxIdVertex(this.primers);
+        for (Object obj1 : this.faces) {
+            final Face face = (Face) obj1;
+            if (face.idVertex1 >= minId && face.idVertex1 <= maxId) {
+                final Vertex vertex1 = findVertexInPrimers(face.idVertex1);
+                if (vertex1 != null && face.idVertex2 >= minId
+                        && face.idVertex2 <= maxId) {
+                    final Vertex vertex2 = findVertexInPrimers(face.idVertex2);
+                    if (vertex2 != null && face.idVertex3 >= minId
+                            && face.idVertex3 <= maxId) {
+                        final Vertex vertex3 = findVertexInPrimers(face.idVertex3);
+                        if (vertex3 != null) {
+                            vertex1.neighbours.add(vertex2);
+                            vertex1.neighbours.add(vertex3);
+                            vertex2.neighbours.add(vertex1);
+                            vertex2.neighbours.add(vertex3);
+                            vertex3.neighbours.add(vertex1);
+                            vertex3.neighbours.add(vertex2);
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    final void findNeighboors(Vertex vertex) {
         for (Object element : this.faces) {
-            final Face face = (Face) element;
-            final Vertex vertex1 = getCurrentBorderVertex(face.idVertex1);
-            final Vertex vertex2 = getCurrentBorderVertex(face.idVertex2);
-            final Vertex vertex3 = getCurrentBorderVertex(face.idVertex3);
-            if (vertex1 != null && vertex2 != null) {
-                vertex1.neighbours.add(vertex2);
-                vertex2.neighbours.add(vertex1);
-            }
-            if (vertex1 != null && vertex3 != null) {
-                vertex1.neighbours.add(vertex3);
-                vertex3.neighbours.add(vertex1);
-            }
-            if (vertex2 != null && vertex3 != null) {
-                vertex2.neighbours.add(vertex3);
-                vertex3.neighbours.add(vertex2);
+            Face face = (Face) element;
+            if (face.idVertex1 == vertex.id) {
+                vertex.neighbours.add(findVertex(face.idVertex2));
+                vertex.neighbours.add(findVertex(face.idVertex3));
+            } else if (face.idVertex2 == vertex.id) {
+                vertex.neighbours.add(findVertex(face.idVertex1));
+                vertex.neighbours.add(findVertex(face.idVertex3));
+            } else if (face.idVertex3 == vertex.id) {
+                vertex.neighbours.add(findVertex(face.idVertex1));
+                vertex.neighbours.add(findVertex(face.idVertex2));
             }
         }
     }
 
-    /**
-     * Find the vertex with the given id in the currentBorderVertices list.
-     *
-     * @param vertexID , the id of the vertex to find.
-     * @return vertex with the given id.
-     */
-    public final Vertex getCurrentBorderVertex(final int vertexID) {
-        Vertex result = null;
-        for (Object element : this.currentBorderVertices) {
-            final Vertex vertex = (Vertex) element;
-            if (vertex.id == vertexID) {
-                result = vertex;
+    final Vertex findVertex(int idVertex) {
+        for (Object obj : vertices) {
+            Vertex vertex = (Vertex) obj;
+            if (vertex.id == idVertex) {
+                return vertex;
             }
         }
-        return result;
+        return null;
     }
 
     /**
@@ -140,87 +184,77 @@ public class Mesh {
     }
 
     /**
-     * Accessor to the current border.
-     *
-     * @return , the current border.
-     */
-    public final Border getCurrentBorder() {
-        return currentBorder;
-    }
-
-    /**
      * Find and return the next vertex of the current border.
      *
      * @param split , the vertex is find next to this split.
      * @return the next vertex of the current border.
      */
-    public final Vertex findNextVertex(final AbstractSplit split) {
+    public final Vertex findNextVertex(Border border) {
         Vertex nextVertex = null;
         AngleSystem system;
         double angleVertex = 360.0;
 
-        system = new AngleSystem(this.currentBorder.lastVertexAdded,
-                this.currentBorder.scndLastVertexAdded,
-                split.createVirtual(this.currentBorder.lastVertexAdded));
+        system = new AngleSystem(border.lastVertexAdded,
+                border.scndLastVertexAdded);
 
-        if (this.currentBorder.firstVertex
-                .equals(this.currentBorder.lastVertexAdded)) {
-            return null;
-        }
-        for (final Iterator it
-                = this.currentBorder.lastVertexAdded.neighbours.iterator();
+        for (final Iterator it = border.lastVertexAdded.neighbours.iterator();
                 it.hasNext();) {
             final Vertex candidate = (Vertex) it.next();
             if (!this.garbage.contains(candidate)) {
                 this.garbage.add(candidate);
 
                 final double angleCandidate = system.getAngle(candidate);
-                if (nextVertex == null || (angleCandidate < angleVertex
-                        && angleCandidate < ANGLE_LIMIT)) {
+                if (nextVertex == null || (angleCandidate < angleVertex)) {
                     nextVertex = candidate;
                     angleVertex = angleCandidate;
                 }
-                // TODO Ajouter condition arret pour bordure linéaire
-            } else if (candidate.equals(this.currentBorder.firstVertex)
-                    && !this.currentBorder.scndLastVertexAdded
-                    .equals(this.currentBorder.firstVertex)) {
+
+            } else if (candidate.equals(border.firstVertex)
+                    && !border.scndLastVertexAdded.equals(border.firstVertex)) {
                 nextVertex = candidate;
                 break;
             }
         }
+        if (nextVertex != null) {
+            System.out.println(nextVertex.toIdString());
+            this.findNeighboors(nextVertex);
+        }
         return nextVertex;
     }
 
-    /**
-     * Create all the borders of a mesh and put it in the list of borders.
-     */
-    public final void createBorders() {
-        for (final Iterator it = this.splits.iterator(); it.hasNext();) {
-            final AbstractSplit split = (AbstractSplit) it.next();
-            currentBorderVertices = split.findBorderVertices(this.vertices);
-            this.doNeighborhood();
-
-            while (!currentBorderVertices.isEmpty()) {
-                this.currentBorder = new Border();
-                this.borders.add(currentBorder);
-
-                split.initiateBorder(this);
-                Vertex nextVertex = this.currentBorder.lastVertexAdded;
-                while (nextVertex != null) {
-                    nextVertex = this.findNextVertex(split);
-                    this.currentBorder.addNextVertex(nextVertex);
-                }
-                nextVertex = this.currentBorder.firstVertex;
-                if (!currentBorder.isCircular) {
-                    while (nextVertex != null) {
-                        nextVertex = this.findNextVertex(split);
-                        this.currentBorder.addPreviousVertex(nextVertex);
-                    }
-                }
-                this.completeGarbage();
-                currentBorderVertices.removeAll(this.garbage);
-                this.garbage.clear();
+    final void createBorders() {
+        createPrimers();
+        doPrimersNeighboors();
+        while (!primers.isEmpty()) {
+            final Border border = new Border(this);
+            Vertex nextVertex = border.lastVertexAdded;
+            while (nextVertex != null) {
+                nextVertex = this.findNextVertex(border);
+                border.addNextVertex(nextVertex);
             }
+            if (border.lastVertexAdded == border.firstVertex) {
+                // on a fait le tour
+            } else {
+                // Un problème ... on repart du 1er
+                nextVertex = border.firstVertex;
+                border.lastVertexAdded = border.firstVertex;
+                border.scndLastVertexAdded = (Vertex) border.vertexSequence.get(1);
+                while (nextVertex != null) {
+                    nextVertex = this.findNextVertex(border);
+                    border.addPreviousVertex(nextVertex);
+                }
+            }
+            completeGarbage();
+            primers.removeAll(this.garbage);
+            this.garbage.clear();
+            this.borders.add(border);
+        }
+    }
+
+    final void createPrimers() {
+        for (Object e : splits) {
+            AbstractSplit split = (AbstractSplit) e;
+            primers.addAll(split.findBorderVertices(vertices));
         }
     }
 
@@ -258,5 +292,4 @@ public class Mesh {
         }
         borders.clear();
     }
-
 }

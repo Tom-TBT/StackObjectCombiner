@@ -51,20 +51,20 @@ final List closeVertices = new ArrayList();
     }
 
     @Override
-    public final Vertex createVirtual(final Vertex original) {
-        return new Vertex(0, original.x + 1, original.y, original.z);
+    protected final Vertex findCloserVertex(final Collection collection) {
+        Vertex result = null;
+        for (final Iterator it = collection.iterator(); it.hasNext();) {
+            final Vertex candidat = (Vertex) it.next();
+            if (result == null || candidat.x > result.x) {
+                result = candidat;
+            }
+        }
+        return result;
     }
 
     @Override
-    protected final Vertex findCloserVertex(final Collection collection) {
-        Vertex chosenOne = null;
-        for (final Iterator it = collection.iterator(); it.hasNext();) {
-            final Vertex vertex = (Vertex) it.next();
-            if (chosenOne == null || vertex.x > chosenOne.x) {
-                chosenOne = vertex;
-            }
-        }
-        return chosenOne;
+    protected float distanceTo(final Vertex vertex) {
+        return Math.abs(this.position - vertex.x);
     }
 
     @Override

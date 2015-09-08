@@ -104,14 +104,14 @@ public class Scene2Part extends AbstractScene {
         splits.add(leftSplitRightSide);
         for (Object upperLeftMeshe : upperLeftMeshes) {
             mesh = loadMesh((String) upperLeftMeshe, splits);
-            mesh.createBorders();
+            mesh.refineBorders();
         }
 
         splits = new ArrayList();
         splits.add(leftSplitLeftSide);
         for (Object upperMiddleMeshe : this.upperMiddleMeshes) {
             mesh = loadMesh((String) upperMiddleMeshe, splits);
-            mesh.createBorders();
+            mesh.refineBorders();
         }
 
     }

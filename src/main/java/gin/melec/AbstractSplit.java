@@ -54,13 +54,6 @@ public abstract class AbstractSplit {
     public abstract List findBorderVertices(final List vertices);
 
     /**
-     * Create a vertex next to the origin, shifted differently switch the split.
-     * @param origin , the vertex from which we create the virtual vertex.
-     * @return a virtual vertex, next to the origin.
-     */
-    public abstract Vertex createVirtual(final Vertex origin);
-
-    /**
      * Getter for the attribute position.
      * @return the position of the border.
      */
@@ -69,30 +62,11 @@ public abstract class AbstractSplit {
     }
 
     /**
-     * Initiate the current border of the mesh with the two first vertex. These
-     * vertex are not find like the others and depend exclusively of the split.
-     * @param mesh , the mesh containing the border we want to initiate.
-     */
-    public final void initiateBorder(final Mesh mesh) {
-        Vertex firstVertex, secondVertex;
-
-        firstVertex = this.findCloserVertex(mesh.currentBorderVertices);
-        secondVertex = this.findCloserVertex(firstVertex.neighbours);
-
-        mesh.currentBorder.addNextVertex(firstVertex);
-        mesh.currentBorder.addNextVertex(secondVertex);
-
-        mesh.currentBorder.firstVertex = firstVertex;
-
-        mesh.garbage.add(firstVertex);
-        mesh.garbage.add(secondVertex);
-    }
-
-    /**
      * A protected method called to search in a collection the closer vertex to
      * the split.
      * @param collection , the collection containing the vertices.
-     * @return the closer vertex to the split.
+     * @param result , the closest vertex.
+     * @return the distance of the closest vertex to the split.
      */
     protected abstract Vertex findCloserVertex(final Collection collection);
 
@@ -107,4 +81,12 @@ public abstract class AbstractSplit {
      * @return the position of the split.
      */
     protected abstract int yPosition();
+
+    /**
+     * Give the distance between the split and the vertex depending the axe of
+     * the split.
+     * @param vertex , the vertex mesured.
+     * @return the distance.
+     */
+    protected abstract float distanceTo(final Vertex vertex);
 }
