@@ -95,24 +95,15 @@ public class AngleSystem {
                 reference.z);
 
         this.vectOrigToVirt = new Vector3D(0, 0, 0);
-        Set guidingVertices = new HashSet();
         for (Object obj: origin.neighbours) {
             Vertex neighbour = (Vertex) obj;
             Vector3D distance = new Vector3D(origin.x - neighbour.x,
                 origin.y - neighbour.y, origin.z - neighbour.z);
-            distance = distance.normalize().scalarMultiply(2);
-            this.vectOrigToVirt = this.vectOrigToVirt.add(distance);
-            guidingVertices.addAll(neighbour.neighbours);
-        }
-        guidingVertices.remove(origin);
-        guidingVertices.removeAll(origin.neighbours);
-        for (Object obj: guidingVertices) {
-            Vertex neighbour = (Vertex) obj;
-            Vector3D distance = new Vector3D(origin.x - neighbour.x,
-                origin.y - neighbour.y, origin.z - neighbour.z);
-            distance = distance.normalize().scalarMultiply(0);
+            distance = distance.normalize().scalarMultiply(10);
             this.vectOrigToVirt = this.vectOrigToVirt.add(distance);
         }
+        System.out.println("POS VIRTUAL: " + vectOrigToVirt.toString());
+
 
         // Ref and virtual point coordonates are changed to correspond with the
         // origin point as... origin.

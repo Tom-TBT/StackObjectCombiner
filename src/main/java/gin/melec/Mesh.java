@@ -125,7 +125,6 @@ public class Mesh {
                 vertex2.neighbours.add(vertex3);
                 vertex3.neighbours.add(vertex1);
                 vertex3.neighbours.add(vertex2);
-
             }
             else if (face.idVertex2 >= minId && face.idVertex2 <= maxId) {
                 vertex1 = findVertex(face.idVertex1);
@@ -207,8 +206,9 @@ public class Mesh {
         for (final Iterator it = border.lastVertexAdded.neighbours.iterator();
                 it.hasNext();) {
             final Vertex candidate = (Vertex) it.next();
-            if (!this.garbage.contains(candidate)) {
 
+            if (!this.garbage.contains(candidate) || (((border.scndLastVertexAdded.neighbours.contains(candidate)) && (border.lastVertexAdded.neighbours.size() == 2) && (border.scndLastVertexAdded != candidate)))) {
+                this.garbage.add(nextVertex);
                 final double angleCandidate = system.getAngle(candidate);
                 if (nextVertex == null || (angleCandidate < angleVertex)) {
                     nextVertex = candidate;
@@ -222,13 +222,13 @@ public class Mesh {
             }
         }
         if (nextVertex != null) {
-            System.out.println(nextVertex.toIdString());
             this.findNeighbours(nextVertex);
+            System.out.println(nextVertex.toIdString() + " " + nextVertex.neighbours.size() + " " + angleVertex + " " + border.vertexSequence.size());
+            this.garbage.add(nextVertex);
 //            for(Object obj : nextVertex.neighbours) {
 //                Vertex neighbour = (Vertex) obj;
 //                this.findNeighbours(neighbour);
 //            }
-            this.garbage.add(nextVertex);
         }
         return nextVertex;
     }
@@ -248,15 +248,6 @@ public class Mesh {
             if (border.lastVertexAdded == border.firstVertex) {
                 // on a fait le tour
                 System.out.println("Wéé!");
-            } else {
-                // Un problème ... on repart du 1er
-                nextVertex = border.firstVertex;
-                border.lastVertexAdded = border.firstVertex;
-                border.scndLastVertexAdded = (Vertex) border.vertexSequence.get(1);
-                while (nextVertex != null) {
-                    nextVertex = this.findNextVertex(border);
-                    border.addPreviousVertex(nextVertex);
-                }
             }
             completeGarbage();
             primers.removeAll(this.garbage);
