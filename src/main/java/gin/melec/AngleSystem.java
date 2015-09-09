@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package gin.melec;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.commons.math3.geometry.euclidean.threed.Line;
 import org.apache.commons.math3.geometry.euclidean.threed.Plane;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -93,11 +95,22 @@ public class AngleSystem {
                 reference.z);
 
         this.vectOrigToVirt = new Vector3D(0, 0, 0);
-        for(Object obj: origin.neighbours) {
-            final Vertex neighbour = (Vertex) obj;
+        Set guidingVertices = new HashSet();
+        for (Object obj: origin.neighbours) {
+            Vertex neighbour = (Vertex) obj;
             Vector3D distance = new Vector3D(origin.x - neighbour.x,
                 origin.y - neighbour.y, origin.z - neighbour.z);
-            distance = distance.normalize();
+            distance = distance.normalize().scalarMultiply(2);
+            this.vectOrigToVirt = this.vectOrigToVirt.add(distance);
+            guidingVertices.addAll(neighbour.neighbours);
+        }
+        guidingVertices.remove(origin);
+        guidingVertices.removeAll(origin.neighbours);
+        for (Object obj: guidingVertices) {
+            Vertex neighbour = (Vertex) obj;
+            Vector3D distance = new Vector3D(origin.x - neighbour.x,
+                origin.y - neighbour.y, origin.z - neighbour.z);
+            distance = distance.normalize().scalarMultiply(0);
             this.vectOrigToVirt = this.vectOrigToVirt.add(distance);
         }
 

@@ -68,17 +68,17 @@ public class Border {
             distanceTmp = currentSplit.distanceTo(candidat);
             if (firstVertex == null || distanceTmp < distanceFirstVertex) {
                 distanceFirstVertex = distanceTmp;
-                firstVertex = candidat;
+                this.firstVertex = candidat;
                 this.split = currentSplit;
             }
         }
-        mesh.findNeighboors(firstVertex);
+        mesh.findNeighbours(firstVertex);
         this.scndLastVertexAdded = firstVertex;
         lastVertexAdded = this.split.findCloserVertex(firstVertex.neighbours);
         this.vertexSequence.add(scndLastVertexAdded);
         this.vertexSequence.add(lastVertexAdded);
 
-        mesh.garbage.add(firstVertex);
+        mesh.garbage.add(scndLastVertexAdded);
         mesh.garbage.add(lastVertexAdded);
     }
 

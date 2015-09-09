@@ -84,16 +84,6 @@ public class Mesh {
         this.primers = new HashSet();
     }
 
-    private Vertex findVertexInPrimers(final int idVertex) {
-        for (Object obj : primers) {
-            final Vertex vertex = (Vertex) obj;
-            if (vertex.id == idVertex) {
-                return vertex;
-            }
-        }
-        return null;
-    }
-
     private int findMaxIdVertex(Set primers) {
         int idMax = 0;
         for (Object obj : this.primers) {
@@ -122,30 +112,47 @@ public class Mesh {
         maxId = findMaxIdVertex(this.primers);
         for (Object obj1 : this.faces) {
             final Face face = (Face) obj1;
+            final Vertex vertex1;
+            final Vertex vertex2;
+            final Vertex vertex3;
             if (face.idVertex1 >= minId && face.idVertex1 <= maxId) {
-                final Vertex vertex1 = findVertexInPrimers(face.idVertex1);
-                if (vertex1 != null && face.idVertex2 >= minId
-                        && face.idVertex2 <= maxId) {
-                    final Vertex vertex2 = findVertexInPrimers(face.idVertex2);
-                    if (vertex2 != null && face.idVertex3 >= minId
-                            && face.idVertex3 <= maxId) {
-                        final Vertex vertex3 = findVertexInPrimers(face.idVertex3);
-                        if (vertex3 != null) {
-                            vertex1.neighbours.add(vertex2);
-                            vertex1.neighbours.add(vertex3);
-                            vertex2.neighbours.add(vertex1);
-                            vertex2.neighbours.add(vertex3);
-                            vertex3.neighbours.add(vertex1);
-                            vertex3.neighbours.add(vertex2);
-                        }
-                    }
-                }
-            }
+                vertex1 = findVertex(face.idVertex1);
+                vertex2 = findVertex(face.idVertex2);
+                vertex3 = findVertex(face.idVertex3);
+                vertex1.neighbours.add(vertex2);
+                vertex1.neighbours.add(vertex3);
+                vertex2.neighbours.add(vertex1);
+                vertex2.neighbours.add(vertex3);
+                vertex3.neighbours.add(vertex1);
+                vertex3.neighbours.add(vertex2);
 
+            }
+            else if (face.idVertex2 >= minId && face.idVertex2 <= maxId) {
+                vertex1 = findVertex(face.idVertex1);
+                vertex2 = findVertex(face.idVertex2);
+                vertex3 = findVertex(face.idVertex3);
+                vertex1.neighbours.add(vertex2);
+                vertex1.neighbours.add(vertex3);
+                vertex2.neighbours.add(vertex1);
+                vertex2.neighbours.add(vertex3);
+                vertex3.neighbours.add(vertex1);
+                vertex3.neighbours.add(vertex2);
+            }
+            else if (face.idVertex3 >= minId && face.idVertex3 <= maxId) {
+                vertex1 = findVertex(face.idVertex1);
+                vertex2 = findVertex(face.idVertex2);
+                vertex3 = findVertex(face.idVertex3);
+                vertex1.neighbours.add(vertex2);
+                vertex1.neighbours.add(vertex3);
+                vertex2.neighbours.add(vertex1);
+                vertex2.neighbours.add(vertex3);
+                vertex3.neighbours.add(vertex1);
+                vertex3.neighbours.add(vertex2);
+            }
         }
     }
 
-    final void findNeighboors(Vertex vertex) {
+    final void findNeighbours(Vertex vertex) {
         for (Object element : this.faces) {
             Face face = (Face) element;
             if (face.idVertex1 == vertex.id) {
@@ -201,7 +208,6 @@ public class Mesh {
                 it.hasNext();) {
             final Vertex candidate = (Vertex) it.next();
             if (!this.garbage.contains(candidate)) {
-                this.garbage.add(candidate);
 
                 final double angleCandidate = system.getAngle(candidate);
                 if (nextVertex == null || (angleCandidate < angleVertex)) {
@@ -217,7 +223,12 @@ public class Mesh {
         }
         if (nextVertex != null) {
             System.out.println(nextVertex.toIdString());
-            this.findNeighboors(nextVertex);
+            this.findNeighbours(nextVertex);
+//            for(Object obj : nextVertex.neighbours) {
+//                Vertex neighbour = (Vertex) obj;
+//                this.findNeighbours(neighbour);
+//            }
+            this.garbage.add(nextVertex);
         }
         return nextVertex;
     }
@@ -228,12 +239,15 @@ public class Mesh {
         while (!primers.isEmpty()) {
             final Border border = new Border(this);
             Vertex nextVertex = border.lastVertexAdded;
-            while (nextVertex != null) {
+            nextVertex = this.findNextVertex(border);
+            border.addNextVertex(nextVertex);
+            while (nextVertex != border.firstVertex) {
                 nextVertex = this.findNextVertex(border);
                 border.addNextVertex(nextVertex);
             }
             if (border.lastVertexAdded == border.firstVertex) {
                 // on a fait le tour
+                System.out.println("Wéé!");
             } else {
                 // Un problème ... on repart du 1er
                 nextVertex = border.firstVertex;
