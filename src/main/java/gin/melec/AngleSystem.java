@@ -94,16 +94,24 @@ public class AngleSystem {
         final Vector3D vectRef = new Vector3D(reference.x, reference.y,
                 reference.z);
 
-        this.vectOrigToVirt = new Vector3D(0, 0, 0);
-        for (Object obj: origin.neighbours) {
-            Vertex neighbour = (Vertex) obj;
-            Vector3D distance = new Vector3D(origin.x - neighbour.x,
-                origin.y - neighbour.y, origin.z - neighbour.z);
-            distance = distance.normalize().scalarMultiply(10);
-            this.vectOrigToVirt = this.vectOrigToVirt.add(distance);
-        }
-        System.out.println("POS VIRTUAL: " + vectOrigToVirt.toString());
+//        this.vectOrigToVirt = new Vector3D(0, 0, 0);
+//        for (Object obj: origin.neighbours) {
+//            Vertex neighbour = (Vertex) obj;
+//            Vector3D distance = new Vector3D(origin.x - neighbour.x,
+//                origin.y - neighbour.y, origin.z - neighbour.z);
+//            distance = distance.normalize().scalarMultiply(10);
+//            this.vectOrigToVirt = this.vectOrigToVirt.add(distance);
+//        }
+//        System.out.println("POS VIRTUAL: " + vectOrigToVirt.toString());
 
+
+        Set gravityCenters = buildGravityCenters(origin);
+        this.vectOrigToVirt = new Vector3D(0, 0, 0);
+        for (Object obj : gravityCenters) {
+            Vector3D gravityCenter = (Vector3D) obj;
+            gravityCenter = gravityCenter.scalarMultiply(-1).normalize();
+            this.vectOrigToVirt = this.vectOrigToVirt.add(gravityCenter);
+        }
 
         // Ref and virtual point coordonates are changed to correspond with the
         // origin point as... origin.
@@ -163,5 +171,26 @@ public class AngleSystem {
         final Line line = new Line(this.vectOrigToUnkn,
                 this.vectOrigToUnkn.add(normal), TOLERANCE);
         return plane.intersection(line);
+    }
+
+    private Set buildGravityCenters(final Vertex origin) {
+        Set result = new HashSet();
+        for (Object obj : origin.faces) {
+            Face face = (Face) obj;
+            Vertex vertex2, vertex3;
+            vertex2 = origin.getNeighbour(face.getFirstNeighbour(origin.id));
+            vertex3 = origin.getNeighbour(face.getSecondNeighbour(origin.id));
+            final Vector3D vectorV2 = new Vector3D(vertex2.x - origin.x,
+                    vertex2.y - origin.y, vertex2.z - origin.z);
+            final Vector3D vectorV3 = new Vector3D(vertex3.x - origin.x,
+                    vertex3.y - origin.y, vertex3.z - origin.z);
+            final Vector3D middle2 = vectorV2.scalarMultiply(0.5);
+            final Vector3D middle3 = vectorV3.scalarMultiply(0.5);
+            final Line median2 = new Line(vectorV2, middle3, 0.001);
+            final Line median3 = new Line(vectorV3, middle2, 0.001);
+            final Vector3D gravityCenter = median2.intersection(median3);
+            result.add(gravityCenter);
+        }
+        return result;
     }
 }

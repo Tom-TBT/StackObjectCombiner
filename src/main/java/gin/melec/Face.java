@@ -56,6 +56,35 @@ public class Face {
         return "f" + " " + idVertex1 + " " + idVertex2 + " " + idVertex3;
     }
 
+    /**
+     * This method search the first neighbour of the given vertex (by it's id).
+     * @param idOrigin , the id of the vertex for which we search neighbour.
+     * @return the id of the first neighbour.
+     */
+    final int getFirstNeighbour(final int idOrigin) {
+        int result;
+        if (idOrigin == idVertex1) {
+            result = idVertex2;
+        } else {
+            result = idVertex1;
+        }
+        return result;
+    }
+    /**
+     * This method search the second neighbour of the given vertex (by it's id).
+     * @param idOrigin , the id of the vertex for which we search neighbour.
+     * @return the id of the second neighbour.
+     */
+    final int getSecondNeighbour(final int idOrigin) {
+        int result;
+        if (idOrigin == idVertex3) {
+            result = idVertex2;
+        } else {
+            result = idVertex3;
+        }
+        return result;
+    }
+
 
 
 }

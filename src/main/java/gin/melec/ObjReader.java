@@ -18,12 +18,12 @@ package gin.melec;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -54,8 +54,8 @@ public class ObjReader {
      * @param faces , the list in which the method put the readed faces.
      * @throws IOException , when their is an error with the lecture of the file
      */
-    public static void readMesh(final String path, final List vertices,
-            final List faces) throws IOException {
+    public static void readMesh(final String path, final Set vertices,
+            final Set faces) throws IOException {
         final InputStream ips = new FileInputStream(path);
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);

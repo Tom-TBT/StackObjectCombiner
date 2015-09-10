@@ -33,18 +33,13 @@ import java.util.logging.Logger;
 public class Mesh {
 
     /**
-     * The angle limit above which a vertex is considered outside the border.
-     */
-    private static final int ANGLE_LIMIT = 230;
-
-    /**
      * Contain the vertices composing this mesh.
      */
-    List vertices;
+    Set vertices;
     /**
      * Contain the faces composing this mesh.
      */
-    List faces;
+    Set faces;
     /**
      * List of borders of this mesh.
      */
@@ -76,12 +71,31 @@ public class Mesh {
      * @param splits , the splits of the mesh.
      */
     public Mesh(final List splits) {
-        this.faces = new ArrayList<Face>();
-        this.vertices = new ArrayList<Vertex>();
+        this.faces = new HashSet<Face>();
+        this.vertices = new HashSet<Vertex>();
         this.garbage = new HashSet();
         this.borders = new ArrayList();
         this.splits = splits;
         this.primers = new HashSet();
+    }
+
+    void setFacesToVertex(final Vertex vertex) {
+        for (Object element : this.faces) {
+            Face face = (Face) element;
+            if (face.idVertex1 == vertex.id) {
+                vertex.faces.add(face);
+                vertex.neighbours.add(findVertex(face.idVertex2));
+                vertex.neighbours.add(findVertex(face.idVertex3));
+            } else if (face.idVertex2 == vertex.id) {
+                vertex.faces.add(face);
+                vertex.neighbours.add(findVertex(face.idVertex1));
+                vertex.neighbours.add(findVertex(face.idVertex3));
+            } else if (face.idVertex3 == vertex.id) {
+                vertex.faces.add(face);
+                vertex.neighbours.add(findVertex(face.idVertex1));
+                vertex.neighbours.add(findVertex(face.idVertex2));
+            }
+        }
     }
 
     private int findMaxIdVertex(Set primers) {
@@ -151,20 +165,16 @@ public class Mesh {
         }
     }
 
-    final void findNeighbours(Vertex vertex) {
-        for (Object element : this.faces) {
-            Face face = (Face) element;
-            if (face.idVertex1 == vertex.id) {
-                vertex.neighbours.add(findVertex(face.idVertex2));
-                vertex.neighbours.add(findVertex(face.idVertex3));
-            } else if (face.idVertex2 == vertex.id) {
-                vertex.neighbours.add(findVertex(face.idVertex1));
-                vertex.neighbours.add(findVertex(face.idVertex3));
-            } else if (face.idVertex3 == vertex.id) {
-                vertex.neighbours.add(findVertex(face.idVertex1));
-                vertex.neighbours.add(findVertex(face.idVertex2));
+    private Vertex findInPrimers(final int idVertex) {
+        Vertex result = null;
+        for (Object obj : this.primers) {
+            final Vertex vertex = (Vertex) obj;
+            if (vertex.id == idVertex) {
+                result = vertex;
+                break;
             }
         }
+        return result;
     }
 
     final Vertex findVertex(int idVertex) {
@@ -208,7 +218,7 @@ public class Mesh {
             final Vertex candidate = (Vertex) it.next();
 
             if (!this.garbage.contains(candidate) || (((border.scndLastVertexAdded.neighbours.contains(candidate)) && (border.lastVertexAdded.neighbours.size() == 2) && (border.scndLastVertexAdded != candidate)))) {
-                this.garbage.add(nextVertex);
+                this.garbage.add(candidate);
                 final double angleCandidate = system.getAngle(candidate);
                 if (nextVertex == null || (angleCandidate < angleVertex)) {
                     nextVertex = candidate;
@@ -222,13 +232,8 @@ public class Mesh {
             }
         }
         if (nextVertex != null) {
-            this.findNeighbours(nextVertex);
+            this.setFacesToVertex(nextVertex);
             System.out.println(nextVertex.toIdString() + " " + nextVertex.neighbours.size() + " " + angleVertex + " " + border.vertexSequence.size());
-            this.garbage.add(nextVertex);
-//            for(Object obj : nextVertex.neighbours) {
-//                Vertex neighbour = (Vertex) obj;
-//                this.findNeighbours(neighbour);
-//            }
         }
         return nextVertex;
     }
@@ -239,9 +244,10 @@ public class Mesh {
         while (!primers.isEmpty()) {
             final Border border = new Border(this);
             Vertex nextVertex = border.lastVertexAdded;
+            this.setFacesToVertex(nextVertex);
             nextVertex = this.findNextVertex(border);
             border.addNextVertex(nextVertex);
-            while (nextVertex != border.firstVertex) {
+            while (nextVertex != border.firstVertex && nextVertex != null) {
                 nextVertex = this.findNextVertex(border);
                 border.addNextVertex(nextVertex);
             }

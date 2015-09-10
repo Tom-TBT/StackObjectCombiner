@@ -18,7 +18,6 @@ package gin.melec;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -72,7 +71,7 @@ public class Border {
                 this.split = currentSplit;
             }
         }
-        mesh.findNeighbours(firstVertex);
+        mesh.setFacesToVertex(firstVertex);
         this.scndLastVertexAdded = firstVertex;
         lastVertexAdded = this.split.findCloserVertex(firstVertex.neighbours);
         this.vertexSequence.add(scndLastVertexAdded);

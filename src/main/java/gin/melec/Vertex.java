@@ -51,6 +51,11 @@ public class Vertex {
     Set neighbours;
 
     /**
+     * The faces to who the vertex belong.
+     */
+    Set faces;
+
+    /**
      * Public constructor of a vertex.
      *
      * @param id , id of the vertex.
@@ -63,7 +68,7 @@ public class Vertex {
         this.x = x;
         this.y = y;
         this.z = z;
-
+        this.faces = new HashSet();
         this.neighbours = new HashSet();
     }
 
@@ -76,7 +81,7 @@ public class Vertex {
     public final String toString() {
         return "v " + this.x + " " + this.y + " " + this.z;
     }
-    
+
     /**
      * Return the string caracterizing the vertex with it's ID.
      *
@@ -163,5 +168,22 @@ public class Vertex {
                 neighbor.addNeighborToGarbage(garbage);
             }
         }
+    }
+
+    /**
+     * Give the neighbour of this vertex with the given id.
+     * @param idNeighbour , the id of the neighbour.
+     * @return the vertex with the corresponding id.
+     */
+    final Vertex getNeighbour(final int idNeighbour) {
+        Vertex result = null;
+        for (Object obj : this.neighbours) {
+            final Vertex candidat = (Vertex) obj;
+            if (candidat.id == idNeighbour) {
+                result = candidat;
+                break;
+            }
+        }
+        return result;
     }
 }

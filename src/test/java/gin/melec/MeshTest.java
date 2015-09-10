@@ -8,7 +8,6 @@ package gin.melec;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -78,17 +77,6 @@ public class MeshTest {
         meshTest.faces.add(f8);
     }
 
-    /**
-     * Test of shift method, of class Mesh.
-     */
-    @Test
-    public void testShift() {
-        System.out.println("shift");
-        meshTest.shift();
-        Vertex result = (Vertex) meshTest.vertices.get(0);
-        assertEquals(199.5, result.x, 0);
-    }
-
 
 //    @Test
 //    public void testCreateBorders() throws IOException {
@@ -110,7 +98,7 @@ public class MeshTest {
 //        circularMesh.exportBorders("./src/test/java/gin/melec/MeshForTests/A_CircularBorder1_borders.obj");
 //    }
 //
-
+//
 //    @Test
 //    public void testCreateDoubleBorders() throws IOException {
 //        System.out.println("createDoubleBorders");
@@ -125,34 +113,34 @@ public class MeshTest {
 //
 //        doubleBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1_borders.obj");
 //    }
-//    @Test
-//    public void testCreateUpBorders() throws IOException {
-//        System.out.println("createUpBorders");
-//        AbstractSplit rightSplit = new SplitRight(148);
-//        List splits = new ArrayList(); splits.add(rightSplit);
-//        Mesh upBorder = new Mesh(splits);
-//        upBorder.vertices = rightSplit.findBorderVertices(upBorder.vertices);
-//        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_UpBorder1.obj"
-//                , upBorder.vertices, upBorder.faces);
-//
-//        upBorder.createBorders();
-//
-//        upBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_UpBorder1_borders.obj");
-//    }
-
     @Test
-    public void testCreateLinearBorders() throws IOException {
-        System.out.println("createLinearBorders");
-        AbstractSplit rightSplit = new SplitRight(247);
+    public void testCreateUpBorders() throws IOException {
+        System.out.println("createUpBorders");
+        AbstractSplit rightSplit = new SplitRight(148);
         List splits = new ArrayList(); splits.add(rightSplit);
-        Mesh linearBorder = new Mesh(splits);
-        linearBorder.vertices = rightSplit.findBorderVertices(linearBorder.vertices);
-        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_LinearBorder1.obj"
-                , linearBorder.vertices, linearBorder.faces);
+        Mesh upBorder = new Mesh(splits);
+        upBorder.vertices = rightSplit.findBorderVertices(upBorder.vertices);
+        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_UpBorder1.obj"
+                , upBorder.vertices, upBorder.faces);
 
-        linearBorder.createBorders();
+        upBorder.createBorders();
 
-        linearBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_LinearBorder1_borders.obj");
+        upBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_UpBorder1_borders.obj");
     }
+
+//    @Test
+//    public void testCreateLinearBorders() throws IOException {
+//        System.out.println("createLinearBorders");
+//        AbstractSplit rightSplit = new SplitRight(247);
+//        List splits = new ArrayList(); splits.add(rightSplit);
+//        Mesh linearBorder = new Mesh(splits);
+//        linearBorder.vertices = rightSplit.findBorderVertices(linearBorder.vertices);
+//        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_LinearBorder1.obj"
+//                , linearBorder.vertices, linearBorder.faces);
+//
+//        linearBorder.createBorders();
+//
+//        linearBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_LinearBorder1_borders.obj");
+//    }
 
 }

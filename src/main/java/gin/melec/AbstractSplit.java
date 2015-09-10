@@ -17,7 +17,6 @@
 package gin.melec;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,7 +50,7 @@ public abstract class AbstractSplit {
      * @param vertices , the list of the vertex to filter.
      * @return the list of the vertex belonging to the border.
      */
-    public abstract List findBorderVertices(final List vertices);
+    public abstract Set findBorderVertices(final Set vertices);
 
     /**
      * Getter for the attribute position.
