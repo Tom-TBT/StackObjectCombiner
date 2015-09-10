@@ -199,43 +199,64 @@ public class Mesh {
         }
     }
 
-    /**
-     * Find and return the next vertex of the current border.
-     *
-     * @param split , the vertex is find next to this split.
-     * @return the next vertex of the current border.
-     */
-    public final Vertex findNextVertex(Border border) {
+    final Vertex findNextVertex(final Border border) {
         Vertex nextVertex = null;
-        AngleSystem system;
-        double angleVertex = 360.0;
+        Set facesRemaining = new HashSet();
+        Set verticesRemaining = new HashSet();
+        facesRemaining.addAll(border.lastVertexAdded.faces);
+        verticesRemaining.addAll(border.lastVertexAdded.neighbours);
+        Boolean notFoundYet = true;
 
-        system = new AngleSystem(border.lastVertexAdded,
-                border.scndLastVertexAdded);
-
-        for (final Iterator it = border.lastVertexAdded.neighbours.iterator();
-                it.hasNext();) {
-            final Vertex candidate = (Vertex) it.next();
-
-            if (!this.garbage.contains(candidate) || (((border.scndLastVertexAdded.neighbours.contains(candidate)) && (border.lastVertexAdded.neighbours.size() == 2) && (border.scndLastVertexAdded != candidate)))) {
-                this.garbage.add(candidate);
-                final double angleCandidate = system.getAngle(candidate);
-                if (nextVertex == null || (angleCandidate < angleVertex)) {
-                    nextVertex = candidate;
-                    angleVertex = angleCandidate;
+        Face currentFace = null;
+        // Search the face, the two last vertex added to the border, have in
+        // in common
+        for (Object obj1 : border.lastVertexAdded.faces) {
+            Face face1 = (Face) obj1;
+            for (Object obj2 : border.scndLastVertexAdded.faces) {
+                Face face2 = (Face) obj2;
+                if (face2 == face1) {
+                    currentFace = face1;
+                    facesRemaining.remove(face1);
+                    verticesRemaining.remove(border.scndLastVertexAdded);
+                    nextVertex = border.scndLastVertexAdded;
+                    break;
                 }
-
-            } else if (candidate.equals(border.firstVertex)
-                    && !border.scndLastVertexAdded.equals(border.firstVertex)) {
-                nextVertex = candidate;
+            }
+            if (currentFace != null) {
                 break;
             }
         }
-        if (nextVertex != null) {
-            this.setFacesToVertex(nextVertex);
-            System.out.println(nextVertex.toIdString() + " " + nextVertex.neighbours.size() + " " + angleVertex + " " + border.vertexSequence.size());
+        while (notFoundYet) {
+            for(Object obj : verticesRemaining) {
+                Vertex vertex = (Vertex) obj;
+                this.garbage.add(vertex);
+                if (currentFace.include(vertex.id)) {
+                    currentFace = getFaceIncluding(vertex, facesRemaining);
+                    facesRemaining.remove(currentFace);
+                    verticesRemaining.remove(vertex);
+                    nextVertex = vertex;
+                    break;
+                }
+            }
+            if (verticesRemaining.isEmpty()) {
+                notFoundYet = false;
+            }
         }
+        this.setFacesToVertex(nextVertex);
+        System.out.println(nextVertex.toIdString());
         return nextVertex;
+    }
+
+    private Face getFaceIncluding(Vertex vertex, Set facesRemaining) {
+        Face result = null;
+        for (Object obj : facesRemaining) {
+            Face face = (Face) obj;
+            if (face.include(vertex.id)) {
+                result = face;
+                break;
+            }
+        }
+        return result;
     }
 
     final void createBorders() {

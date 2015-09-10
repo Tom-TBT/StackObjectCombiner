@@ -88,4 +88,8 @@ public abstract class AbstractSplit {
      * @return the distance.
      */
     protected abstract float distanceTo(final Vertex vertex);
+
+    protected abstract Set refineBorders(final Set borders);
+
+    protected abstract boolean isClose(final Vertex vertex);
 }

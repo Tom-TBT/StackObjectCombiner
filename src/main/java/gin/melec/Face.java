@@ -85,6 +85,17 @@ public class Face {
         return result;
     }
 
+    final boolean include(final int idVertex) {
+        boolean result;
+        if (idVertex == idVertex1 || idVertex == idVertex2
+                || idVertex == idVertex3) {
+            result = true;
+        } else {
+            result = false;
+        }
+        return result;
+    }
+
 
 
 }

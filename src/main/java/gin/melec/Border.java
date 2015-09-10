@@ -81,8 +81,10 @@ public class Border {
         mesh.garbage.add(lastVertexAdded);
     }
 
-    public Border() {
+    public Border(Vertex vertex) {
         this.vertexSequence = new LinkedList();
+        this.firstVertex = vertex;
+        this.vertexSequence.add(firstVertex);
     }
 
     /**
