@@ -16,39 +16,44 @@
  */
 package gin.melec;
 
+import java.util.Arrays;
+
 /**
  *
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Face {
+public class Face implements Comparable<Face> {
 
     /**
      * The id of the first vertex of this face.
      */
-    int idVertex1;
+    private final int idVertex1;
 
     /**
      * The id of the second vertex of this face.
      */
-    int idVertex2;
+    private final int idVertex2;
 
     /**
      * The id of the third vertex of this face.
      */
-    int idVertex3;
+    private final int idVertex3;
 
     /**
      * Public constructor of a face, taking id of three vertex.
-     * @param idVertex1 , first vertex of the face.
-     * @param idVertex2 , second vertex of the face.
-     * @param idVertex3 , third vertex of the face.
+     * @param id1 , first vertex of the face.
+     * @param id2 , second vertex of the face.
+     * @param id3 , third vertex of the face.
      */
-    public Face(final int idVertex1, final int idVertex2,
-            final int idVertex3) {
-        this.idVertex1 = idVertex1;
-        this.idVertex2 = idVertex2;
-        this.idVertex3 = idVertex3;
+    public Face(final int id1, final int id2,
+            final int id3) {
+        final int[] idArray = new int[3];
+        idArray[0] = id1; idArray[1] = id2; idArray[2] = id3;
+        Arrays.sort(idArray);
+        this.idVertex1 = idArray[0];
+        this.idVertex2 = idArray[1];
+        this.idVertex3 = idArray[2];
     }
 
     @Override
@@ -75,7 +80,7 @@ public class Face {
      * @param idOrigin , the id of the vertex for which we search neighbour.
      * @return the id of the second neighbour.
      */
-    final int getSecondNeighbour(final int idOrigin) {
+    public final int getSecondNeighbour(final int idOrigin) {
         int result;
         if (idOrigin == idVertex3) {
             result = idVertex2;
@@ -85,7 +90,7 @@ public class Face {
         return result;
     }
 
-    final boolean include(final int idVertex) {
+    public final boolean include(final int idVertex) {
         boolean result;
         if (idVertex == idVertex1 || idVertex == idVertex2
                 || idVertex == idVertex3) {
@@ -96,6 +101,60 @@ public class Face {
         return result;
     }
 
+    @Override
+    public final int compareTo(final Face face) {
+        int result;
+        if (this.idVertex1 == face.idVertex1) {
+            if (this.idVertex2 == face.idVertex2) {
+                result = this.idVertex3 - face.idVertex3;
+            } else {
+                result = this.idVertex2 - face.idVertex2;
+            }
+        } else {
+            result = this.idVertex1 - face.idVertex1;
+        }
+        return result;
+    }
 
+    @Override
+    public final int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + this.idVertex1;
+        hash = 17 * hash + this.idVertex2;
+        hash = 17 * hash + this.idVertex3;
+        return hash;
+    }
 
+    @Override
+    public final boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Face other = (Face) obj;
+        if (this.idVertex1 != other.idVertex1) {
+            return false;
+        }
+        if (this.idVertex2 != other.idVertex2) {
+            return false;
+        }
+        if (this.idVertex3 != other.idVertex3) {
+            return false;
+        }
+        return true;
+    }
+
+    public final int getIdVertex1() {
+        return idVertex1;
+    }
+
+    public final int getIdVertex2() {
+        return idVertex2;
+    }
+
+    public final int getIdVertex3() {
+        return idVertex3;
+    }
 }

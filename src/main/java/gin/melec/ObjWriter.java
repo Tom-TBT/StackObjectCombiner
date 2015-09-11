@@ -58,10 +58,10 @@ public class ObjWriter {
 
         // Better than a toString function in Mesh, because of the memory this
         // will use.
-        for (Object element : mesh.vertices) {
+        for (Object element : mesh.getVertices()) {
             prW.write(element.toString() + "\n");
         }
-        for (Object element : mesh.faces) {
+        for (Object element : mesh.getFaces()) {
             prW.write(element.toString() + "\n");
         }
 
@@ -86,8 +86,7 @@ public class ObjWriter {
         for (Object o : borders) {
             final Border border = (Border) o;
             prW.write("b " + numBorder + "\n");
-            for (Object ob : border.vertexSequence) {
-                final Vertex vertex = (Vertex) ob;
+            for (Vertex vertex : border.getVertexSequence()) {
                 prW.write(vertex.toIdString() + "\n");
             }
             numBorder++;

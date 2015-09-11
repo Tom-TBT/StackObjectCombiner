@@ -33,7 +33,7 @@ public class SplitUp extends AbstractSplit {
 
     @Override
     protected float distanceTo(final Vertex vertex) {
-        return Math.abs(this.position - vertex.y);
+        return Math.abs(this.position - vertex.getY());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class SplitUp extends AbstractSplit {
 
     @Override
     protected final boolean isClose(final Vertex vertex) {
-        return vertex.y < (this.position + WINDOW);
+        return vertex.getY() < (this.position + WINDOW);
     }
 
 }

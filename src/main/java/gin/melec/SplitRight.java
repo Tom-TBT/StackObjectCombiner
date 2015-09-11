@@ -36,7 +36,7 @@ public class SplitRight extends AbstractSplit {
 
     @Override
     protected float distanceTo(final Vertex vertex) {
-        return Math.abs(this.position - vertex.x);
+        return Math.abs(this.position - vertex.getX());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class SplitRight extends AbstractSplit {
 
     @Override
     protected final boolean isClose(final Vertex vertex) {
-        return vertex.x > (this.position - WINDOW);
+        return vertex.getX() > (this.position - WINDOW);
     }
 
 }

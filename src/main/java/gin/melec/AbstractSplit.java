@@ -17,11 +17,11 @@
 package gin.melec;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -34,7 +34,7 @@ public abstract class AbstractSplit {
      * The maximal distance to the split from which a vertex does no longer
      * belong to the border.
      */
-    protected static final int WINDOW = 4;
+    protected static final int WINDOW = 2;
 
     /**
      * The position of the split.
@@ -56,10 +56,9 @@ public abstract class AbstractSplit {
      * @param vertices , the list of the vertex to filter.
      * @return the list of the vertex belonging to the border.
      */
-    public final Set findBorderVertices(final Set vertices) {
-        final Set closeVertices = new HashSet();
-        for (final Iterator it = vertices.iterator(); it.hasNext();) {
-            final Vertex vertex = (Vertex) it.next();
+    public final Set findBorderVertices(final Set<Vertex> vertices) {
+        final TreeSet<Vertex> closeVertices = new TreeSet();
+        for (Vertex vertex : vertices) {
             if (this.isClose(vertex)) {
                 closeVertices.add(vertex);
             }
@@ -69,7 +68,6 @@ public abstract class AbstractSplit {
 
     /**
      * Getter for the attribute position.
-     *
      * @return the position of the border.
      */
     public final int getPosition() {
@@ -83,10 +81,9 @@ public abstract class AbstractSplit {
      * @param collection , the collection containing the vertices.
      * @return the distance of the closest vertex to the split.
      */
-    protected final Vertex findCloserVertex(final Collection collection) {
+    protected final Vertex findCloserVertex(final Set<Vertex> collection) {
         Vertex result = null;
-        for (final Iterator it = collection.iterator(); it.hasNext();) {
-            final Vertex candidat = (Vertex) it.next();
+        for (Vertex candidat : collection) {
             if (result == null
                     || this.distanceTo(candidat) < this.distanceTo(result)) {
                 result = candidat;
@@ -124,16 +121,14 @@ public abstract class AbstractSplit {
      * @param borders , the borders to refine.
      * @return refined borders.
      */
-    protected final Set refineBorders(final Set borders) {
+    protected final Set refineBorders(final Set<Border> borders) {
         final Set result = new HashSet();
-        for (Object obj1 : borders) {
-            final Border border = (Border) obj1;
-
-            final List sortedBorder = new ArrayList();
+        for (Border border : borders) {
+            final List<Vertex> sortedBorder = new ArrayList();
             // Creation of a new list starting with an outside vertex.
-            for (final Iterator it = border.vertexSequence.iterator();
-                    it.hasNext();) {
-                Vertex vertex = (Vertex) it.next();
+            for (final Iterator<Vertex> it =
+                    border.getVertexSequence().iterator(); it.hasNext();) {
+                Vertex vertex = it.next();
                 if (this.isClose(vertex)) {
                     sortedBorder.add(vertex);
                 } else {
@@ -141,14 +136,13 @@ public abstract class AbstractSplit {
                     sortedBorder.add(i, vertex);
                     while (it.hasNext()) {
                         i++;
-                        vertex = (Vertex) it.next();
+                        vertex = it.next();
                         sortedBorder.add(i, vertex);
                     }
                 }
             }
             Border currentBorder = null;
-            for (Object obj2 : sortedBorder) {
-                final Vertex vertex = (Vertex) obj2;
+            for (Vertex vertex : sortedBorder) {
                 if (currentBorder == null && this.isClose(vertex)) {
                     currentBorder = new Border();
                     currentBorder.addNextVertex(vertex);

@@ -27,29 +27,29 @@ import java.util.List;
 public class Border {
 
     /**
-     * The first vertex of the border's sequence.
-     */
-    Vertex firstVertex;
-
-    /**
-     * The last vertex added to the border.
-     */
-    Vertex lastVertexAdded;
-
-    /**
-     * The last vertex added to the border.
-     */
-    Vertex scndLastVertexAdded;
-
-    /**
      * The split that initiate this border.
      */
-    AbstractSplit split;
+    private AbstractSplit split;
 
     /**
      * The sequence of vertex forming the border.
      */
-    List<Vertex> vertexSequence;
+    private LinkedList<Vertex> vertexSequence;
+
+    /**
+     * The distance between the first and the last vertex of the border.
+     */
+    private double straightLenght;
+
+    /**
+     * The real lenght of the border.
+     */
+    private double cumulLenght;
+
+    /**
+     * The center of the border.
+     */
+    private Vertex center;
 
     /**
      * Public constructor for the border.
@@ -57,27 +57,26 @@ public class Border {
     public Border(final Mesh mesh) {
         this.vertexSequence = new LinkedList();
 
-        // Search the next first vertex
-        this.firstVertex = null;
+        Vertex currentVertex = null;
         Vertex candidat = null;
         float distanceTmp, distanceFirstVertex = 0;
-        for (AbstractSplit currentSplit : mesh.splits) {
-            candidat = currentSplit.findCloserVertex(mesh.primers);
-            distanceTmp = currentSplit.distanceTo(candidat);
-            if (firstVertex == null || distanceTmp < distanceFirstVertex) {
+        for (AbstractSplit currentSplit : mesh.getSplits()) {
+            currentVertex = currentSplit.findCloserVertex(mesh.getPrimers());
+            distanceTmp = currentSplit.distanceTo(currentVertex);
+            if (getFirstVertex() == null || distanceTmp < distanceFirstVertex) {
                 distanceFirstVertex = distanceTmp;
-                this.firstVertex = candidat;
+                candidat = currentVertex;
                 this.split = currentSplit;
             }
         }
-        mesh.setFacesToVertex(firstVertex);
-        this.scndLastVertexAdded = firstVertex;
-        lastVertexAdded = this.split.findCloserVertex(firstVertex.neighbours);
-        this.vertexSequence.add(scndLastVertexAdded);
-        this.vertexSequence.add(lastVertexAdded);
+        vertexSequence.add(candidat);
 
-        mesh.garbage.add(scndLastVertexAdded);
-        mesh.garbage.add(lastVertexAdded);
+        mesh.setFacesToVertex(getFirstVertex());
+        vertexSequence.add(this.split.findCloserVertex(
+                getFirstVertex().getNeighbours()));
+
+        mesh.getGarbage().add(getSecondLastVertex());
+        mesh.getGarbage().add(getLastVertex());
     }
 
     public Border() {
@@ -98,28 +97,55 @@ public class Border {
      */
     public final void addNextVertex(final Vertex vertex) {
         if (vertex != null) {
-            if (this.vertexSequence.isEmpty()) {
-                this.firstVertex = vertex;
-            }
             this.vertexSequence.add(vertex);
-            scndLastVertexAdded = lastVertexAdded;
-            lastVertexAdded = vertex;
         }
     }
 
     public final void prepare() {
-        // TODO things
+        straightLenght = getFirstVertex().distanceTo(getLastVertex());
+
+        cumulLenght = 0;
+        float x = 0, y = 0, z = 0;
+        for (int i = 0; i < vertexSequence.size() - 1; i++) {
+            cumulLenght += vertexSequence.get(i)
+                    .distanceTo(vertexSequence.get(i + 1));
+            x += vertexSequence.get(i).getX();
+            y += vertexSequence.get(i).getY();
+            z += vertexSequence.get(i).getZ();
+        }
+        x = x / vertexSequence.size();
+        y = y / vertexSequence.size();
+        z = z / vertexSequence.size();
+        this.center = new Vertex(0, x, y, z);
     }
 
     public final Vertex getFirstVertex() {
-        return vertexSequence.get(0);
+        final Vertex result;
+        if (vertexSequence.isEmpty()) {
+            result = null;
+        } else {
+            result = vertexSequence.getFirst();
+        }
+        return result;
     }
 
     public final Vertex getLastVertex() {
-        return vertexSequence.get(vertexSequence.size() - 1);
+        final Vertex result;
+        if (vertexSequence.isEmpty()) {
+            result = null;
+        } else {
+            result = vertexSequence.getLast();
+        }
+        return result;
     }
 
     public final Vertex getSecondLastVertex() {
-        return vertexSequence.get(vertexSequence.size() - 2);
+        final Vertex result;
+        if (vertexSequence.isEmpty()) {
+            result = null;
+        } else {
+            result = vertexSequence.get(vertexSequence.size() - 2);
+        }
+        return result;
     }
 }

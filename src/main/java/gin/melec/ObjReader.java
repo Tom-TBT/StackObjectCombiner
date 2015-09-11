@@ -115,10 +115,7 @@ public class ObjReader {
                 Float.parseFloat(splitedLine[1]),
                 Float.parseFloat(splitedLine[2]),
                 Float.parseFloat(splitedLine[3]));
-                if (isFirstLine) {
-                    border.firstVertex = v;
-                }
-                border.vertexSequence.add(v);
+                border.addNextVertex(v);
                 isFirstLine = false;
             }
         }

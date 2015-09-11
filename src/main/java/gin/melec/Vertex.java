@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,36 +25,36 @@ import java.util.Set;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Vertex {
+public class Vertex implements Comparable<Vertex>, Serializable {
 
     /**
      * The id number of the vertex.
      */
-    int id;
+    private int id;
     /**
      * The x coordonate of the vertex.
      */
-    public float x;
+    private float x;
 
     /**
      * The y coordonate of the vertex.
      */
-    public float y;
+    private float y;
 
     /**
      * The z coordonate of the vertex.
      */
-    public float z;
+    private float z;
 
     /**
      * The list of the neighbours of this vertex.
      */
-    Set neighbours;
+    private Set<Vertex> neighbours;
 
     /**
      * The faces to who the vertex belong.
      */
-    Set faces;
+    private Set<Face> faces;
 
     /**
      * Public constructor of a vertex.
@@ -91,79 +92,15 @@ public class Vertex {
         return "v " + this.x + " " + this.y + " " + this.z + " " + this.id;
     }
 
-    /**
-     * Distance on the plan Y/Z of this vertex to an other one.
-     *
-     * @param ver , the vertex compared to.
-     * @return , the distance on the plan Y/Z.
-     */
-    public final float distanceOnYZ(final Vertex ver) {
-        final double distance = Math.sqrt(Math.pow(Math.abs(this.y - ver.y), 2)
-                + Math.pow(Math.abs(this.z - ver.z), 2.0));
-
-        return (float) distance;
-    }
-
-    /**
-     * Distance on the plan X/Z of this vertex to an other one.
-     *
-     * @param ver , the vertex compared to.
-     * @return , the distance on the plan X/Z.
-     */
-    public final float distanceOnXZ(final Vertex ver) {
-        final double distance = Math.sqrt(Math.pow(Math.abs(this.x - ver.x), 2)
-                + Math.pow(Math.abs(this.z - ver.z), 2.0));
-
-        return (float) distance;
-    }
-
-    /**
-     * Distance of this vertex and an other one only on the X axe.
-     *
-     * @param ver , the vertex compared to.
-     * @return , the distance on the axe X.
-     */
-    public final float distanceOnX(final Vertex ver) {
-        return Math.abs(this.x - ver.x);
-    }
-
-    /**
-     * Distance of this vertex and an other one only on the Y axe.
-     *
-     * @param ver , the vertex compared to.
-     * @return , the distance on the axe Y.
-     */
-    public final float distanceOnY(final Vertex ver) {
-        return Math.abs(this.y - ver.y);
-    }
-
-    /**
-     * Distance of this vertex to the border (vertical border).
-     * @param splitPosition , the position of the border (x).
-     * @return  , the distance between the vertex and the border.
-     */
-    public final float distanceToSplitX(final int splitPosition) {
-        return Math.abs(this.x - splitPosition);
-    }
-
-    /**
-     * Distance of this vertex to the border (horizontal border).
-     * @param splitPosition , the position of the border (y).
-     * @return  , the distance between the vertex and the border.
-     */
-    public final float distanceToSplitY(final int splitPosition) {
-        return Math.abs(this.y - splitPosition);
-    }
 
     /**
      * Recursive function to add every neighbor and their neighbor
      * to the garbage of the mesh the vertices belong to.
      * @param garbage , the garbage where vertices are added.
      */
-    final void addNeighborToGarbage(final Set garbage) {
+    public final void addNeighborToGarbage(final Set garbage) {
         garbage.add(this);
-        for (Object element : this.neighbours) {
-            final Vertex neighbor = (Vertex) element;
+        for (Vertex neighbor : this.neighbours) {
             if (!garbage.contains(neighbor)) {
                 neighbor.addNeighborToGarbage(garbage);
             }
@@ -175,15 +112,87 @@ public class Vertex {
      * @param idNeighbour , the id of the neighbour.
      * @return the vertex with the corresponding id.
      */
-    final Vertex getNeighbour(final int idNeighbour) {
+    public final Vertex getNeighbour(final int idNeighbour) {
         Vertex result = null;
-        for (Object obj : this.neighbours) {
-            final Vertex candidat = (Vertex) obj;
+        for (Vertex candidat : this.neighbours) {
             if (candidat.id == idNeighbour) {
                 result = candidat;
                 break;
             }
         }
         return result;
+    }
+
+    public final double distanceTo(final Vertex vertex) {
+        return Math.sqrt(Math.pow((double) this.x - (double) vertex.x, 2)
+                + Math.pow((double) this.y - (double) vertex.y, 2)
+                + Math.pow((double) this.z - (double) vertex.z, 2));
+    }
+
+    @Override
+    public final int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + this.id;
+        hash = 89 * hash + Float.floatToIntBits(this.x);
+        hash = 89 * hash + Float.floatToIntBits(this.y);
+        hash = 89 * hash + Float.floatToIntBits(this.z);
+        return hash;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Vertex other = (Vertex) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public final int compareTo(final Vertex vertex) {
+        return this.id - vertex.id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public float getZ() {
+        return z;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
+    }
+
+    public Set<Vertex> getNeighbours() {
+        return neighbours;
+    }
+
+    public Set<Face> getFaces() {
+        return faces;
     }
 }

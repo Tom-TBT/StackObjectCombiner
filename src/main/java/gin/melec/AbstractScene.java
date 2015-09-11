@@ -76,7 +76,7 @@ public abstract class AbstractScene {
         final Mesh mesh = new Mesh(splits);
         try {
             ObjReader.readMesh(this.workingDirectory + "/" + meshName,
-                    mesh.vertices, mesh.faces);
+                    mesh.getVertices(), mesh.getFaces());
         } catch (IOException ex) {
             Logger.getLogger(Scene2Part.class.getName()).log(Level.SEVERE,
                     null, ex);
