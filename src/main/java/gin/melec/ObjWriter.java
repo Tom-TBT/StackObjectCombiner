@@ -20,7 +20,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -74,7 +74,7 @@ public class ObjWriter {
      * @param borders , the borders to write.
      * @throws IOException if their is an error while writing.
      */
-    static void writeBorders(final String filePath, final List borders)
+    static void writeBorders(final String filePath, final Set borders)
             throws IOException {
 
         final FileWriter fiW = new FileWriter(filePath);

@@ -81,10 +81,8 @@ public class Border {
         mesh.garbage.add(lastVertexAdded);
     }
 
-    public Border(Vertex vertex) {
+    public Border() {
         this.vertexSequence = new LinkedList();
-        this.firstVertex = vertex;
-        this.vertexSequence.add(firstVertex);
     }
 
     /**
@@ -102,16 +100,7 @@ public class Border {
         }
     }
 
-    /**
-     * Add the given vertex to the border, in first position.
-     * @param vertex , the vertex to add.
-     */
-    public final void addPreviousVertex(final Vertex vertex) {
-        if (vertex != null) {
-            this.vertexSequence.add(0, vertex);
-            scndLastVertexAdded = lastVertexAdded;
-            lastVertexAdded = vertex;
-        }
+    public final void prepare() {
+        // TODO things
     }
-
 }

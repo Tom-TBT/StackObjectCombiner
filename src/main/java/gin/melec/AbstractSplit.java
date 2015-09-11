@@ -16,7 +16,11 @@
  */
 package gin.melec;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,7 +34,7 @@ public abstract class AbstractSplit {
      * The maximal distance to the split from which a vertex does no longer
      * belong to the border.
      */
-    protected static final int WINDOW = 2;
+    protected static final int WINDOW = 4;
 
     /**
      * The position of the split.
@@ -39,6 +43,7 @@ public abstract class AbstractSplit {
 
     /**
      * Public constructor for a split with a position.
+     *
      * @param position , the position of the border.
      */
     public AbstractSplit(final int position) {
@@ -47,13 +52,24 @@ public abstract class AbstractSplit {
 
     /**
      * Find the vertices who belong to the border.
+     *
      * @param vertices , the list of the vertex to filter.
      * @return the list of the vertex belonging to the border.
      */
-    public abstract Set findBorderVertices(final Set vertices);
+    public final Set findBorderVertices(final Set vertices) {
+        final Set closeVertices = new HashSet();
+        for (final Iterator it = vertices.iterator(); it.hasNext();) {
+            final Vertex vertex = (Vertex) it.next();
+            if (this.isClose(vertex)) {
+                closeVertices.add(vertex);
+            }
+        }
+        return closeVertices;
+    }
 
     /**
      * Getter for the attribute position.
+     *
      * @return the position of the border.
      */
     public final int getPosition() {
@@ -63,20 +79,32 @@ public abstract class AbstractSplit {
     /**
      * A protected method called to search in a collection the closer vertex to
      * the split.
+     *
      * @param collection , the collection containing the vertices.
-     * @param result , the closest vertex.
      * @return the distance of the closest vertex to the split.
      */
-    protected abstract Vertex findCloserVertex(final Collection collection);
+    protected final Vertex findCloserVertex(final Collection collection) {
+        Vertex result = null;
+        for (final Iterator it = collection.iterator(); it.hasNext();) {
+            final Vertex candidat = (Vertex) it.next();
+            if (result == null
+                    || this.distanceTo(candidat) < this.distanceTo(result)) {
+                result = candidat;
+            }
+        }
+        return result;
+    }
 
     /**
      * Give the position of the split in his x Position.
+     *
      * @return the position of the split.
      */
     protected abstract int xPosition();
 
     /**
      * Give the position of the split in his y Position.
+     *
      * @return the position of the split.
      */
     protected abstract int yPosition();
@@ -84,12 +112,68 @@ public abstract class AbstractSplit {
     /**
      * Give the distance between the split and the vertex depending the axe of
      * the split.
+     *
      * @param vertex , the vertex mesured.
      * @return the distance.
      */
     protected abstract float distanceTo(final Vertex vertex);
 
-    protected abstract Set refineBorders(final Set borders);
+    /**
+     * Take the borders, remove the vertex that are not close to the split, and
+     * create new borders.
+     * @param borders , the borders to refine.
+     * @return refined borders.
+     */
+    protected final Set refineBorders(final Set borders) {
+        final Set result = new HashSet();
+        for (Object obj1 : borders) {
+            final Border border = (Border) obj1;
 
+            final List sortedBorder = new ArrayList();
+            // Creation of a new list starting with an outside vertex.
+            for (final Iterator it = border.vertexSequence.iterator();
+                    it.hasNext();) {
+                Vertex vertex = (Vertex) it.next();
+                if (this.isClose(vertex)) {
+                    sortedBorder.add(vertex);
+                } else {
+                    int i = 0;
+                    sortedBorder.add(i, vertex);
+                    while (it.hasNext()) {
+                        i++;
+                        vertex = (Vertex) it.next();
+                        sortedBorder.add(i, vertex);
+                    }
+                }
+            }
+            Border currentBorder = null;
+            for (Object obj2 : sortedBorder) {
+                final Vertex vertex = (Vertex) obj2;
+                if (currentBorder == null && this.isClose(vertex)) {
+                    currentBorder = new Border();
+                    currentBorder.addNextVertex(vertex);
+                } else if (currentBorder != null) {
+                    if (this.isClose(vertex)) {
+                        currentBorder.addNextVertex(vertex);
+                    } else {
+                        currentBorder.prepare();
+                        result.add(currentBorder);
+                        currentBorder = null;
+                    }
+                }
+            }
+            if (currentBorder != null) {
+                currentBorder.prepare();
+                result.add(currentBorder);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * A method that indicate if the given vertex is close to the split.
+     * @param vertex , the vertex to check.
+     * @return true if the vertex is close, else false.
+     */
     protected abstract boolean isClose(final Vertex vertex);
 }

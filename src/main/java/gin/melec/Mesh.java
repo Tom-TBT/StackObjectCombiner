@@ -43,7 +43,7 @@ public class Mesh {
     /**
      * List of borders of this mesh.
      */
-    List borders;
+    Set borders;
 
     /**
      * Contain the vertex already used to make a border. This garbage is emptied
@@ -74,7 +74,7 @@ public class Mesh {
         this.faces = new HashSet<Face>();
         this.vertices = new HashSet<Vertex>();
         this.garbage = new HashSet();
-        this.borders = new ArrayList();
+        this.borders = new HashSet();
         this.splits = splits;
         this.primers = new HashSet();
     }
@@ -281,6 +281,8 @@ public class Mesh {
             this.garbage.clear();
             this.borders.add(border);
         }
+        AbstractSplit split = (AbstractSplit) this.splits.get(0);
+        this.borders = split.refineBorders(this.borders);
     }
 
     final void createPrimers() {

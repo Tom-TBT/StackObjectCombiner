@@ -17,10 +17,6 @@
 package gin.melec;
 
 import static gin.melec.AbstractSplit.WINDOW;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  *
@@ -39,30 +35,6 @@ public class SplitDown extends AbstractSplit {
     }
 
     @Override
-    public final Set findBorderVertices(final Set vertices) {
-        final Set closeVertices = new HashSet();
-        for (final Iterator it = vertices.iterator(); it.hasNext();) {
-            final Vertex vertex = (Vertex) it.next();
-            if (vertex.y > this.position - WINDOW) {
-                closeVertices.add(vertex);
-            }
-        }
-        return closeVertices;
-    }
-
-    @Override
-    protected final Vertex findCloserVertex(final Collection collection) {
-        Vertex result = null;
-        for (final Iterator it = collection.iterator(); it.hasNext();) {
-            final Vertex candidat = (Vertex) it.next();
-            if (result == null || candidat.y > result.y) {
-                result = candidat;
-            }
-        }
-        return result;
-    }
-
-    @Override
     protected float distanceTo(final Vertex vertex) {
         return Math.abs(this.position - vertex.y);
     }
@@ -75,6 +47,11 @@ public class SplitDown extends AbstractSplit {
     @Override
     protected final int yPosition() {
         return position;
+    }
+
+    @Override
+    protected final boolean isClose(final Vertex vertex) {
+        return vertex.y > (this.position - WINDOW);
     }
 
 }

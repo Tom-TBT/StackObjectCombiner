@@ -17,10 +17,6 @@
 package gin.melec;
 
 import static gin.melec.AbstractSplit.WINDOW;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  *
@@ -39,30 +35,6 @@ public class SplitRight extends AbstractSplit {
     }
 
     @Override
-    public final Set findBorderVertices(final Set vertices) {
-        final Set closeVertices = new HashSet();
-        for (final Iterator it = vertices.iterator(); it.hasNext();) {
-            final Vertex vertex = (Vertex) it.next();
-            if (vertex.x > this.position - WINDOW) {
-                closeVertices.add(vertex);
-            }
-        }
-        return closeVertices;
-    }
-
-    @Override
-    protected final Vertex findCloserVertex(final Collection collection) {
-        Vertex result = null;
-        for (final Iterator it = collection.iterator(); it.hasNext();) {
-            final Vertex candidat = (Vertex) it.next();
-            if (result == null || candidat.x > result.x) {
-                result = candidat;
-            }
-        }
-        return result;
-    }
-
-    @Override
     protected float distanceTo(final Vertex vertex) {
         return Math.abs(this.position - vertex.x);
     }
@@ -75,32 +47,6 @@ public class SplitRight extends AbstractSplit {
     @Override
     protected final int yPosition() {
         return 0;
-    }
-
-
-
-    @Override
-    protected  final Set refineBorders(final Set borders) {
-        Set result = new HashSet();
-        for (Object obj1 : borders) {
-            Border border = (Border) obj1;
-            Border currentBorder = null;
-            for(Object obj2 : border.vertexSequence) { // TODO   partir d'un bout, pas n'importe où sinon on peut couper une bordure en 2
-                Vertex vertex = (Vertex) obj2;
-                if(currentBorder == null && this.isClose(vertex)) {
-                    currentBorder = new Border(vertex);
-                    // ajout 1er vertex
-                } else if (currentBorder != null) {
-                    if (this.isClose(vertex)) {
-                        currentBorder.vertexSequence.add(vertex);
-                    } else {
-                        result.add(currentBorder);
-                        currentBorder = null;
-                    }
-                }
-            }
-        }
-        return result;
     }
 
     @Override
