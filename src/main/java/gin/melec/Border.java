@@ -49,7 +49,7 @@ public class Border {
     /**
      * The sequence of vertex forming the border.
      */
-    List vertexSequence;
+    List<Vertex> vertexSequence;
 
     /**
      * Public constructor for the border.
@@ -61,8 +61,7 @@ public class Border {
         this.firstVertex = null;
         Vertex candidat = null;
         float distanceTmp, distanceFirstVertex = 0;
-        for (Object obj : mesh.splits) {
-            final AbstractSplit currentSplit = (AbstractSplit) obj;
+        for (AbstractSplit currentSplit : mesh.splits) {
             candidat = currentSplit.findCloserVertex(mesh.primers);
             distanceTmp = currentSplit.distanceTo(candidat);
             if (firstVertex == null || distanceTmp < distanceFirstVertex) {
@@ -85,6 +84,14 @@ public class Border {
         this.vertexSequence = new LinkedList();
     }
 
+    public AbstractSplit getSplit() {
+        return split;
+    }
+
+    public List<Vertex> getVertexSequence() {
+        return vertexSequence;
+    }
+
     /**
      * Add the given vertex to the end of the border.
      * @param vertex , the vertex to add.
@@ -102,5 +109,17 @@ public class Border {
 
     public final void prepare() {
         // TODO things
+    }
+
+    public final Vertex getFirstVertex() {
+        return vertexSequence.get(0);
+    }
+
+    public final Vertex getLastVertex() {
+        return vertexSequence.get(vertexSequence.size() - 1);
+    }
+
+    public final Vertex getSecondLastVertex() {
+        return vertexSequence.get(vertexSequence.size() - 2);
     }
 }
