@@ -116,7 +116,7 @@ public class Mesh {
         }
     }
 
-    private final Vertex getVertex(final int idVertex) {
+    private Vertex getVertex(final int idVertex) {
         Vertex result;
         Vertex doppleganger = new Vertex(idVertex, 0, 0, 0);
         result = this.vertices.floor(doppleganger);
@@ -266,6 +266,14 @@ public class Mesh {
         borders.clear();
     }
 
+    final void importBorders(final String filePath) {
+        try {
+            this.borders = (Set<Border>) ObjReader.readBorders(filePath);
+        } catch (IOException ex) {
+            Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public TreeSet<Vertex> getVertices() {
         return vertices;
     }
@@ -290,5 +298,16 @@ public class Mesh {
         return splits;
     }
 
-    
+    @Override
+    public final String toString() {
+        final StringBuilder strBui = new StringBuilder();
+        for (Vertex vertex : this.vertices) {
+            strBui.append(vertex.toString()).append("\n");
+        }
+        for (Face face : this.faces) {
+            strBui.append(face.toString()).append("\n");
+        }
+        return strBui.toString();
+    }
+
 }

@@ -17,6 +17,8 @@
 package gin.melec;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +28,15 @@ import java.util.Set;
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
 public class Vertex implements Comparable<Vertex>, Serializable {
+
+    private static DecimalFormat df = new DecimalFormat("##.##");
+    private static DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+
+    static {
+        df.setMaximumFractionDigits(3);
+        dfs.setDecimalSeparator('.');
+        df.setDecimalFormatSymbols(dfs);
+    }
 
     /**
      * The id number of the vertex.
@@ -80,7 +91,8 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      */
     @Override
     public final String toString() {
-        return "v " + this.x + " " + this.y + " " + this.z;
+        return "v " + df.format(this.x) + " " + df.format(this.y) + " "
+                + df.format(this.z);
     }
 
     /**
@@ -89,7 +101,8 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      * @return , a string describing the vertex with it's ID.
      */
     public final String toIdString() {
-        return "v " + this.x + " " + this.y + " " + this.z + " " + this.id;
+        return "v " + df.format(this.x) + " " + df.format(this.y) + " "
+                + df.format(this.z) + " " + this.id;
     }
 
 
