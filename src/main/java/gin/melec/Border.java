@@ -264,50 +264,26 @@ public class Border {
             linkCurrent = linkIterator.next();
             origCurrent = linkCurrent.getOrigin();
             destCurrent = linkCurrent.getDestination();
-            if (origCurrent == origPrevious || destCurrent == destPrevious) {
-                origPrevious = origCurrent;
-                destPrevious = destCurrent;
-            } else {
+            if (origCurrent != origPrevious && destCurrent != destPrevious) {
                 final List<Vertex> vertexToLink = findVertexLinked(origCurrent,
                         origPrevious, destCurrent, destPrevious);
                 newLinks.add(new Link(vertexToLink.get(0), vertexToLink.get(1),
                         this.getVertexSequence().indexOf(vertexToLink.get(0)),
                         border.getVertexSequence().indexOf(vertexToLink.get(1))));
-                origPrevious = origCurrent;
-                destPrevious = destCurrent;
-            }
-        }
 
-        // Complete the links
-//        int currentIndexOrigin = 0;
-//        int currentIndexDestination = 0;
-//        Set<Link> newLinks = new HashSet();
-//        for (Link link : links) {
-//            if ((link.getIndexOrigin() != currentIndexOrigin)
-//                   && (link.getIndexDestination() != currentIndexDestination)) {
-//                final List<Vertex> vertexToLink = findVertexLink(
-//                        this.getVertexSequence().get(currentIndexOrigin),
-//                        this.getVertexSequence().get(link.getIndexOrigin()),
-//                        border.getVertexSequence().get(currentIndexDestination),
-//                        border.getVertexSequence().get(link.getIndexDestination()));
-//
-//                newLinks.add(new Link(vertexToLink.get(0), vertexToLink.get(1),
+            }
+            origPrevious = origCurrent;
+            destPrevious = destCurrent;
+        }
+//        if (this.isCircular) {
+//            List<Vertex> vertexToLink = findVertexLinked(this.getFirstVertex(),
+//                    this.getLastVertex(), border.getFirstVertex(),
+//                    border.getLastVertex());
+//            newLinks.add(new Link(vertexToLink.get(0),
+//                    vertexToLink.get(1),
 //                    this.getVertexSequence().indexOf(vertexToLink.get(0)),
 //                    border.getVertexSequence().indexOf(vertexToLink.get(1))));
-//                currentIndexOrigin = link.getIndexOrigin();
-//                currentIndexDestination = link.getIndexDestination();
-//
-//            } else {
-//                if (link.getIndexOrigin() != currentIndexOrigin) {
-//                    currentIndexOrigin = link.getIndexOrigin();
-//                }
-//                if (link.getIndexDestination() != currentIndexDestination) {
-//                    currentIndexDestination = link.getIndexDestination();
-//                }
-//            }
 //        }
-        //if(this.isCircular) {
-        //}
         links.addAll(newLinks);
         return links;
     }
@@ -329,19 +305,29 @@ public class Border {
         return result;
     }
 
-//    private void removeDuplicates(List<Link> links) {
-//        List<Link> toRemove = new ArrayList();
-//        for(Link link1 : links) {
-//            for(Link link2 : links) {
-//                if (link1 != link2) {
-//                    if (link1.equals(link2) && !toRemove.contains(link1)) {
-//                        toRemove.add(link2);
-//                    }
-//                }
-//            }
-//        }
-//        for(Link link : toRemove) {
-//            links.remove(link);
-//        }
-//    }
+    public List exportLinks(Set links, int idShift) {
+        List<Face> newFaces = new ArrayList();
+
+        Vertex origCurrent, origPrevious, destCurrent, destPrevious;
+        Link linkCurrent;
+        Iterator<Link> linkIterator = links.iterator();
+        origPrevious = linkIterator.next().getOrigin();
+        destPrevious = linkIterator.next().getDestination();
+        linkIterator = links.iterator(); // Reset the iterator
+        while (linkIterator.hasNext()) {
+            linkCurrent = linkIterator.next();
+            origCurrent = linkCurrent.getOrigin();
+            destCurrent = linkCurrent.getDestination();
+            if (origCurrent != origPrevious) {
+                newFaces.add(new Face(origCurrent.getId(),
+                        origPrevious.getId(), destCurrent.getId() + idShift));
+            } else if (destCurrent != destPrevious) {
+                newFaces.add(new Face(origCurrent.getId(), destPrevious.getId()
+                        + idShift, destCurrent.getId() + idShift));
+            }
+            origPrevious = origCurrent;
+            destPrevious = destCurrent;
+        }
+        return newFaces;
+    }
 }
