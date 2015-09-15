@@ -17,7 +17,6 @@
 package gin.melec;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -121,8 +120,8 @@ public abstract class AbstractSplit {
      * @param borders , the borders to refine.
      * @return refined borders.
      */
-    protected final Set refineBorders(final Set<Border> borders) {
-        final Set result = new HashSet();
+    protected final List refineBorders(final List<Border> borders) {
+        final List result = new ArrayList();
         for (Border border : borders) {
             final List<Vertex> sortedBorder = new ArrayList();
             // Creation of a new list starting with an outside vertex.

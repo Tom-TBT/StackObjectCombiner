@@ -16,10 +16,6 @@
  */
 package gin.melec;
 
-import java.util.List;
-import java.util.TreeSet;
-import org.junit.Test;
-
 /**
  *
  * @author Tom Boissonnet
@@ -85,49 +81,8 @@ public class BorderTest {
 //        }
 //    }
 
-//    @Test
-//    public void testLinkTo() {
-//        Border border1 = new Border();
-//        Border border2 = new Border();
-//        border1.addNextVertex(new Vertex(1, 0, 0, 0));
-//        border1.addNextVertex(new Vertex(2, 0, 1, 0));
-//        border1.addNextVertex(new Vertex(3, 0, 1, 0.8f));
-//        border1.addNextVertex(new Vertex(4, 0, 1, 1));
-//        border1.addNextVertex(new Vertex(5, 0, 0, 1));
-//        border2.addNextVertex(new Vertex(1, 1, 0, 0));
-//        border2.addNextVertex(new Vertex(2, 1, 1, 0));
-//        border2.addNextVertex(new Vertex(3, 1, 1, 1));
-//        border2.addNextVertex(new Vertex(4, 1, 0, 1));
-//
-//        TreeSet<Link> links = new TreeSet();
-//        links.addAll(border1.linkTo(border2));
-//
-//        for(Link link : links) {
-//            System.out.println(link.getOrigin() + " // " + link.getDestination());
-//        }
-//    }
+    
 
-    @Test
-    public void testExportLinks() {
-        Border border1 = new Border();
-        Border border2 = new Border();
-        border1.addNextVertex(new Vertex(1, 0, 0, 0));
-        border1.addNextVertex(new Vertex(2, 0, 1, 0));
-        border1.addNextVertex(new Vertex(3, 0, 1, 0.8f));
-        border1.addNextVertex(new Vertex(4, 0, 1, 1));
-        border1.addNextVertex(new Vertex(5, 0, 0, 1));
-        border2.addNextVertex(new Vertex(1, 1, 0, 0));
-        border2.addNextVertex(new Vertex(2, 1, 1, 0));
-        border2.addNextVertex(new Vertex(3, 1, 1, 1));
-        border2.addNextVertex(new Vertex(4, 1, 0, 1));
 
-        TreeSet<Link> links = new TreeSet();
-        links.addAll(border1.linkTo(border2));
-
-        List<Face> faces = border1.exportLinks(links, 130);
-        for(Face face : faces) {
-            System.out.println(face.toString());
-        }
-    }
 
 }

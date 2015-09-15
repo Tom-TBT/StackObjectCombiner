@@ -5,6 +5,7 @@
  */
 package gin.melec;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -90,19 +91,19 @@ public class MeshTest {
 //    }
 //
 //
-//    @Test
-//    public void testCreateDoubleBorders() throws IOException {
-//        System.out.println("createDoubleBorders");
-//        AbstractSplit rightSplit = new SplitRight(133);
-//        List splits = new ArrayList(); splits.add(rightSplit);
-//        Mesh doubleBorder = new Mesh(splits);
-//        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1.obj"
-//                , doubleBorder.vertices, doubleBorder.faces);
-//
-//        doubleBorder.createBorders();
-//
-//        doubleBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1_borders.obj");
-//    }
+    @Test
+    public void testCreateDoubleBorders() throws IOException {
+        System.out.println("createDoubleBorders");
+        AbstractSplit rightSplit = new SplitRight(133);
+        List splits = new ArrayList(); splits.add(rightSplit);
+        Mesh doubleBorder = new Mesh(splits);
+        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1.obj"
+                , doubleBorder.getVertices(), doubleBorder.getFaces());
+
+        doubleBorder.createBorders();
+
+        doubleBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1_borders.obj");
+    }
 //    @Test
 //    public void testCreateUpBorders() throws IOException {
 //        System.out.println("createUpBorders");
@@ -189,20 +190,20 @@ public class MeshTest {
 //        mitoDroite.createBorders();
 //        mitoDroite.exportBorders("./src/test/java/gin/melec/MitoTest/B_mitoDroite_bordure.obj");
 //    }
-    @Test
-    public void testJoinBorders() {
-        System.out.println("JoinBorders");
-        AbstractSplit leftSplit = new SplitLeft(103);
-        AbstractSplit rightSplit = new SplitRight(103);
-        List splits = new ArrayList(); splits.add(rightSplit);
-        Mesh mitoDroite = new Mesh(splits);
-        splits = new ArrayList(); splits.add(leftSplit);
-        Mesh mitoGauche = new Mesh(splits);
-        mitoDroite.importBorders("./src/test/java/gin/melec/MitoTest/B_mitoDroite_bordure.obj");
-        mitoGauche.importBorders("./src/test/java/gin/melec/MitoTest/A_mitoGauche_bordure.obj");
-
-        System.out.println(mitoDroite.getBorders().size());
-    }
+//    @Test
+//    public void testJoinBorders() {
+//        System.out.println("JoinBorders");
+//        AbstractSplit leftSplit = new SplitLeft(103);
+//        AbstractSplit rightSplit = new SplitRight(103);
+//        List splits = new ArrayList(); splits.add(rightSplit);
+//        Mesh mitoDroite = new Mesh(splits);
+//        splits = new ArrayList(); splits.add(leftSplit);
+//        Mesh mitoGauche = new Mesh(splits);
+//        mitoDroite.importBorders("./src/test/java/gin/melec/MitoTest/B_mitoDroite_bordure.obj");
+//        mitoGauche.importBorders("./src/test/java/gin/melec/MitoTest/A_mitoGauche_bordure.obj");
+//
+//        System.out.println(mitoDroite.getBorders().size());
+//    }
 
 
 }

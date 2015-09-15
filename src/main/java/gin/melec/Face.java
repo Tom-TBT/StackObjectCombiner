@@ -61,6 +61,11 @@ public class Face implements Comparable<Face> {
         return "f" + " " + idVertex1 + " " + idVertex2 + " " + idVertex3;
     }
 
+
+    String toIncrementString(int increment) {
+        return "f" + " " + (idVertex1+increment) + " " + (idVertex2+increment) + " " + (idVertex3+increment);
+    }
+
     /**
      * This method search the first neighbour of the given vertex (by it's id).
      * @param idOrigin , the id of the vertex for which we search neighbour.

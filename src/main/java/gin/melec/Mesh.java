@@ -43,7 +43,7 @@ public class Mesh {
     /**
      * List of borders of this mesh.
      */
-    private Set<Border> borders;
+    private List<Border> borders;
 
     /**
      * Contain the vertex already used to make a border. This garbage is emptied
@@ -74,7 +74,7 @@ public class Mesh {
         this.faces = new TreeSet();
         this.vertices = new TreeSet();
         this.garbage = new HashSet();
-        this.borders = new HashSet();
+        this.borders = new ArrayList();
         this.splits = splits;
         this.primers = new TreeSet();
     }
@@ -120,7 +120,7 @@ public class Mesh {
         Vertex result;
         Vertex doppleganger = new Vertex(idVertex, 0, 0, 0);
         result = this.vertices.floor(doppleganger);
-        if(!result.equals(doppleganger)) {
+        if (!result.equals(doppleganger)) {
             result = null;
         }
         return result;
@@ -163,7 +163,7 @@ public class Mesh {
             }
         }
         while (notFoundYet) {
-            for(Vertex vertex : verticesRemaining) {
+            for (Vertex vertex : verticesRemaining) {
                 this.garbage.add(vertex);
                 if (currentFace.include(vertex.getId())) {
                     currentFace = getFaceIncluding(vertex, facesRemaining);
@@ -178,7 +178,9 @@ public class Mesh {
             }
         }
         this.setFacesToVertex(nextVertex);
-        System.out.println(nextVertex.toIdString());
+        if (nextVertex.equals(border.getFirstVertex())) {
+            nextVertex = null;
+        }
         return nextVertex;
     }
 
@@ -203,13 +205,9 @@ public class Mesh {
             this.setFacesToVertex(nextVertex);
             nextVertex = this.findNextVertex(border);
             border.addNextVertex(nextVertex);
-            while (nextVertex != border.getFirstVertex() && nextVertex != null) {
+            while (nextVertex != null) {
                 nextVertex = this.findNextVertex(border);
                 border.addNextVertex(nextVertex);
-            }
-            if (border.getLastVertex() == border.getFirstVertex()) {
-                // on a fait le tour
-                System.out.println("Wéé!");
             }
             completeGarbage();
             primers.removeAll(this.garbage);
@@ -219,8 +217,8 @@ public class Mesh {
         this.borders = this.separateBorders();
     }
 
-    private final Set separateBorders() {
-        Set result = new HashSet();
+    private final List separateBorders() {
+        List result = new ArrayList();
         for (AbstractSplit split : this.splits) {
             result.addAll(split.refineBorders(this.borders));
         }
@@ -268,7 +266,7 @@ public class Mesh {
 
     final void importBorders(final String filePath) {
         try {
-            this.borders = (Set<Border>) ObjReader.readBorders(filePath);
+            this.borders = ObjReader.readBorders(filePath);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -278,11 +276,15 @@ public class Mesh {
         return vertices;
     }
 
+    public void setBorders(List<Border> borders) {
+        this.borders = borders;
+    }
+
     public Set<Face> getFaces() {
         return faces;
     }
 
-    public Set<Border> getBorders() {
+    public List<Border> getBorders() {
         return borders;
     }
 

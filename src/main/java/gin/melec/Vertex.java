@@ -105,7 +105,6 @@ public class Vertex implements Comparable<Vertex>, Serializable {
                 + df.format(this.z) + " " + this.id;
     }
 
-
     /**
      * Recursive function to add every neighbor and their neighbor
      * to the garbage of the mesh the vertices belong to.

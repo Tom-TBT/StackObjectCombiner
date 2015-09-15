@@ -16,13 +16,9 @@
  */
 package gin.melec;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  *
@@ -196,7 +192,7 @@ public class Border {
         Vertex firstVertex1 = this.getFirstVertex();
         Vertex previousVertex1, nextVertex1, nextVertex2;
 
-        //if (this.isCircular) {
+        //TODO if (this.isCircular) {
         for (Iterator<Vertex> it = this.vertexSequence.iterator();
                 it.hasNext();) {
             Vertex candidate = it.next();
@@ -226,108 +222,5 @@ public class Border {
 
     }
 
-    public final Set linkTo(Border border) {
-        Set<Link> links = new TreeSet();
 
-        for (Vertex vertex : this.getVertexSequence()) {
-            Vertex linked = border.getFirstVertex();
-            for (Vertex candidat : border.getVertexSequence()) {
-                if (vertex.distanceTo(candidat) < vertex.distanceTo(linked)) {
-                    linked = candidat;
-                }
-            }
-            links.add(new Link(vertex, linked,
-                    this.getVertexSequence().indexOf(vertex),
-                    border.getVertexSequence().indexOf(linked)));
-        }
-
-        for (Vertex vertex : border.getVertexSequence()) {
-            Vertex linked = this.getFirstVertex();
-            for (Vertex candidat : this.getVertexSequence()) {
-                if (vertex.distanceTo(candidat) < vertex.distanceTo(linked)) {
-                    linked = candidat;
-                }
-            }
-            links.add(new Link(vertex, linked,
-                    border.getVertexSequence().indexOf(vertex),
-                    this.getVertexSequence().indexOf(linked)));
-        }
-
-        //removeDuplicates(links);
-        Set<Link> newLinks = new HashSet();
-        Vertex origCurrent, origPrevious, destCurrent, destPrevious;
-        Link linkCurrent;
-        Iterator<Link> linkIterator = links.iterator();
-        origPrevious = this.getFirstVertex();
-        destPrevious = border.getFirstVertex();
-        while (linkIterator.hasNext()) {
-            linkCurrent = linkIterator.next();
-            origCurrent = linkCurrent.getOrigin();
-            destCurrent = linkCurrent.getDestination();
-            if (origCurrent != origPrevious && destCurrent != destPrevious) {
-                final List<Vertex> vertexToLink = findVertexLinked(origCurrent,
-                        origPrevious, destCurrent, destPrevious);
-                newLinks.add(new Link(vertexToLink.get(0), vertexToLink.get(1),
-                        this.getVertexSequence().indexOf(vertexToLink.get(0)),
-                        border.getVertexSequence().indexOf(vertexToLink.get(1))));
-
-            }
-            origPrevious = origCurrent;
-            destPrevious = destCurrent;
-        }
-//        if (this.isCircular) {
-//            List<Vertex> vertexToLink = findVertexLinked(this.getFirstVertex(),
-//                    this.getLastVertex(), border.getFirstVertex(),
-//                    border.getLastVertex());
-//            newLinks.add(new Link(vertexToLink.get(0),
-//                    vertexToLink.get(1),
-//                    this.getVertexSequence().indexOf(vertexToLink.get(0)),
-//                    border.getVertexSequence().indexOf(vertexToLink.get(1))));
-//        }
-        links.addAll(newLinks);
-        return links;
-    }
-
-    private List findVertexLinked(final Vertex ori1, final Vertex ori2,
-            final Vertex dest1, final Vertex dest2) {
-        final List result = new ArrayList();
-        double distance1, distance2;
-        distance1 = ori1.distanceTo(dest2);
-        distance2 = ori2.distanceTo(dest1);
-
-        if (distance1 < distance2) {
-            result.add(ori1);
-            result.add(dest2);
-        } else {
-            result.add(ori2);
-            result.add(dest1);
-        }
-        return result;
-    }
-
-    public List exportLinks(Set links, int idShift) {
-        List<Face> newFaces = new ArrayList();
-
-        Vertex origCurrent, origPrevious, destCurrent, destPrevious;
-        Link linkCurrent;
-        Iterator<Link> linkIterator = links.iterator();
-        origPrevious = linkIterator.next().getOrigin();
-        destPrevious = linkIterator.next().getDestination();
-        linkIterator = links.iterator(); // Reset the iterator
-        while (linkIterator.hasNext()) {
-            linkCurrent = linkIterator.next();
-            origCurrent = linkCurrent.getOrigin();
-            destCurrent = linkCurrent.getDestination();
-            if (origCurrent != origPrevious) {
-                newFaces.add(new Face(origCurrent.getId(),
-                        origPrevious.getId(), destCurrent.getId() + idShift));
-            } else if (destCurrent != destPrevious) {
-                newFaces.add(new Face(origCurrent.getId(), destPrevious.getId()
-                        + idShift, destCurrent.getId() + idShift));
-            }
-            origPrevious = origCurrent;
-            destPrevious = destCurrent;
-        }
-        return newFaces;
-    }
 }

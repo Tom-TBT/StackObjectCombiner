@@ -21,7 +21,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -86,8 +87,8 @@ public class ObjReader {
      * @return a list of vertices making the border.
      * @throws IOException if their is an error while reading the file.
      */
-    public static Set readBorders(final String path) throws IOException {
-        final Set<Border> borders = new HashSet();
+    public static List readBorders(final String path) throws IOException {
+        final List<Border> borders = new ArrayList();
 
         final InputStream ips = new FileInputStream(path);
         final InputStreamReader ipsr = new InputStreamReader(ips);
