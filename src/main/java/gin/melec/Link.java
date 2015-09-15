@@ -21,7 +21,7 @@ package gin.melec;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Link implements Comparable<Link>{
+public class Link implements Comparable<Link> {
 
     /**
      * The vertex from where the link is initiate. In a set of links, the origin
@@ -30,8 +30,8 @@ public class Link implements Comparable<Link>{
     private final Vertex origin;
 
     /**
-     * The destination of the link. In a set of links, the destination
-     * always come from the same border.
+     * The destination of the link. In a set of links, the destination always
+     * come from the same border.
      */
     private final Vertex destination;
 
@@ -114,10 +114,10 @@ public class Link implements Comparable<Link>{
             return false;
         }
         final Link other = (Link) obj;
-        if ((this.origin != other.origin ||
-                this.destination != other.destination)
-                && (this.origin != other.destination ||
-                this.destination != other.origin)) {
+        if ((this.origin != other.origin
+                || this.destination != other.destination)
+                && (this.origin != other.destination
+                || this.destination != other.origin)) {
             return false;
         }
         if (this.destination != other.destination

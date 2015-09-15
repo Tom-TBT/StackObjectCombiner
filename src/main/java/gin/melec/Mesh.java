@@ -133,7 +133,7 @@ public class Mesh {
     final void completeGarbage() {
         final List<Vertex> vertexToCheck = new ArrayList(this.garbage);
         for (Vertex vertex : vertexToCheck) {
-            vertex.addNeighborToGarbage(this.garbage);
+            vertex.addNeighborToGarbage(this.garbage, this.primers);
         }
     }
 
@@ -164,7 +164,6 @@ public class Mesh {
         }
         while (notFoundYet) {
             for (Vertex vertex : verticesRemaining) {
-                this.garbage.add(vertex);
                 if (currentFace.include(vertex.getId())) {
                     currentFace = getFaceIncluding(vertex, facesRemaining);
                     facesRemaining.remove(currentFace);

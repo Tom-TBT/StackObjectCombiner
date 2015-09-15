@@ -17,7 +17,9 @@
 package gin.melec;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 import org.junit.Test;
 
 /**
@@ -75,6 +77,50 @@ public class LinkerTest {
 //        }
 //    }
 
+    @Test
+    public void testRealBorder() throws IOException {
+        Mesh leftMesh, rightMesh;
+        AbstractSplit rightSplit = new SplitRight(248);
+        List splits = new ArrayList(); splits.add(rightSplit);
+        Mesh mitoGauche = new Mesh(splits);
+        ObjReader.readMesh("./src/test/java/gin/melec/LinearTest/A_LinearBorder1.obj"
+                , mitoGauche.getVertices(), mitoGauche.getFaces());
+        mitoGauche.createBorders();
+
+        System.out.println("Border1 OK");
+
+        AbstractSplit leftSplit = new SplitLeft(248);
+        splits = new ArrayList(); splits.add(leftSplit);
+        Mesh mitoDroite = new Mesh(splits);
+        ObjReader.readMesh("./src/test/java/gin/melec/LinearTest/B_LinearBorder1.obj"
+                , mitoDroite.getVertices(), mitoDroite.getFaces());
+        mitoDroite.createBorders();
+
+        System.out.println("Border2 OK");
+
+        TreeSet<Link> links = new TreeSet();
+        Border leftBorder = mitoGauche.getBorders().get(0);
+        Border rightBorder = mitoDroite.getBorders().get(0);
+        leftBorder.alignOn(rightBorder);
+        links.addAll(Linker.linkTo(leftBorder, rightBorder));
+        List<Face> newFaces = Linker.exportLinks(links, mitoGauche.getVertices().size());
+        for(Vertex vertex : mitoGauche.getVertices()) {
+            System.out.println(vertex.toString());
+        }
+        for(Vertex vertex : mitoDroite.getVertices()) {
+            System.out.println(vertex.toString());
+        }
+        for (Face face : mitoGauche.getFaces()) {
+            System.out.println(face.toString());
+        }
+        for (Face face : mitoDroite.getFaces()) {
+            System.out.println(face.toIncrementString(mitoGauche.getVertices().size()));
+        }
+        for(Face face : newFaces) {
+            System.out.println(face.toString());
+        }
+    }
+
 //    @Test
 //    public void testRealBorder() throws IOException {
 //        Mesh leftMesh, rightMesh;
@@ -114,25 +160,6 @@ public class LinkerTest {
 //            System.out.println(face.toString());
 //        }
 //    }
-
-    @Test
-    public void testBacASable() throws IOException {
-        Border bordureGauche, bordureDroite;
-        List<Border> bordures = ObjReader.readBorders("./src/test/java/gin/melec/MitoTest/A_mitoGauche_bordure.obj");
-        bordureGauche = bordures.get(0);
-        bordures = ObjReader.readBorders("./src/test/java/gin/melec/MitoTest/B_mitoDroite_bordure.obj");
-        bordureDroite = bordures.get(0);
-        Vertex linked = null;
-        Vertex vertex = new Vertex(0, 104.403f, 130.347f,202.656f);
-            linked = bordureGauche.getFirstVertex();
-            for (Vertex candidat : bordureGauche.getVertexSequence()) {
-                if (vertex.distanceTo(candidat) < vertex.distanceTo(linked)) {
-                    linked = candidat;
-                }
-            }
-
-        System.out.println(linked);
-    }
 
 
 }

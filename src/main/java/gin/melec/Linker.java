@@ -61,7 +61,7 @@ public class Linker {
 
     public static final Set linkTo(final Border origin,
             final Border destination) {
-        final Set<Link> links = new TreeSet();
+        final TreeSet<Link> links = new TreeSet();
 
         // Linking the origin vertices to the destination vertices
         for (Vertex vertex : origin.getVertexSequence()) {
@@ -76,16 +76,19 @@ public class Linker {
                     destination.getVertexSequence().indexOf(linked)));
         }
         // Linking the destination vertices to the origin vertices
-        for (Vertex vertex : destination.getVertexSequence()) {
-            Vertex linked = origin.getFirstVertex();
-            for (Vertex candidat : origin.getVertexSequence()) {
-                if (vertex.distanceTo(candidat) < vertex.distanceTo(linked)) {
-                    linked = candidat;
-                }
-            }
-            links.add(new Link(linked, vertex,
+        Iterator<Vertex> it = destination.getVertexSequence().iterator();
+        Vertex previousVertex = it.next();
+        Vertex currentVertex = it.next();
+        while (it.hasNext()) {
+            if (!Linker.containVertex(currentVertex, links)) {
+                List<Vertex> candidates = Linker.findCandidates(previousVertex, links);
+                Vertex linked = Linker.findLinked(currentVertex, candidates.get(0), candidates.get(1));
+                links.add(new Link(linked, currentVertex,
                     origin.getVertexSequence().indexOf(linked),
-                    destination.getVertexSequence().indexOf(vertex)));
+                    destination.getVertexSequence().indexOf(currentVertex)));
+            }
+            previousVertex = currentVertex;
+            currentVertex = it.next();
         }
 
         final Set<Link> newLinks = new HashSet();
@@ -122,6 +125,41 @@ public class Linker {
 //        }
         links.addAll(newLinks);
         return links;
+    }
+
+    static List findCandidates(Vertex vertex, TreeSet<Link> links) {
+        List<Vertex> candidates = new ArrayList();
+
+        Iterator<Link> it = links.descendingIterator();
+        Link currentLink = it.next();
+        Vertex candidate1 = null, candidate2 = currentLink.getOrigin();
+        while(it.hasNext()) {
+            currentLink = it.next();
+            candidate1 = currentLink.getOrigin();
+            if (currentLink.getDestination().equals(vertex)) {
+                break;
+            }
+        }
+        candidates.add(candidate1);
+        candidates.add(candidate2);
+
+        return candidates;
+    }
+
+    static boolean containVertex(Vertex vertex, Set<Link> links) {
+        for (Link link : links) {
+            if (link.getOrigin().equals(vertex) || link.getDestination().equals(vertex)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Vertex findLinked(Vertex currentVertex, Vertex candidate1, Vertex candidate2) {
+        if (candidate2 != null && (currentVertex.distanceTo(candidate2) < currentVertex.distanceTo(candidate1))) {
+            return candidate2;
+        }
+        return candidate1;
     }
 
     public static List exportLinks(final Set links, final int idShift) {

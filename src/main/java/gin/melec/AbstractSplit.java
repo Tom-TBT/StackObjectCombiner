@@ -33,7 +33,7 @@ public abstract class AbstractSplit {
      * The maximal distance to the split from which a vertex does no longer
      * belong to the border.
      */
-    protected static final int WINDOW = 2;
+    protected static final int WINDOW = 4;
 
     /**
      * The position of the split.
@@ -125,8 +125,8 @@ public abstract class AbstractSplit {
         for (Border border : borders) {
             final List<Vertex> sortedBorder = new ArrayList();
             // Creation of a new list starting with an outside vertex.
-            for (final Iterator<Vertex> it =
-                    border.getVertexSequence().iterator(); it.hasNext();) {
+            for (final Iterator<Vertex> it
+                    = border.getVertexSequence().iterator(); it.hasNext();) {
                 Vertex vertex = it.next();
                 if (this.isClose(vertex)) {
                     sortedBorder.add(vertex);

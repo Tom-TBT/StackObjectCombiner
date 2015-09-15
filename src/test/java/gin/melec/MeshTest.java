@@ -76,6 +76,23 @@ public class MeshTest {
 //        meshTest.faces.add(f8);
 //    }
 
+//    @Test
+//    public void testShift() throws IOException {
+//        System.out.println("Shift");
+//        AbstractSplit rightSplit = new SplitRight(248);
+//        List splits = new ArrayList(); splits.add(rightSplit);
+//        Mesh mesh = new Mesh(splits);
+//        ObjReader.readMesh("./src/test/java/gin/melec/LinearTest/B_LinearBorder1.obj"
+//                , mesh.getVertices(), mesh.getFaces());
+//        mesh.shift();
+//        for(Vertex vertex : mesh.getVertices()){
+//            System.out.println(vertex.toString());
+//        }
+//        for(Face face : mesh.getFaces()){
+//            System.out.println(face.toString());
+//        }
+//    }
+
 //
 //    @Test
 //    public void testCreateBorders() throws IOException {
@@ -91,19 +108,19 @@ public class MeshTest {
 //    }
 //
 //
-    @Test
-    public void testCreateDoubleBorders() throws IOException {
-        System.out.println("createDoubleBorders");
-        AbstractSplit rightSplit = new SplitRight(133);
-        List splits = new ArrayList(); splits.add(rightSplit);
-        Mesh doubleBorder = new Mesh(splits);
-        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1.obj"
-                , doubleBorder.getVertices(), doubleBorder.getFaces());
-
-        doubleBorder.createBorders();
-
-        doubleBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1_borders.obj");
-    }
+//    @Test
+//    public void testCreateDoubleBorders() throws IOException {
+//        System.out.println("createDoubleBorders");
+//        AbstractSplit rightSplit = new SplitRight(133);
+//        List splits = new ArrayList(); splits.add(rightSplit);
+//        Mesh doubleBorder = new Mesh(splits);
+//        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1.obj"
+//                , doubleBorder.getVertices(), doubleBorder.getFaces());
+//
+//        doubleBorder.createBorders();
+//
+//        doubleBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_MultiBorder1_borders.obj");
+//    }
 //    @Test
 //    public void testCreateUpBorders() throws IOException {
 //        System.out.println("createUpBorders");
@@ -132,6 +149,23 @@ public class MeshTest {
 //
 //        linearBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/A_LinearBorder1_borders.obj");
 //    }
+
+    @Test
+    public void testCreateLinearBorders2() throws IOException {
+        System.out.println("createLinearBorders");
+        AbstractSplit leftSplit = new SplitLeft(248);
+        List<AbstractSplit> splits = new ArrayList(); splits.add(leftSplit);
+        Mesh linearBorder = new Mesh(splits);
+        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/B_LinearBorder1.obj"
+                , linearBorder.getVertices(), linearBorder.getFaces());
+        linearBorder.createBorders();
+
+        System.out.println("Border2 OK");
+
+        linearBorder.exportBorders("./src/test/java/gin/melec/MeshForTests/B_LinearBorder1_borders.obj");
+    }
+
+
 //
 //    @Test
 //    public void testCreateHasardBorders() throws IOException {
