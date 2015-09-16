@@ -41,7 +41,8 @@ public class Face implements Comparable<Face> {
     private final int idVertex3;
 
     /**
-     * Public constructor of a face, taking id of three vertex.
+     * Public constructor of a face, taking id of three vertex. Vertex are
+     * ordered with their id.
      * @param id1 , first vertex of the face.
      * @param id2 , second vertex of the face.
      * @param id3 , third vertex of the face.
@@ -62,6 +63,11 @@ public class Face implements Comparable<Face> {
     }
 
 
+    /**
+     * TODO   kill this one.
+     * @param increment
+     * @return
+     */
     String toIncrementString(int increment) {
         return "f" + " " + (idVertex1+increment) + " " + (idVertex2+increment) + " " + (idVertex3+increment);
     }
@@ -95,6 +101,11 @@ public class Face implements Comparable<Face> {
         return result;
     }
 
+    /**
+     * Check if the face contain or not the vertex given by it's id.
+     * @param idVertex , the id of the vertex to check.
+     * @return true if the face contain the vertex, else false.
+     */
     public final boolean include(final int idVertex) {
         boolean result;
         if (idVertex == idVertex1 || idVertex == idVertex2
@@ -151,14 +162,26 @@ public class Face implements Comparable<Face> {
         return true;
     }
 
+    /**
+     * Getter of the id of the first vertex of this face.
+     * @return the id of the first vertex of this face.
+     */
     public final int getIdVertex1() {
         return idVertex1;
     }
 
+    /**
+     * Getter of the id of the second vertex of this face.
+     * @return the id of the second vertex of this face.
+     */
     public final int getIdVertex2() {
         return idVertex2;
     }
 
+    /**
+     * Getter of the id of the third vertex of this face.
+     * @return the id of the third vertex of this face.
+     */
     public final int getIdVertex3() {
         return idVertex3;
     }

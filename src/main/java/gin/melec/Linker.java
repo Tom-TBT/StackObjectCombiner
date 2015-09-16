@@ -42,6 +42,16 @@ public class Linker {
         private static final Linker INSTANCE = new Linker();
     }
 
+    /**
+     * This method choose between 4 vertex the two that will form a link, to
+     * cut a quadrilateral in two triangles.
+     * @param ori1 , the first vertex candidate as origin.
+     * @param ori2 , the second vertex candidate as origin.
+     * @param dest1 , the first vertex candidate as destination.
+     * @param dest2 , the second vertex candidate as destination.
+     * @return a list composed of two vertex, index 0 containing the origin and
+     * index 1 containing the destination.
+     */
     private static List findVertexLinked(final Vertex ori1, final Vertex ori2,
             final Vertex dest1, final Vertex dest2) {
         final List result = new ArrayList();
@@ -59,6 +69,14 @@ public class Linker {
         return result;
     }
 
+    /**
+     * Link the border origin to the border destination. Every link made will
+     * have as origin a vertex from the origin border, and as destination a
+     * vertex from the destination border.
+     * @param origin , the origin border.
+     * @param destination , the destination border.
+     * @return a set of links between the two borders.
+     */
     public static final Set linkTo(final Border origin,
             final Border destination) {
         final TreeSet<Link> links = new TreeSet();
@@ -81,8 +99,10 @@ public class Linker {
         Vertex currentVertex = it.next();
         while (it.hasNext()) {
             if (!Linker.containVertex(currentVertex, links)) {
-                List<Vertex> candidates = Linker.findCandidates(previousVertex, links);
-                Vertex linked = Linker.findLinked(currentVertex, candidates.get(0), candidates.get(1));
+                List<Vertex> candidates = Linker.findCandidates(previousVertex
+                        , links);
+                Vertex linked = currentVertex.whichCloser(candidates.get(0)
+                        , candidates.get(1));
                 links.add(new Link(linked, currentVertex,
                     origin.getVertexSequence().indexOf(linked),
                     destination.getVertexSequence().indexOf(currentVertex)));
@@ -127,6 +147,15 @@ public class Linker {
         return links;
     }
 
+    /**
+     * Used once links have been made from one border to an other. After this,
+     * their is still some vertex to link, but it can't be link in a way that
+     * links cross each other. So this method find the vertex that can be
+     * linked.
+     * @param vertex , the previous vertex which is already linked.
+     * @param links , the set of the links.
+     * @return a list of the vertex that are linkable.
+     */
     static List findCandidates(Vertex vertex, TreeSet<Link> links) {
         List<Vertex> candidates = new ArrayList();
 
@@ -146,22 +175,32 @@ public class Linker {
         return candidates;
     }
 
-    static boolean containVertex(Vertex vertex, Set<Link> links) {
+    /**
+     * Return a boolean that indicates if the set of links contain as origin or
+     * destination the vertex given.
+     * @param vertex , the vertex to check.
+     * @param links , the set of links to check.
+     * @return true if the vertex is in a link, else false.
+     */
+    private static boolean containVertex(final Vertex vertex,
+            final Set<Link> links) {
+        boolean result = false;
         for (Link link : links) {
-            if (link.getOrigin().equals(vertex) || link.getDestination().equals(vertex)) {
-                return true;
+            if (link.getOrigin().equals(vertex)
+                    || link.getDestination().equals(vertex)) {
+                result = true;
+                break;
             }
         }
-        return false;
+        return result;
     }
 
-    private static Vertex findLinked(Vertex currentVertex, Vertex candidate1, Vertex candidate2) {
-        if (candidate2 != null && (currentVertex.distanceTo(candidate2) < currentVertex.distanceTo(candidate1))) {
-            return candidate2;
-        }
-        return candidate1;
-    }
-
+    /**
+     * Export the links of the set into faces.
+     * @param links , the set where the links are stocked.
+     * @param idShift , the shift to apply to the destination's id in faces.
+     * @return the faces created from the links.
+     */
     public static List exportLinks(final Set links, final int idShift) {
         final List<Face> newFaces = new ArrayList();
 

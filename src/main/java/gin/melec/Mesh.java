@@ -79,7 +79,11 @@ public class Mesh {
         this.primers = new TreeSet();
     }
 
-    final void setFacesToVertex(final Vertex vertex) {
+    /**
+     * Set to a vertex the faces in which he is.
+     * @param vertex , the vertex to set the faces.
+     */
+    public final void setFacesToVertex(final Vertex vertex) {
         for (Face face : this.faces) {
             if (face.getIdVertex1() == vertex.getId()) {
                 vertex.getFaces().add(face);
@@ -97,7 +101,11 @@ public class Mesh {
         }
     }
 
-    private void doPrimersNeighboors() {
+    /**
+     * Set the neighbours to the primers. Every primers need to know its
+     * neighbours, so that they can add them in the garbage later.
+     */
+    private void doPrimersNeighbours() {
         int minId, maxId;
         minId = this.primers.first().getId();
         maxId = this.primers.last().getId();
@@ -116,6 +124,11 @@ public class Mesh {
         }
     }
 
+    /**
+     * Find the vertex corresponding to the given id, in the vertices.
+     * @param idVertex , the id of the vertex to find.
+     * @return the vertex with the given id.
+     */
     private Vertex getVertex(final int idVertex) {
         Vertex result;
         Vertex doppleganger = new Vertex(idVertex, 0, 0, 0);
@@ -137,6 +150,12 @@ public class Mesh {
         }
     }
 
+    /**
+     * Find the next vertex to add to the border. It is find according to the
+     * appartenance of a face in which is also the last vertex added.
+     * @param border , the border for which we search the next vertex.
+     * @return the next vertex to add to the border.
+     */
     final Vertex findNextVertex(final Border border) {
         Vertex nextVertex = null;
         final Set<Face> facesRemaining = new HashSet();
@@ -183,6 +202,12 @@ public class Mesh {
         return nextVertex;
     }
 
+    /**
+     * Give the face containing the vertex. The face is only search in a subset.
+     * @param vertex , the vertex for which we search the face.
+     * @param facesRemaining , the subset of faces.
+     * @return the face containing the vertex.
+     */
     private Face getFaceIncluding(final Vertex vertex,
             final Set<Face> facesRemaining) {
         Face result = null;
@@ -195,9 +220,17 @@ public class Mesh {
         return result;
     }
 
-    final void createBorders() {
+    /**
+     * This is the principal method for creating every borders of a mesh. It
+     * first create primers (vertex of the mesh) which can potentially initiate
+     * a new border. Then a border is created from the primers, and once the
+     * border has been detected, the vertex already detected are removed to the
+     * primers. The iteration of the detection of the borders stop once the
+     * primers set is empty.
+     */
+    public final void createBorders() {
         createPrimers();
-        doPrimersNeighboors();
+        doPrimersNeighbours();
         while (!primers.isEmpty()) {
             final Border border = new Border(this);
             Vertex nextVertex = border.getLastVertex();
@@ -216,15 +249,22 @@ public class Mesh {
         this.borders = this.separateBorders();
     }
 
-    private final List separateBorders() {
-        List result = new ArrayList();
+    /**
+     * Separate the sub-borders of a border.
+     * @return a list a the sub-borders.
+     */
+    private List separateBorders() {
+        final List result = new ArrayList();
         for (AbstractSplit split : this.splits) {
             result.addAll(split.refineBorders(this.borders));
         }
         return result;
     }
 
-    final void createPrimers() {
+    /**
+     * Add the vertex that can initiate a border to the primers set.
+     */
+    private void createPrimers() {
         for (AbstractSplit split : splits) {
             primers.addAll(split.findBorderVertices(vertices));
         }
@@ -263,7 +303,11 @@ public class Mesh {
         borders.clear();
     }
 
-    final void importBorders(final String filePath) {
+    /**
+     * Import the borders from a given file.
+     * @param filePath ,the path of the file in which the borders are contained.
+     */
+    public final void importBorders(final String filePath) {
         try {
             this.borders = ObjReader.readBorders(filePath);
         } catch (IOException ex) {
@@ -271,31 +315,55 @@ public class Mesh {
         }
     }
 
-    public TreeSet<Vertex> getVertices() {
+    /**
+     * Getter of the attribute vertices.
+     * @return the vertices of the mesh.
+     */
+    public final TreeSet<Vertex> getVertices() {
         return vertices;
     }
-
-    public void setBorders(List<Border> borders) {
+    /**
+     * TODO check utility
+     * @param borders
+     */
+    public final void setBorders(List<Border> borders) {
         this.borders = borders;
     }
-
-    public Set<Face> getFaces() {
+    /**
+     * Getter of the attribute faces.
+     * @return the faces of the mesh.
+     */
+    public final Set<Face> getFaces() {
         return faces;
     }
-
-    public List<Border> getBorders() {
+    /**
+     * Getter of the attribute borders.
+     * @return the borders of the mesh.
+     */
+    public final List<Border> getBorders() {
         return borders;
     }
-
-    public Set<Vertex> getGarbage() {
+    /**
+     * Getter of the attribute garbage.
+     * @return the garbage of the mesh.
+     */
+    public final Set<Vertex> getGarbage() {
         return garbage;
     }
 
-    public TreeSet<Vertex> getPrimers() {
+    /**
+     * Getter of the attribute primers.
+     * @return the primers of the mesh.
+     */
+    public final TreeSet<Vertex> getPrimers() {
         return primers;
     }
 
-    public List<AbstractSplit> getSplits() {
+    /**
+     * Getter of the attribute splits.
+     * @return the splits of the mesh.
+     */
+    public final List<AbstractSplit> getSplits() {
         return splits;
     }
 

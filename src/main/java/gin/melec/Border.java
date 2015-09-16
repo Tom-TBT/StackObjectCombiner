@@ -58,7 +58,10 @@ public class Border {
     private boolean isCircular;
 
     /**
-     * Public constructor for the border.
+     * Public constructor for the border. This constructor is used when the
+     * border need to be detected. The constructor look at the primers of the
+     * given mesh to build the new border.
+     * @param mesh , the mesh from which a new border is created.
      */
     public Border(final Mesh mesh) {
         this.vertexSequence = new LinkedList();
@@ -85,21 +88,31 @@ public class Border {
         mesh.getGarbage().add(getLastVertex());
     }
 
+    /**
+     * A simple constructor which is used when a border is only loaded.
+     */
     public Border() {
         this.vertexSequence = new LinkedList();
     }
 
+    /**
+     * Getter for the split of the border.
+     * @return the split of the border.
+     */
     public AbstractSplit getSplit() {
         return split;
     }
 
+    /**
+     * Getter for the vertex sequence of the border.
+     * @return the vertex sequence of the border
+     */
     public List<Vertex> getVertexSequence() {
         return vertexSequence;
     }
 
     /**
      * Add the given vertex to the end of the border.
-     *
      * @param vertex , the vertex to add.
      */
     public final void addNextVertex(final Vertex vertex) {
@@ -108,6 +121,11 @@ public class Border {
         }
     }
 
+    /**
+     * This method prepare the attributes of the border. This set up for example
+     * the lenght, or the position of the center of the border. These parameters
+     * are used for automatic matching of the borders.
+     */
     public final void prepare() {
         straightLenght = getFirstVertex().distanceTo(getLastVertex());
 
@@ -126,8 +144,12 @@ public class Border {
         this.center = new Vertex(0, x, y, z);
     }
 
+    /**
+     * Getter for the first vertex of the border's vertex sequence.
+     * @return the first vertex of this border.
+     */
     public final Vertex getFirstVertex() {
-        final Vertex result;
+        Vertex result;
         if (vertexSequence.isEmpty()) {
             result = null;
         } else {
@@ -136,8 +158,12 @@ public class Border {
         return result;
     }
 
+    /**
+     * Getter for the last vertex of the border's vertex sequence.
+     * @return the last vertex of this border.
+     */
     public final Vertex getLastVertex() {
-        final Vertex result;
+        Vertex result;
         if (vertexSequence.isEmpty()) {
             result = null;
         } else {
@@ -146,8 +172,12 @@ public class Border {
         return result;
     }
 
+    /**
+     * Getter for the second last vertex of the border's vertex sequence.
+     * @return the second last vertex of this border.
+     */
     public final Vertex getSecondLastVertex() {
-        final Vertex result;
+        Vertex result;
         if (vertexSequence.isEmpty()) {
             result = null;
         } else {
@@ -156,6 +186,10 @@ public class Border {
         return result;
     }
 
+    /**
+     * Revert the sequence of the border. Used when borders to join need to be
+     * aligned (in term of vertex sequence).
+     */
     public final void revertSequence() {
         final LinkedList newSequence = new LinkedList<Vertex>();
         for (Iterator it = this.vertexSequence.descendingIterator();
@@ -165,6 +199,11 @@ public class Border {
         this.vertexSequence = newSequence;
     }
 
+    /**
+     * Change the first vertex of the border's vertex sequence. Used when
+     * borders to join need to be aligned (in term of vertex sequence). Used
+     * only on circular borders.
+     */
     public final void changeFirstVertex(final Vertex vertex) {
         final LinkedList endSequence = new LinkedList<Vertex>();
         final LinkedList newStartSequence = new LinkedList<Vertex>();
@@ -187,6 +226,11 @@ public class Border {
         this.vertexSequence = newStartSequence;
     }
 
+    /**
+     * This method take a border as reference, and align the border on. Can then
+     * change the first vertex of the border, and the order of the sequence.
+     * @param border , the border on which this border is aligned.
+     */
     public final void alignOn(Border border) {
         final Vertex firstVertex2 = border.getFirstVertex();
         Vertex firstVertex1 = this.getFirstVertex();

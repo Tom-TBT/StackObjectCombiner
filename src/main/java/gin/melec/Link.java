@@ -44,6 +44,16 @@ public class Link implements Comparable<Link> {
      */
     private final int indexDestination;
 
+    /**
+     * Public constructor of a link. A link is formed with two vertex : a vertex
+     * from where the link originate (origin), and a second, the destination.
+     * The index are the index in their sequence, and they are used to compare
+     * two links (interface comparable).
+     * @param origin , the vertex from where the link originate.
+     * @param destination , the second vertex linked.
+     * @param indexOrigin , the index of the origin in his sequence.
+     * @param indexDestination , the index of the destination in his sequence.
+     */
     public Link(final Vertex origin, final Vertex destination,
             final int indexOrigin, final int indexDestination) {
         this.origin = origin;
@@ -52,18 +62,33 @@ public class Link implements Comparable<Link> {
         this.indexDestination = indexDestination;
     }
 
+    /**
+     * Getter of the origin.
+     * @return the origin of the link.
+     */
     public Vertex getOrigin() {
         return origin;
     }
-
+    /**
+     * Getter of the destination.
+     * @return the destination of the link.
+     */
     public Vertex getDestination() {
         return destination;
     }
 
+    /**
+     * Getter of the indexOrigin.
+     * @return the index of the origin in his sequence.
+     */
     public int getIndexOrigin() {
         return indexOrigin;
     }
 
+    /**
+     * Getter of the indexDestination.
+     * @return the index of the destination in his sequence.
+     */
     public int getIndexDestination() {
         return indexDestination;
     }
@@ -96,17 +121,18 @@ public class Link implements Comparable<Link> {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         int hash = 5;
         hash = 19 * hash + (this.origin != null ? this.origin.hashCode() : 0);
-        hash = 19 * hash + (this.destination != null ? this.destination.hashCode() : 0);
+        hash = 19 * hash + (this.destination != null
+                ? this.destination.hashCode() : 0);
         hash = 19 * hash + this.indexOrigin;
         hash = 19 * hash + this.indexDestination;
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }

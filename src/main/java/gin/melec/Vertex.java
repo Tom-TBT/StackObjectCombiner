@@ -29,19 +29,22 @@ import java.util.Set;
  */
 public class Vertex implements Comparable<Vertex>, Serializable {
 
-    private static DecimalFormat df = new DecimalFormat("##.##");
-    private static DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+    /**
+     * A decimal format used to export vertex with only 3 fraction digits.
+     */
+    private static final DecimalFormat DF = new DecimalFormat("##.##");
+    private static final DecimalFormatSymbols DFS = new DecimalFormatSymbols();
 
     static {
-        df.setMaximumFractionDigits(3);
-        dfs.setDecimalSeparator('.');
-        df.setDecimalFormatSymbols(dfs);
+        DF.setMaximumFractionDigits(3);
+        DFS.setDecimalSeparator('.');
+        DF.setDecimalFormatSymbols(DFS);
     }
 
     /**
      * The id number of the vertex.
      */
-    private int id;
+    private final int id;
     /**
      * The x coordonate of the vertex.
      */
@@ -91,8 +94,8 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      */
     @Override
     public final String toString() {
-        return "v " + df.format(this.x) + " " + df.format(this.y) + " "
-                + df.format(this.z);
+        return "v " + DF.format(this.x) + " " + DF.format(this.y) + " "
+                + DF.format(this.z);
     }
 
     /**
@@ -101,8 +104,8 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      * @return , a string describing the vertex with it's ID.
      */
     public final String toIdString() {
-        return "v " + df.format(this.x) + " " + df.format(this.y) + " "
-                + df.format(this.z) + " " + this.id;
+        return "v " + DF.format(this.x) + " " + DF.format(this.y) + " "
+                + DF.format(this.z) + " " + this.id;
     }
 
     /**
@@ -135,10 +138,33 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         return result;
     }
 
+    /**
+     * Compute the distance between this vertex and an other one.
+     * @param vertex , the vertex to compute the distance to this vertex.
+     * @return the distance between the two vertex.
+     */
     public final double distanceTo(final Vertex vertex) {
         return Math.sqrt(Math.pow((double) this.x - (double) vertex.x, 2)
                 + Math.pow((double) this.y - (double) vertex.y, 2)
                 + Math.pow((double) this.z - (double) vertex.z, 2));
+    }
+
+    /**
+     * Find the closer vertex to this vertex between two candidates.
+     * @param candidate1 , the first candidate.
+     * @param candidate2 , the second candidate.
+     * @return the closer of the two vertex.
+     */
+    public final Vertex whichCloser(final Vertex candidate1
+            , final Vertex candidate2) {
+        Vertex result;
+        if (candidate2 != null && candidate1 != null
+               && (this.distanceTo(candidate2) < this.distanceTo(candidate1))) {
+            result = candidate2;
+        } else {
+            result = candidate1;
+        }
+        return result;
     }
 
     @Override
@@ -172,39 +198,69 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         return this.id - vertex.id;
     }
 
-    public int getId() {
+    /**
+     * Getter of the attribute id.
+     * @return the id of the vertex.
+     */
+    public final int getId() {
         return id;
     }
-
-    public float getX() {
+    /**
+     * Getter of the attribute x.
+     * @return the x of the vertex.
+     */
+    public final float getX() {
         return x;
     }
-
-    public void setX(float x) {
+    /**
+     * Setter of the attribute x.
+     * @param x , the new value for the x of this vertex.
+     */
+    public final void setX(float x) {
         this.x = x;
     }
-
-    public float getY() {
+    /**
+     * Getter of the attribute y.
+     * @return the y of the vertex.
+     */
+    public final float getY() {
         return y;
     }
 
-    public void setY(float y) {
+    /**
+     * Setter of the attribute y.
+     * @param y , the new value for the y of this vertex.
+     */
+    public final void setY(float y) {
         this.y = y;
     }
-
-    public float getZ() {
+    /**
+     * Getter of the attribute z.
+     * @return the z of the vertex.
+     */
+    public final float getZ() {
         return z;
     }
 
-    public void setZ(float z) {
+    /**
+     * Setter of the attribute z.
+     * @param z , the new value for the z of this vertex.
+     */
+    public final void setZ(float z) {
         this.z = z;
     }
-
-    public Set<Vertex> getNeighbours() {
+    /**
+     * Getter of the attribute neighbours.
+     * @return the neighbours of the vertex.
+     */
+    public final Set<Vertex> getNeighbours() {
         return neighbours;
     }
-
-    public Set<Face> getFaces() {
+    /**
+     * Getter of the attribute faces.
+     * @return the faces of the vertex.
+     */
+    public final Set<Face> getFaces() {
         return faces;
     }
 }
