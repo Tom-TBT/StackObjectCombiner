@@ -62,40 +62,34 @@ public class Border {
      * Public constructor for the border. This constructor is used when the
      * border need to be detected. The constructor look at the primers of the
      * given mesh to build the new border.
+     *
      * @param mesh , the mesh from which a new border is created.
      */
     public Border(final Mesh mesh) {
         this.vertexSequence = new LinkedList();
 
         Vertex currentVertex = null;
-        Vertex candidat = null;
-        float distanceTmp, distanceFirstVertex = 0;
+        Vertex firstVertex = null, secondVertex = null;
         for (AbstractSplit currentSplit : mesh.getSplits()) {
             currentVertex = currentSplit.findCloserVertex(mesh.getPrimers());
-            distanceTmp = currentSplit.distanceTo(currentVertex);
-            if (getFirstVertex() == null || distanceTmp < distanceFirstVertex) {
-                distanceFirstVertex = distanceTmp;
-                candidat = currentVertex;
+            if (currentVertex.belongToBorder()) {
+                firstVertex = currentVertex;
                 this.split = currentSplit;
+                break;
+            } else {
+                mesh.getPrimers().remove(currentVertex);
             }
         }
-        //check candidat
-        mesh.setFacesToVertex(candidat);
-        List<Vertex> substitutes = new ArrayList();
-        substitutes.addAll(candidat.getNeighbours());
-        while (!candidat.belongToBorder()) {
-            candidat = substitutes.get(0);
-            substitutes.remove(candidat);
-            mesh.setFacesToVertex(candidat);
+        vertexSequence.add(firstVertex);
+        mesh.setNeighbourhoodToVertex(firstVertex);
+        for (final Vertex vertex : firstVertex.getNeighbours()) {
+            if (vertex.belongToBorder()) {
+                secondVertex = vertex;
+                break;
+            }
         }
-
-        vertexSequence.add(candidat);
-
-        mesh.setFacesToVertex(getFirstVertex());
-        vertexSequence.add(this.split.findCloserVertex(
-                getFirstVertex().getNeighbours()));
-        //check 2eme vertex
-
+        vertexSequence.add(secondVertex);
+        mesh.setNeighbourhoodToVertex(secondVertex);
         mesh.getGarbage().add(getSecondLastVertex());
         mesh.getGarbage().add(getLastVertex());
     }
@@ -109,6 +103,7 @@ public class Border {
 
     /**
      * Getter for the split of the border.
+     *
      * @return the split of the border.
      */
     public AbstractSplit getSplit() {
@@ -117,6 +112,7 @@ public class Border {
 
     /**
      * Getter for the vertex sequence of the border.
+     *
      * @return the vertex sequence of the border
      */
     public List<Vertex> getVertexSequence() {
@@ -125,6 +121,7 @@ public class Border {
 
     /**
      * Add the given vertex to the end of the border.
+     *
      * @param vertex , the vertex to add.
      */
     public final void addNextVertex(final Vertex vertex) {
@@ -158,6 +155,7 @@ public class Border {
 
     /**
      * Getter for the first vertex of the border's vertex sequence.
+     *
      * @return the first vertex of this border.
      */
     public final Vertex getFirstVertex() {
@@ -172,6 +170,7 @@ public class Border {
 
     /**
      * Getter for the last vertex of the border's vertex sequence.
+     *
      * @return the last vertex of this border.
      */
     public final Vertex getLastVertex() {
@@ -186,6 +185,7 @@ public class Border {
 
     /**
      * Getter for the second last vertex of the border's vertex sequence.
+     *
      * @return the second last vertex of this border.
      */
     public final Vertex getSecondLastVertex() {
@@ -241,6 +241,7 @@ public class Border {
     /**
      * This method take a border as reference, and align the border on. Can then
      * change the first vertex of the border, and the order of the sequence.
+     *
      * @param border , the border on which this border is aligned.
      */
     public final void alignOn(Border border) {
@@ -277,6 +278,5 @@ public class Border {
         //}
 
     }
-
 
 }

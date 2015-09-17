@@ -81,9 +81,10 @@ public class Mesh {
 
     /**
      * Set to a vertex the faces in which he is.
+     *
      * @param vertex , the vertex to set the faces.
      */
-    public final void setFacesToVertex(final Vertex vertex) {
+    public final void setNeighbourhoodToVertex(final Vertex vertex) {
         for (Face face : this.faces) {
             if (face.getVertex1().equals(vertex)) {
                 vertex.getFaces().add(face);
@@ -139,50 +140,29 @@ public class Mesh {
     /**
      * Find the next vertex to add to the border. It is find according to the
      * appartenance of a face in which is also the last vertex added.
+     *
      * @param border , the border for which we search the next vertex.
      * @return the next vertex to add to the border.
      */
-    final Vertex findNextVertex(final Border border) {
-        Vertex nextVertex = null;
-        final Set<Face> facesRemaining = new HashSet();
-        final Set<Vertex> verticesRemaining = new HashSet();
-        facesRemaining.addAll(border.getLastVertex().getFaces());
-        verticesRemaining.addAll(border.getLastVertex().getNeighbours());
-        Boolean notFoundYet = true;
-
+    private final Vertex findNextVertex(final Border border) {
+        Vertex nextVertex = border.getSecondLastVertex();
         Face currentFace = null;
-        // Search the face, the two last vertex added to the border, have in
-        // in common
-        for (Face face1 : border.getLastVertex().getFaces()) {
-            for (Face face2 : border.getSecondLastVertex().getFaces()) {
-                if (face2 == face1) {
-                    currentFace = face1;
-                    facesRemaining.remove(face1);
-                    verticesRemaining.remove(border.getSecondLastVertex());
-                    nextVertex = border.getSecondLastVertex();
+        final Set<Face> facesRemaining = new HashSet();
+        facesRemaining.addAll(border.getLastVertex().getFaces());
+
+        while (!facesRemaining.isEmpty()) {
+            for (Face face : facesRemaining) {
+                if (face.include(nextVertex)) {
+                    currentFace = face;
                     break;
                 }
             }
-            if (currentFace != null) {
-                break;
-            }
+            facesRemaining.remove(currentFace);
+            nextVertex = currentFace.getThirdVertex(border.getLastVertex(),
+                    nextVertex);
         }
-        while (notFoundYet) {
-            for (Vertex vertex : verticesRemaining) {
-                // hoix selon les 2 premier !!
-                if (currentFace.include(vertex)) {
-                    currentFace = vertex.getFaceIncluding(facesRemaining);
-                    facesRemaining.remove(currentFace);
-                    verticesRemaining.remove(vertex);
-                    nextVertex = vertex;
-                    break;
-                }
-            }
-            if (verticesRemaining.isEmpty()) {
-                notFoundYet = false;
-            }
-        }
-        this.setFacesToVertex(nextVertex);
+
+        this.setNeighbourhoodToVertex(nextVertex);
         if (nextVertex.equals(border.getFirstVertex())) {
             nextVertex = null;
         }
@@ -203,9 +183,6 @@ public class Mesh {
         while (!primers.isEmpty()) {
             final Border border = new Border(this);
             Vertex nextVertex = border.getLastVertex();
-            this.setFacesToVertex(nextVertex);
-            nextVertex = this.findNextVertex(border);
-            border.addNextVertex(nextVertex);
             while (nextVertex != null) {
                 nextVertex = this.findNextVertex(border);
                 border.addNextVertex(nextVertex);
@@ -220,6 +197,7 @@ public class Mesh {
 
     /**
      * Separate the sub-borders of a border.
+     *
      * @return a list a the sub-borders.
      */
     private List separateBorders() {
@@ -274,6 +252,7 @@ public class Mesh {
 
     /**
      * Import the borders from a given file.
+     *
      * @param filePath ,the path of the file in which the borders are contained.
      */
     public final void importBorders(final String filePath) {
@@ -286,34 +265,43 @@ public class Mesh {
 
     /**
      * Getter of the attribute vertices.
+     *
      * @return the vertices of the mesh.
      */
     public final TreeSet<Vertex> getVertices() {
         return vertices;
     }
+
     /**
      * TODO check utility
+     *
      * @param borders
      */
     public final void setBorders(List<Border> borders) {
         this.borders = borders;
     }
+
     /**
      * Getter of the attribute faces.
+     *
      * @return the faces of the mesh.
      */
     public final Set<Face> getFaces() {
         return faces;
     }
+
     /**
      * Getter of the attribute borders.
+     *
      * @return the borders of the mesh.
      */
     public final List<Border> getBorders() {
         return borders;
     }
+
     /**
      * Getter of the attribute garbage.
+     *
      * @return the garbage of the mesh.
      */
     public final Set<Vertex> getGarbage() {
@@ -322,6 +310,7 @@ public class Mesh {
 
     /**
      * Getter of the attribute primers.
+     *
      * @return the primers of the mesh.
      */
     public final TreeSet<Vertex> getPrimers() {
@@ -330,6 +319,7 @@ public class Mesh {
 
     /**
      * Getter of the attribute splits.
+     *
      * @return the splits of the mesh.
      */
     public final List<AbstractSplit> getSplits() {
