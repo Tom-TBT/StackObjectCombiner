@@ -36,27 +36,12 @@ public class Border {
     /**
      * The sequence of vertex forming the border.
      */
-    private LinkedList<Vertex> vertexSequence;
+    protected LinkedList<Vertex> vertexSequence;
 
     /**
-     * The distance between the first and the last vertex of the border.
+     * The sub borders of a border.
      */
-    private double straightLenght;
-
-    /**
-     * The real lenght of the border.
-     */
-    private double cumulLenght;
-
-    /**
-     * The center of the border.
-     */
-    private Vertex center;
-
-    /**
-     * The center of the border.
-     */
-    private boolean isCircular;
+    private List<SubBorder> subBorders;
 
     /**
      * Public constructor for the border. This constructor is used when the
@@ -67,6 +52,7 @@ public class Border {
      */
     public Border(final Mesh mesh) {
         this.vertexSequence = new LinkedList();
+        this.subBorders = new ArrayList();
 
         Vertex currentVertex = null;
         Vertex firstVertex = null, secondVertex = null;
@@ -99,6 +85,7 @@ public class Border {
      */
     public Border() {
         this.vertexSequence = new LinkedList();
+        this.subBorders = new ArrayList();
     }
 
     /**
@@ -106,7 +93,7 @@ public class Border {
      *
      * @return the split of the border.
      */
-    public AbstractSplit getSplit() {
+    public final AbstractSplit getSplit() {
         return split;
     }
 
@@ -115,7 +102,7 @@ public class Border {
      *
      * @return the vertex sequence of the border
      */
-    public List<Vertex> getVertexSequence() {
+    public final List<Vertex> getVertexSequence() {
         return vertexSequence;
     }
 
@@ -128,29 +115,6 @@ public class Border {
         if (vertex != null) {
             this.vertexSequence.add(vertex);
         }
-    }
-
-    /**
-     * This method prepare the attributes of the border. This set up for example
-     * the lenght, or the position of the center of the border. These parameters
-     * are used for automatic matching of the borders.
-     */
-    public final void prepare() {
-        straightLenght = getFirstVertex().distanceTo(getLastVertex());
-
-        cumulLenght = 0;
-        float x = 0, y = 0, z = 0;
-        for (int i = 0; i < vertexSequence.size() - 1; i++) {
-            cumulLenght += vertexSequence.get(i)
-                    .distanceTo(vertexSequence.get(i + 1));
-            x += vertexSequence.get(i).getX();
-            y += vertexSequence.get(i).getY();
-            z += vertexSequence.get(i).getZ();
-        }
-        x = x / vertexSequence.size();
-        y = y / vertexSequence.size();
-        z = z / vertexSequence.size();
-        this.center = new Vertex(0, x, y, z);
     }
 
     /**
@@ -199,16 +163,40 @@ public class Border {
     }
 
     /**
-     * Revert the sequence of the border. Used when borders to join need to be
-     * aligned (in term of vertex sequence).
+     * Divide the border into sub-borders. A border can be decompose from 1 to
+     * many subborders, in case of a multiple crossing of the split.
      */
-    public final void revertSequence() {
-        final LinkedList newSequence = new LinkedList<Vertex>();
-        for (Iterator it = this.vertexSequence.descendingIterator();
-                it.hasNext();) {
-            newSequence.add(it.next());
+    public final void separateSubBorders() {
+        boolean isCircular = true;
+        // Moving the first vertex to an outside vertex if it exist.
+        for (Vertex vertex : this.vertexSequence) {
+            if (!this.split.isClose(vertex)) {
+                this.changeFirstVertex(vertex);
+                isCircular = false;
+            }
         }
-        this.vertexSequence = newSequence;
+        SubBorder currentSubBorder = null;
+
+        for (Vertex vertex : this.vertexSequence) {
+            if (currentSubBorder == null && this.split.isClose(vertex)) {
+                currentSubBorder = new SubBorder();
+                currentSubBorder.setCircular(isCircular);
+                currentSubBorder.addNextVertex(vertex);
+            } else if (currentSubBorder != null) {
+                if (this.split.isClose(vertex)) {
+                    currentSubBorder.addNextVertex(vertex);
+                } else {
+                    currentSubBorder.prepare();
+                    subBorders.add(currentSubBorder);
+                    currentSubBorder = null;
+                }
+            }
+        }
+        if (currentSubBorder != null) {
+            currentSubBorder.prepare();
+            subBorders.add(currentSubBorder);
+        }
+
     }
 
     /**
@@ -222,8 +210,8 @@ public class Border {
 
         Iterator<Vertex> it = this.vertexSequence.iterator();
         while (it.hasNext()) {
-            Vertex currentVertex = it.next();
-            if (currentVertex == vertex) {
+            final Vertex currentVertex = it.next();
+            if (currentVertex.equals(vertex)) {
                 newStartSequence.add(currentVertex);
                 break;
             } else {
@@ -237,46 +225,4 @@ public class Border {
 
         this.vertexSequence = newStartSequence;
     }
-
-    /**
-     * This method take a border as reference, and align the border on. Can then
-     * change the first vertex of the border, and the order of the sequence.
-     *
-     * @param border , the border on which this border is aligned.
-     */
-    public final void alignOn(Border border) {
-        final Vertex firstVertex2 = border.getFirstVertex();
-        Vertex firstVertex1 = this.getFirstVertex();
-        Vertex previousVertex1, nextVertex1, nextVertex2;
-
-        //TODO if (this.isCircular) {
-        for (Iterator<Vertex> it = this.vertexSequence.iterator();
-                it.hasNext();) {
-            Vertex candidate = it.next();
-            if (candidate.distanceTo(firstVertex2)
-                    < firstVertex1.distanceTo(firstVertex2)) {
-                firstVertex1 = candidate;
-            }
-        }
-        if (firstVertex1 != this.getFirstVertex()) {
-            previousVertex1 = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertex1) - 1);
-        } else {
-            previousVertex1 = this.vertexSequence.getLast();
-        }
-        if (firstVertex1 != this.vertexSequence.getLast()) {
-            nextVertex1 = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertex1) + 1);
-        } else {
-            nextVertex1 = this.vertexSequence.getFirst();
-        }
-        nextVertex2 = border.getVertexSequence().get(1);
-
-        if (nextVertex1.distanceTo(nextVertex2)
-                > previousVertex1.distanceTo(nextVertex2)) {
-            this.revertSequence();
-        }
-        this.changeFirstVertex(firstVertex1);
-        //}
-
-    }
-
 }

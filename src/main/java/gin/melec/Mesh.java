@@ -161,11 +161,7 @@ public class Mesh {
             nextVertex = currentFace.getThirdVertex(border.getLastVertex(),
                     nextVertex);
         }
-
         this.setNeighbourhoodToVertex(nextVertex);
-        if (nextVertex.equals(border.getFirstVertex())) {
-            nextVertex = null;
-        }
         return nextVertex;
     }
 
@@ -183,7 +179,7 @@ public class Mesh {
         while (!primers.isEmpty()) {
             final Border border = new Border(this);
             Vertex nextVertex = border.getLastVertex();
-            while (nextVertex != null) {
+            while (!nextVertex.equals(border.getFirstVertex())) {
                 nextVertex = this.findNextVertex(border);
                 border.addNextVertex(nextVertex);
             }
@@ -192,20 +188,9 @@ public class Mesh {
             this.garbage.clear();
             this.borders.add(border);
         }
-        this.borders = this.separateBorders();
-    }
-
-    /**
-     * Separate the sub-borders of a border.
-     *
-     * @return a list a the sub-borders.
-     */
-    private List separateBorders() {
-        final List result = new ArrayList();
-        for (AbstractSplit split : this.splits) {
-            result.addAll(split.refineBorders(this.borders));
+        for (Border border : this.borders) {
+            border.separateSubBorders();
         }
-        return result;
     }
 
     /**

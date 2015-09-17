@@ -67,6 +67,7 @@ public abstract class AbstractSplit {
 
     /**
      * Getter for the attribute position.
+     *
      * @return the position of the border.
      */
     public final int getPosition() {
@@ -115,56 +116,8 @@ public abstract class AbstractSplit {
     protected abstract float distanceTo(final Vertex vertex);
 
     /**
-     * Take the borders, remove the vertex that are not close to the split, and
-     * create new borders.
-     * @param borders , the borders to refine.
-     * @return refined borders.
-     */
-    protected final List refineBorders(final List<Border> borders) {
-        final List result = new ArrayList();
-        for (Border border : borders) {
-            final List<Vertex> sortedBorder = new ArrayList();
-            // Creation of a new list starting with an outside vertex.
-            for (final Iterator<Vertex> it
-                    = border.getVertexSequence().iterator(); it.hasNext();) {
-                Vertex vertex = it.next();
-                if (this.isClose(vertex)) {
-                    sortedBorder.add(vertex);
-                } else {
-                    int i = 0;
-                    sortedBorder.add(i, vertex);
-                    while (it.hasNext()) {
-                        i++;
-                        vertex = it.next();
-                        sortedBorder.add(i, vertex);
-                    }
-                }
-            }
-            Border currentBorder = null;
-            for (Vertex vertex : sortedBorder) {
-                if (currentBorder == null && this.isClose(vertex)) {
-                    currentBorder = new Border();
-                    currentBorder.addNextVertex(vertex);
-                } else if (currentBorder != null) {
-                    if (this.isClose(vertex)) {
-                        currentBorder.addNextVertex(vertex);
-                    } else {
-                        currentBorder.prepare();
-                        result.add(currentBorder);
-                        currentBorder = null;
-                    }
-                }
-            }
-            if (currentBorder != null) {
-                currentBorder.prepare();
-                result.add(currentBorder);
-            }
-        }
-        return result;
-    }
-
-    /**
      * A method that indicate if the given vertex is close to the split.
+     *
      * @param vertex , the vertex to check.
      * @return true if the vertex is close, else false.
      */
