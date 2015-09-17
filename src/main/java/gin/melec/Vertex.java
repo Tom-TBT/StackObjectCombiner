@@ -19,7 +19,10 @@ package gin.melec;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -44,7 +47,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     /**
      * The id number of the vertex.
      */
-    private final int id;
+    private int id;
     /**
      * The x coordonate of the vertex.
      */
@@ -165,6 +168,51 @@ public class Vertex implements Comparable<Vertex>, Serializable {
             result = candidate1;
         }
         return result;
+    }
+
+
+    boolean belongToBorder() {
+        boolean result = true;
+        List<Vertex> tmpNeighbours = new ArrayList();
+        List<Face> facesRemaining = new ArrayList();
+        tmpNeighbours.addAll(this.neighbours);
+        facesRemaining.addAll(this.faces);
+        Vertex firstVertex = tmpNeighbours.get(0);
+        Vertex currentVertex = firstVertex;
+        Face currentFace = firstVertex.getFaceIncluding(facesRemaining);
+        facesRemaining.remove(currentFace);
+        while(currentFace != null) {
+            currentVertex = currentFace.getThirdVertex(this, currentVertex);
+            currentFace = currentVertex.getFaceIncluding(facesRemaining);
+            facesRemaining.remove(currentFace);
+            if (currentVertex.equals(firstVertex)) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Give the face containing the vertex. The face is only search in a subset.
+     * @param vertex , the vertex for which we search the face.
+     * @param facesRemaining , the subset of faces.
+     * @return the face containing the vertex.
+     */
+    public Face getFaceIncluding(final Collection<Face> facesRemaining) {
+        Face result = null;
+        for (Face face : facesRemaining) {
+            if (face.include(this)) {
+                result = face;
+                break;
+            }
+        }
+        return result;
+    }
+
+
+    void IncrementId(int idShift) {
+        this.id += idShift;
     }
 
     @Override

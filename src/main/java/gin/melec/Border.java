@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,11 +79,22 @@ public class Border {
                 this.split = currentSplit;
             }
         }
+        //check candidat
+        mesh.setFacesToVertex(candidat);
+        List<Vertex> substitutes = new ArrayList();
+        substitutes.addAll(candidat.getNeighbours());
+        while (!candidat.belongToBorder()) {
+            candidat = substitutes.get(0);
+            substitutes.remove(candidat);
+            mesh.setFacesToVertex(candidat);
+        }
+
         vertexSequence.add(candidat);
 
         mesh.setFacesToVertex(getFirstVertex());
         vertexSequence.add(this.split.findCloserVertex(
                 getFirstVertex().getNeighbours()));
+        //check 2eme vertex
 
         mesh.getGarbage().add(getSecondLastVertex());
         mesh.getGarbage().add(getLastVertex());

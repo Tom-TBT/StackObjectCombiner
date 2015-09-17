@@ -85,18 +85,18 @@ public class Mesh {
      */
     public final void setFacesToVertex(final Vertex vertex) {
         for (Face face : this.faces) {
-            if (face.getIdVertex1() == vertex.getId()) {
+            if (face.getVertex1().equals(vertex)) {
                 vertex.getFaces().add(face);
-                vertex.getNeighbours().add(getVertex(face.getIdVertex2()));
-                vertex.getNeighbours().add(getVertex(face.getIdVertex3()));
-            } else if (face.getIdVertex2() == vertex.getId()) {
+                vertex.getNeighbours().add(face.getVertex2());
+                vertex.getNeighbours().add(face.getVertex3());
+            } else if (face.getVertex2().equals(vertex)) {
                 vertex.getFaces().add(face);
-                vertex.getNeighbours().add(getVertex(face.getIdVertex1()));
-                vertex.getNeighbours().add(getVertex(face.getIdVertex3()));
-            } else if (face.getIdVertex3() == vertex.getId()) {
+                vertex.getNeighbours().add(face.getVertex1());
+                vertex.getNeighbours().add(face.getVertex3());
+            } else if (face.getVertex3().equals(vertex)) {
                 vertex.getFaces().add(face);
-                vertex.getNeighbours().add(getVertex(face.getIdVertex1()));
-                vertex.getNeighbours().add(getVertex(face.getIdVertex2()));
+                vertex.getNeighbours().add(face.getVertex1());
+                vertex.getNeighbours().add(face.getVertex2());
             }
         }
     }
@@ -110,10 +110,11 @@ public class Mesh {
         minId = this.primers.first().getId();
         maxId = this.primers.last().getId();
         for (Face face : this.faces) {
-            if ((face.getIdVertex1() >= minId && face.getIdVertex3() <= maxId)) {
-                final Vertex vertex1 = getVertex(face.getIdVertex1());
-                final Vertex vertex2 = getVertex(face.getIdVertex2());
-                final Vertex vertex3 = getVertex(face.getIdVertex3());
+            if ((face.getVertex1().getId() >= minId
+                    && face.getVertex3().getId() <= maxId)) {
+                final Vertex vertex1 = face.getVertex1();
+                final Vertex vertex2 = face.getVertex2();
+                final Vertex vertex3 = face.getVertex3();
                 vertex1.getNeighbours().add(vertex2);
                 vertex1.getNeighbours().add(vertex3);
                 vertex2.getNeighbours().add(vertex1);
@@ -122,21 +123,6 @@ public class Mesh {
                 vertex3.getNeighbours().add(vertex2);
             }
         }
-    }
-
-    /**
-     * Find the vertex corresponding to the given id, in the vertices.
-     * @param idVertex , the id of the vertex to find.
-     * @return the vertex with the given id.
-     */
-    private Vertex getVertex(final int idVertex) {
-        Vertex result;
-        Vertex doppleganger = new Vertex(idVertex, 0, 0, 0);
-        result = this.vertices.floor(doppleganger);
-        if (!result.equals(doppleganger)) {
-            result = null;
-        }
-        return result;
     }
 
     /**
@@ -183,8 +169,9 @@ public class Mesh {
         }
         while (notFoundYet) {
             for (Vertex vertex : verticesRemaining) {
-                if (currentFace.include(vertex.getId())) {
-                    currentFace = getFaceIncluding(vertex, facesRemaining);
+                // hoix selon les 2 premier !!
+                if (currentFace.include(vertex)) {
+                    currentFace = vertex.getFaceIncluding(facesRemaining);
                     facesRemaining.remove(currentFace);
                     verticesRemaining.remove(vertex);
                     nextVertex = vertex;
@@ -200,24 +187,6 @@ public class Mesh {
             nextVertex = null;
         }
         return nextVertex;
-    }
-
-    /**
-     * Give the face containing the vertex. The face is only search in a subset.
-     * @param vertex , the vertex for which we search the face.
-     * @param facesRemaining , the subset of faces.
-     * @return the face containing the vertex.
-     */
-    private Face getFaceIncluding(final Vertex vertex,
-            final Set<Face> facesRemaining) {
-        Face result = null;
-        for (Face face : facesRemaining) {
-            if (face.include(vertex.getId())) {
-                result = face;
-                break;
-            }
-        }
-        return result;
     }
 
     /**

@@ -216,11 +216,12 @@ public class Linker {
             origCurrent = linkCurrent.getOrigin();
             destCurrent = linkCurrent.getDestination();
             if (!origCurrent.equals(origPrevious)) {
-                newFaces.add(new Face(origCurrent.getId(),
-                        origPrevious.getId(), destCurrent.getId() + idShift));
+                destCurrent.IncrementId(idShift);
+                newFaces.add(new Face(origCurrent, origPrevious, destCurrent));
             } else if (!destCurrent.equals(destPrevious)) {
-                newFaces.add(new Face(origCurrent.getId(), destPrevious.getId()
-                        + idShift, destCurrent.getId() + idShift));
+                destCurrent.IncrementId(idShift);
+                destPrevious.IncrementId(idShift);
+                newFaces.add(new Face(origCurrent, destPrevious, destCurrent));
             }
             origPrevious = origCurrent;
             destPrevious = destCurrent;

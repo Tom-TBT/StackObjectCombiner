@@ -19,8 +19,8 @@ package gin.melec;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *
@@ -31,119 +31,36 @@ public class VertexTest {
 
     public VertexTest() {
     }
+    @Test
+    public void testBelongToBorder() {
+        Vertex v1 = new Vertex (1, 0, 0, 0);
+        Vertex v2 = new Vertex (2, 1, 1, 0);
+        Vertex v3 = new Vertex (3, -1, 1, 0);
+        Vertex v4 = new Vertex (4, -1, -1, 0);
+        Vertex v5 = new Vertex (5, 1, -1, 0);
+        Face f1 = new Face(v1,v2,v3);
+        Face f2 = new Face(v1,v3,v4);
+        Face f3 = new Face(v1,v4,v5);
+        Face f4 = new Face(v1,v5,v2);
 
-    /**
-     * Test of toString method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testToString() {
-        System.out.println("toString");
-        final Vertex instance = new Vertex(1450, 27.9f, 45, 74.3f);
-        final String expResult = "v 27.9 45.0 74.3";
-        String result = instance.toString();
-        assertEquals(expResult, result);
+        v1.getFaces().add(f1); v1.getFaces().add(f2); v1.getFaces().add(f3);
+        v1.getFaces().add(f4); v2.getFaces().add(f1); v2.getFaces().add(f4);
+        v3.getFaces().add(f1); v3.getFaces().add(f2); v4.getFaces().add(f2);
+        v4.getFaces().add(f3); v5.getFaces().add(f3); v5.getFaces().add(f4);
+
+        v1.getNeighbours().add(v2); v1.getNeighbours().add(v3);
+        v1.getNeighbours().add(v4); v1.getNeighbours().add(v5);
+        v2.getNeighbours().add(v3); v2.getNeighbours().add(v5);
+        v3.getNeighbours().add(v2); v3.getNeighbours().add(v4);
+        v4.getNeighbours().add(v3); v4.getNeighbours().add(v5);
+        v5.getNeighbours().add(v2); v5.getNeighbours().add(v4);
+        v2.getNeighbours().add(v1); v3.getNeighbours().add(v1);
+        v4.getNeighbours().add(v1); v5.getNeighbours().add(v1);
+
+        assertTrue(!v1.belongToBorder());
+        assertTrue(v2.belongToBorder());
+        assertTrue(v3.belongToBorder());
+        assertTrue(v4.belongToBorder());
+        assertTrue(v5.belongToBorder());
     }
-
-    /**
-     * Test of distanceOnYZ method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testDistanceOnYZ() {
-        System.out.println("distanceOnYZ");
-        Vertex ver = new Vertex(666, 14, 9, 19);
-        Vertex instance = new Vertex(667, 12, 12, 23);
-        float expResult = 5.0F;
-        float result = instance.distanceOnYZ(ver);
-        assertEquals(expResult, result, 0.01);
-    }
-
-    /**
-     * Test of distanceOnXZ method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testDistanceOnXZ() {
-        System.out.println("distanceOnXZ");
-        Vertex ver = new Vertex(668, 14, 87, 9);
-        Vertex instance = new Vertex(669, 17, 65, 5);
-        float expResult = 5.0F;
-        float result = instance.distanceOnXZ(ver);
-        assertEquals(expResult, result, 0.01);
-    }
-
-    /**
-     * Test of distanceOnX method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testDistanceOnX() {
-        System.out.println("distanceOnX");
-        Vertex ver = new Vertex(665, 13.8f, 87, 9);
-        Vertex instance = new Vertex(664, 14.5f, 87, 9);
-        float expResult = 0.7F;
-        float result = instance.distanceOnX(ver);
-        assertEquals(expResult, result, 0.01);
-    }
-
-    /**
-     * Test of distanceOnY method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testDistanceOnY() {
-        System.out.println("distanceOnX");
-        Vertex ver = new Vertex(665, 13.8f, 87, 9);
-        Vertex instance = new Vertex(664, 14.5f, 95, 9);
-        float expResult = 8.0F;
-        float result = instance.distanceOnY(ver);
-        assertEquals(expResult, result, 0.01);
-    }
-
-    /**
-     * Test of distanceToBorderX method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testDistanceToBorderX() {
-        System.out.println("distanceToBorderX");
-        int splitPosition = 300;
-        Vertex instance = new Vertex(664, 299.2f, 95, 9);
-        float expResult = 0.8F;
-        float result = instance.distanceToSplitX(splitPosition);
-        assertEquals(expResult, result, 0.01);
-    }
-
-    /**
-     * Test of distanceToBorderY method, of class Vertex.
-     */
-    @org.junit.Test
-    public void testDistanceToBorderY() {
-        System.out.println("distanceToBorderX");
-        int splitPosition = 200;
-        Vertex instance = new Vertex(664, 299.2f, 199, 9);
-        float expResult = 1.0F;
-        float result = instance.distanceToSplitY(splitPosition);
-        assertEquals(expResult, result, 0.01);
-    }
-
-    /**
-     * Test of addNeighborToGarbage, of class Vertex.
-     * @throws java.io.IOException
-     */
-    @org.junit.Test
-    public void testAddNeighborToGarbage() throws IOException {
-        int splitPosition = 291;
-        List splits = new ArrayList();
-        splits.add(new SplitRight(splitPosition));
-        Mesh mesh = new Mesh(splits);
-        ObjReader.readMesh(
-                "./src/test/java/gin/melec/MeshForTests/MeshTest_line_firstBot.obj",
-                mesh.vertices, mesh.faces);
-        mesh.doNeighborhood();
-        // One vertex is put in the garbage
-        mesh.garbage.add(mesh.vertices.get(0));
-        mesh.completeGarbage();
-
-        int expectedResult = 36;
-        int result = mesh.garbage.size();
-
-        assertEquals(expectedResult, result);
-    }
-
 }

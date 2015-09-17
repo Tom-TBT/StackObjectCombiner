@@ -60,6 +60,7 @@ public class ObjReader {
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);
 
+        final List<Vertex> tmpVertices = new ArrayList();
         String currentLine;
         String[] splitedLine;
         int id = 1;
@@ -67,18 +68,20 @@ public class ObjReader {
         while ((currentLine = buR.readLine()) != null) {
             splitedLine = currentLine.split(" ");
             if (splitedLine[0].equals("v")) {
-                vertices.add(new Vertex(id, Float.parseFloat(splitedLine[1]),
+                tmpVertices.add(new Vertex(id, Float.parseFloat(splitedLine[1]),
                         Float.parseFloat(splitedLine[2]),
                         Float.parseFloat(splitedLine[3])));
                 id++;
             }
             else if (splitedLine[0].equals("f")) {
-                faces.add(new Face(Integer.parseInt(splitedLine[1]),
-                        Integer.parseInt(splitedLine[2]),
-                        Integer.parseInt(splitedLine[3])));
+                faces.add(new Face(
+                        tmpVertices.get(Integer.parseInt(splitedLine[1]) - 1),
+                        tmpVertices.get(Integer.parseInt(splitedLine[2]) - 1),
+                        tmpVertices.get(Integer.parseInt(splitedLine[3]) - 1)));
             }
         }
         buR.close();
+        vertices.addAll(tmpVertices);
     }
 
     /**

@@ -16,7 +16,9 @@
  */
 package gin.melec;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -28,88 +30,107 @@ public class Face implements Comparable<Face> {
     /**
      * The id of the first vertex of this face.
      */
-    private final int idVertex1;
+    private final Vertex vertex1;
 
     /**
      * The id of the second vertex of this face.
      */
-    private final int idVertex2;
+    private final Vertex vertex2;
 
     /**
      * The id of the third vertex of this face.
      */
-    private final int idVertex3;
+    private final Vertex vertex3;
 
     /**
      * Public constructor of a face, taking id of three vertex. Vertex are
      * ordered with their id.
+     *
      * @param id1 , first vertex of the face.
      * @param id2 , second vertex of the face.
      * @param id3 , third vertex of the face.
      */
-    public Face(final int id1, final int id2,
-            final int id3) {
-        final int[] idArray = new int[3];
-        idArray[0] = id1; idArray[1] = id2; idArray[2] = id3;
-        Arrays.sort(idArray);
-        this.idVertex1 = idArray[0];
-        this.idVertex2 = idArray[1];
-        this.idVertex3 = idArray[2];
+    public Face(final Vertex v1, final Vertex v2,
+            final Vertex v3) {
+        final List<Vertex> sortingList = new ArrayList();
+        sortingList.add(v1);
+        sortingList.add(v2);
+        sortingList.add(v3);
+        Collections.sort(sortingList);
+        this.vertex1 = sortingList.get(0);
+        this.vertex2 = sortingList.get(1);
+        this.vertex3 = sortingList.get(2);
     }
 
     @Override
     public final String toString() {
-        return "f" + " " + idVertex1 + " " + idVertex2 + " " + idVertex3;
+        return "f" + " " + vertex1.getId() + " " + vertex2.getId() + " " + vertex3.getId();
     }
 
-
     /**
-     * TODO   kill this one.
+     * TODO kill this one.
+     *
      * @param increment
      * @return
      */
     String toIncrementString(int increment) {
-        return "f" + " " + (idVertex1+increment) + " " + (idVertex2+increment) + " " + (idVertex3+increment);
+        return "f" + " " + (vertex1.getId() + increment) + " " + (vertex2.getId() + increment) + " " + (vertex3.getId() + increment);
     }
 
     /**
      * This method search the first neighbour of the given vertex (by it's id).
+     *
      * @param idOrigin , the id of the vertex for which we search neighbour.
      * @return the id of the first neighbour.
      */
-    final int getFirstNeighbour(final int idOrigin) {
-        int result;
-        if (idOrigin == idVertex1) {
-            result = idVertex2;
+    public final Vertex getFirstNeighbour(final Vertex vertex) {
+        Vertex result;
+        if (vertex.equals(this.vertex1)) {
+            result = this.vertex2;
         } else {
-            result = idVertex1;
+            result = this.vertex1;
         }
         return result;
     }
+
     /**
      * This method search the second neighbour of the given vertex (by it's id).
+     *
      * @param idOrigin , the id of the vertex for which we search neighbour.
      * @return the id of the second neighbour.
      */
-    public final int getSecondNeighbour(final int idOrigin) {
-        int result;
-        if (idOrigin == idVertex3) {
-            result = idVertex2;
+    public final Vertex getSecondNeighbour(final Vertex vertex) {
+        Vertex result;
+        if (vertex.equals(this.vertex3)) {
+            result = this.vertex2;
         } else {
-            result = idVertex3;
+            result = this.vertex3;
+        }
+        return result;
+    }
+
+    Vertex getThirdVertex(Vertex v1, Vertex v2) {
+        Vertex result;
+        if (!this.vertex1.equals(v1) && !this.vertex1.equals(v2)) {
+            result = this.vertex1;
+        } else if (!this.vertex2.equals(v1) && !this.vertex2.equals(v2)) {
+            result = this.vertex2;
+        } else {
+            result = this.vertex3;
         }
         return result;
     }
 
     /**
      * Check if the face contain or not the vertex given by it's id.
+     *
      * @param idVertex , the id of the vertex to check.
      * @return true if the face contain the vertex, else false.
      */
-    public final boolean include(final int idVertex) {
+    public final boolean include(final Vertex vertex) {
         boolean result;
-        if (idVertex == idVertex1 || idVertex == idVertex2
-                || idVertex == idVertex3) {
+        if (vertex.equals(this.vertex1) || vertex.equals(this.vertex2)
+                || vertex.equals(this.vertex3)) {
             result = true;
         } else {
             result = false;
@@ -120,14 +141,14 @@ public class Face implements Comparable<Face> {
     @Override
     public final int compareTo(final Face face) {
         int result;
-        if (this.idVertex1 == face.idVertex1) {
-            if (this.idVertex2 == face.idVertex2) {
-                result = this.idVertex3 - face.idVertex3;
+        if (this.vertex1.getId() == face.vertex1.getId()) {
+            if (this.vertex2.getId() == face.vertex2.getId()) {
+                result = this.vertex3.getId() - face.vertex3.getId();
             } else {
-                result = this.idVertex2 - face.idVertex2;
+                result = this.vertex2.getId() - face.vertex2.getId();
             }
         } else {
-            result = this.idVertex1 - face.idVertex1;
+            result = this.vertex1.getId() - face.vertex1.getId();
         }
         return result;
     }
@@ -135,9 +156,9 @@ public class Face implements Comparable<Face> {
     @Override
     public final int hashCode() {
         int hash = 7;
-        hash = 17 * hash + this.idVertex1;
-        hash = 17 * hash + this.idVertex2;
-        hash = 17 * hash + this.idVertex3;
+        hash = 17 * hash + this.vertex1.getId();
+        hash = 17 * hash + this.vertex2.getId();
+        hash = 17 * hash + this.vertex3.getId();
         return hash;
     }
 
@@ -150,13 +171,13 @@ public class Face implements Comparable<Face> {
             return false;
         }
         final Face other = (Face) obj;
-        if (this.idVertex1 != other.idVertex1) {
+        if (!this.vertex1.equals(other.vertex1)) {
             return false;
         }
-        if (this.idVertex2 != other.idVertex2) {
+        if (!this.vertex2.equals(other.vertex2)) {
             return false;
         }
-        if (this.idVertex3 != other.idVertex3) {
+        if (!this.vertex3.equals(other.vertex3)) {
             return false;
         }
         return true;
@@ -164,25 +185,28 @@ public class Face implements Comparable<Face> {
 
     /**
      * Getter of the id of the first vertex of this face.
+     *
      * @return the id of the first vertex of this face.
      */
-    public final int getIdVertex1() {
-        return idVertex1;
+    public final Vertex getVertex1() {
+        return vertex1;
     }
 
     /**
      * Getter of the id of the second vertex of this face.
+     *
      * @return the id of the second vertex of this face.
      */
-    public final int getIdVertex2() {
-        return idVertex2;
+    public final Vertex getVertex2() {
+        return vertex2;
     }
 
     /**
      * Getter of the id of the third vertex of this face.
+     *
      * @return the id of the third vertex of this face.
      */
-    public final int getIdVertex3() {
-        return idVertex3;
+    public final Vertex getVertex3() {
+        return vertex3;
     }
 }
