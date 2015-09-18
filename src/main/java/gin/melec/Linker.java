@@ -216,11 +216,11 @@ public class Linker {
             origCurrent = linkCurrent.getOrigin();
             destCurrent = linkCurrent.getDestination();
             if (!origCurrent.equals(origPrevious)) {
-                destCurrent.IncrementId(idShift);
+                destCurrent.incrementId(idShift);
                 newFaces.add(new Face(origCurrent, origPrevious, destCurrent));
             } else if (!destCurrent.equals(destPrevious)) {
-                destCurrent.IncrementId(idShift);
-                destPrevious.IncrementId(idShift);
+                destCurrent.incrementId(idShift);
+                destPrevious.incrementId(idShift);
                 newFaces.add(new Face(origCurrent, destPrevious, destCurrent));
             }
             origPrevious = origCurrent;

@@ -170,18 +170,22 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         return result;
     }
 
-
-    boolean belongToBorder() {
+    /**
+     * This method check if the Vertex belong to a border or not. This is
+     * checked by regarding if their is a circularity in his neighbours.
+     * @return true if it belong to a border, else false.
+     */
+    public final boolean belongToBorder() {
         boolean result = true;
-        List<Vertex> tmpNeighbours = new ArrayList();
-        List<Face> facesRemaining = new ArrayList();
+        final List<Vertex> tmpNeighbours = new ArrayList();
+        final List<Face> facesRemaining = new ArrayList();
         tmpNeighbours.addAll(this.neighbours);
         facesRemaining.addAll(this.faces);
-        Vertex firstVertex = tmpNeighbours.get(0);
+        final Vertex firstVertex = tmpNeighbours.get(0);
         Vertex currentVertex = firstVertex;
         Face currentFace = firstVertex.getFaceIncluding(facesRemaining);
         facesRemaining.remove(currentFace);
-        while(currentFace != null) {
+        while (currentFace != null) {
             currentVertex = currentFace.getThirdVertex(this, currentVertex);
             currentFace = currentVertex.getFaceIncluding(facesRemaining);
             facesRemaining.remove(currentFace);
@@ -199,7 +203,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      * @param facesRemaining , the subset of faces.
      * @return the face containing the vertex.
      */
-    public Face getFaceIncluding(final Collection<Face> facesRemaining) {
+    public final Face getFaceIncluding(final Collection<Face> facesRemaining) {
         Face result = null;
         for (Face face : facesRemaining) {
             if (face.include(this)) {
@@ -210,8 +214,12 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         return result;
     }
 
-
-    void IncrementId(int idShift) {
+    /**
+     * Increment the Id of the vertex by the given shift. This is used when two
+     * meshed are merged.
+     * @param idShift , the shift to apply to the vertex's id.
+     */
+    public final void incrementId(final int idShift) {
         this.id += idShift;
     }
 
