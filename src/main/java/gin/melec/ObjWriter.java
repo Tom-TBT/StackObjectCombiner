@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -54,9 +55,9 @@ public class ObjWriter {
      * @param mesh , the array containing the new mesh.
      * @throws IOException , thrown by the writer.
      */
-    public static void writeMesh(final String meshPath, final Mesh mesh)
+    public static void writeMesh(final Path path, final Mesh mesh)
             throws IOException {
-        final FileWriter fiW = new FileWriter(meshPath);
+        final FileWriter fiW = new FileWriter(path.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
 
@@ -79,11 +80,11 @@ public class ObjWriter {
      * @param borders , the borders to write.
      * @throws IOException if their is an error while writing.
      */
-    static void serializeBorders(final String filePath, final List<Border> borders)
+    static void serializeBorders(final Path path, final List<Border> borders)
             throws IOException {
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(filePath))) {
+                new FileOutputStream(path.toString()))) {
             oos.writeObject(borders);
         }
 

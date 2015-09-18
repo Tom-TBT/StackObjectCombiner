@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -58,9 +59,9 @@ public class ObjReader {
      * @param faces , the list in which the method put the readed faces.
      * @throws IOException , when their is an error with the lecture of the file
      */
-    public static void readMesh(final String path, final Set vertices,
+    public static void readMesh(final Path path, final Set vertices,
             final Set faces) throws IOException {
-        final InputStream ips = new FileInputStream(path);
+        final InputStream ips = new FileInputStream(path.toString());
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);
 
@@ -94,10 +95,10 @@ public class ObjReader {
      * @return a list of vertices making the border.
      * @throws IOException if their is an error while reading the file.
      */
-    public static List readBorders(final String filePath) throws IOException {
+    public static List deserializeBorders(final Path path) throws IOException {
         List<Border> borders = null;
         try (ObjectInputStream ois = new ObjectInputStream(
-                new FileInputStream(filePath))) {
+                new FileInputStream(path.toString()))) {
             borders = (ArrayList) ois.readObject();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ObjReader.class.getName()).log(Level.SEVERE, null, ex);

@@ -17,6 +17,7 @@
 package gin.melec;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,11 +67,17 @@ public class Mesh {
     private List<AbstractSplit> splits;
 
     /**
+     * The path to this mesh's file.
+     */
+    private Path path;
+
+    /**
      * Public constructor for a mesh.
      *
      * @param splits , the splits of the mesh.
      */
-    public Mesh(final List<AbstractSplit> splits) {
+    public Mesh(final List<AbstractSplit> splits, final Path path) {
+        this.path = path;
         this.faces = new TreeSet();
         this.vertices = new TreeSet();
         this.garbage = new HashSet();
@@ -222,13 +229,36 @@ public class Mesh {
     }
 
     /**
+     * Use the ObjWriter to write the vertices and the faces in the file of the
+     * mesh.
+     */
+    public final void exportMesh() {
+        try {
+            ObjWriter.writeMesh(this.path, this);
+        } catch (IOException ex) {
+            Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Use the ObjReader to import into the mesh the vertices and the faces.
+     */
+    public final void importMesh() {
+        try {
+            ObjReader.readMesh(this.path, this.vertices, this.faces);
+        } catch (IOException ex) {
+            Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
      * This method is used to export in a file the borders of this mesh.
      *
      * @param filePath , the filename to use.
      */
-    final void exportBorders(final String filePath) {
+    public final void exportBorders() {
         try {
-            ObjWriter.serializeBorders(filePath, borders);
+            ObjWriter.serializeBorders(this.path, borders);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -239,9 +269,9 @@ public class Mesh {
      *
      * @param filePath ,the path of the file in which the borders are contained.
      */
-    public final void importBorders(final String filePath) {
+    public final void importBorders() {
         try {
-            this.borders = ObjReader.readBorders(filePath);
+            this.borders = ObjReader.deserializeBorders(this.path);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -303,23 +333,17 @@ public class Mesh {
 
     /**
      * Getter of the attribute splits.
-     *
      * @return the splits of the mesh.
      */
     public final List<AbstractSplit> getSplits() {
         return splits;
     }
-
-    @Override
-    public final String toString() {
-        final StringBuilder strBui = new StringBuilder();
-        for (Vertex vertex : this.vertices) {
-            strBui.append(vertex.toString()).append("\n");
-        }
-        for (Face face : this.faces) {
-            strBui.append(face.toString()).append("\n");
-        }
-        return strBui.toString();
+    /**
+     * Getter of the attribute path.
+     * @return the path of the mesh.
+     */
+    public final Path getPath() {
+        return path;
     }
 
 }
