@@ -66,12 +66,12 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     /**
      * The list of the neighbours of this vertex.
      */
-    private Set<Vertex> neighbours;
+    private transient Set<Vertex> neighbours;
 
     /**
      * The faces to who the vertex belong.
      */
-    private Set<Face> faces;
+    private transient Set<Face> faces;
 
     /**
      * Public constructor of a vertex.
@@ -99,16 +99,6 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     public final String toString() {
         return "v " + DF.format(this.x) + " " + DF.format(this.y) + " "
                 + DF.format(this.z);
-    }
-
-    /**
-     * Return the string caracterizing the vertex with it's ID.
-     *
-     * @return , a string describing the vertex with it's ID.
-     */
-    public final String toIdString() {
-        return "v " + DF.format(this.x) + " " + DF.format(this.y) + " "
-                + DF.format(this.z) + " " + this.id;
     }
 
     /**

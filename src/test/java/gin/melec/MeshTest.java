@@ -104,7 +104,10 @@ public class MeshTest {
                 , circularMesh.getVertices(), circularMesh.getFaces());
 
         circularMesh.createBorders();
-        circularMesh.exportBorders("./src/test/java/gin/melec/MeshForTests/A_CircularBorder1_borders.obj");
+        circularMesh.exportBorders("/home/tom/testSerialisation.srz");
+        List<Border> bordersLues = ObjReader.readBorders("/home/tom/testSerialisation.srz");
+
+        System.out.println("PauseDebugg");
     }
 //
 //

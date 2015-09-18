@@ -18,12 +18,16 @@ package gin.melec;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -90,41 +94,15 @@ public class ObjReader {
      * @return a list of vertices making the border.
      * @throws IOException if their is an error while reading the file.
      */
-    public static List readBorders(final String path) throws IOException {
-        final List<Border> borders = new ArrayList();
-
-        final InputStream ips = new FileInputStream(path);
-        final InputStreamReader ipsr = new InputStreamReader(ips);
-        final BufferedReader buR = new BufferedReader(ipsr);
-
-        String currentLine;
-        String[] splitedLine;
-        boolean isFirstLine = true;
-        Border border = new Border();
-
-        while ((currentLine = buR.readLine()) != null) {
-            splitedLine = currentLine.split(" ");
-            if (splitedLine[0].equals("b") && isFirstLine) {
-                //border.isCircular = splitedLine[2].equals("circular");
-            }
-            else if (splitedLine[0].equals("b") && !isFirstLine) {
-                borders.add(border);
-                border = new Border();
-                //border.isCircular = splitedLine[2].equals("circular");
-                isFirstLine = true;
-            }
-            else if (splitedLine[0].equals("v")) {
-                final Vertex v = new Vertex(Integer.parseInt(splitedLine[4]),
-                Float.parseFloat(splitedLine[1]),
-                Float.parseFloat(splitedLine[2]),
-                Float.parseFloat(splitedLine[3]));
-                border.addNextVertex(v);
-                isFirstLine = false;
-            }
+    public static List readBorders(final String filePath) throws IOException {
+        List<Border> borders = null;
+        try (ObjectInputStream ois = new ObjectInputStream(
+                new FileInputStream(filePath))) {
+            borders = (ArrayList) ois.readObject();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ObjReader.class.getName()).log(Level.SEVERE, null, ex);
         }
-        buR.close();
 
-        borders.add(border);
         return borders;
     }
 }

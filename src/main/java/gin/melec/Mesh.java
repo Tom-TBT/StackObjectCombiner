@@ -228,11 +228,10 @@ public class Mesh {
      */
     final void exportBorders(final String filePath) {
         try {
-            ObjWriter.writeBorders(filePath, this.borders);
+            ObjWriter.serializeBorders(filePath, borders);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
-        borders.clear();
     }
 
     /**

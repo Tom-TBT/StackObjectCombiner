@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -24,7 +25,7 @@ import java.util.LinkedList;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class SubBorder extends Border{
+public class SubBorder extends Border implements Serializable {
 
     /**
      * The distance between the first and the last vertex of the border.

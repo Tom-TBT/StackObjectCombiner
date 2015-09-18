@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Face implements Comparable<Face> {
+public class Face implements Comparable<Face>{
 
     /**
      * The id of the first vertex of this face.
@@ -65,16 +66,6 @@ public class Face implements Comparable<Face> {
     @Override
     public final String toString() {
         return "f" + " " + vertex1.getId() + " " + vertex2.getId() + " " + vertex3.getId();
-    }
-
-    /**
-     * TODO kill this one.
-     *
-     * @param increment
-     * @return
-     */
-    String toIncrementString(int increment) {
-        return "f" + " " + (vertex1.getId() + increment) + " " + (vertex2.getId() + increment) + " " + (vertex3.getId() + increment);
     }
 
     /**

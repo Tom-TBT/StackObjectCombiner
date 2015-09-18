@@ -17,8 +17,10 @@
 package gin.melec;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -41,11 +43,13 @@ public class ObjWriter {
     }
 
     private static class ObjWriterHolder {
+
         private static final ObjWriter INSTANCE = new ObjWriter();
     }
 
     /**
      * Replace the given mesh by the new mesh contained in the array.
+     *
      * @param meshPath , the path of the old mesh.
      * @param mesh , the array containing the new mesh.
      * @throws IOException , thrown by the writer.
@@ -70,28 +74,18 @@ public class ObjWriter {
 
     /**
      * A method to write borders in a file.
+     *
      * @param filePath , the path to the file to write.
      * @param borders , the borders to write.
      * @throws IOException if their is an error while writing.
      */
-    static void writeBorders(final String filePath, final List borders)
+    static void serializeBorders(final String filePath, final List<Border> borders)
             throws IOException {
 
-        final FileWriter fiW = new FileWriter(filePath);
-        final BufferedWriter bfW = new BufferedWriter(fiW);
-        final PrintWriter prW = new PrintWriter(bfW);
-
-        int numBorder = 1;
-
-        for (Object o : borders) {
-            final Border border = (Border) o;
-            prW.write("b " + numBorder + "\n");
-            for (Vertex vertex : border.getVertexSequence()) {
-                prW.write(vertex.toIdString() + "\n");
-            }
-            numBorder++;
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(filePath))) {
+            oos.writeObject(borders);
         }
-        prW.close();
-    }
 
+    }
 }

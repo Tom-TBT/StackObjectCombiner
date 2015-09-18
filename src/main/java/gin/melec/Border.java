@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,7 +27,7 @@ import java.util.List;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Border {
+public class Border implements Serializable {
 
     /**
      * The split that initiate this border.
