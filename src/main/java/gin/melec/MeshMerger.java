@@ -40,7 +40,7 @@ public class MeshMerger {
         private static final MeshMerger INSTANCE = new MeshMerger();
     }
 
-    static void work(final List<List> allMeshes) {
+    public static void work(final List<List> allMeshes) {
         Mesh mesh1, mesh2;
         String choices[];
         choices = getChoices(allMeshes);

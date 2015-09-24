@@ -14,7 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package gin.melec;
+
+
+import gin.melec.AbstractSplit;
+import gin.melec.Mesh;
+import gin.melec.MeshMerger;
+import gin.melec.MeshMover;
+import gin.melec.SplitDown;
+import gin.melec.SplitLeft;
+import gin.melec.SplitRight;
+import gin.melec.SplitUp;
 
 import ij.IJ;
 import ij.gui.GenericDialog;
@@ -24,6 +33,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -75,7 +85,7 @@ public class Stack_Object_Combiner implements PlugIn {
         boolean result;
         final GenericDialog gDial = new GenericDialog("Stack Object Combiner");
         gDial.addMessage("Choose the action to perform");
-        gDial.enableYesNoCancel("Replace the meshes", "Merge two meshes");
+        gDial.enableYesNoCancel("Move meshes", "Merge two meshes");
         gDial.showDialog();
         if (gDial.wasCanceled()) {
             result = false;
