@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -72,6 +73,11 @@ public class Mesh {
     private Path path;
 
     /**
+     * The boolean that indicate if the mesh has already been moved.
+     */
+    private boolean moved;
+
+    /**
      * Public constructor for a mesh.
      *
      * @param splits , the splits of the mesh.
@@ -84,6 +90,13 @@ public class Mesh {
         this.borders = new ArrayList();
         this.splits = splits;
         this.primers = new TreeSet();
+
+        try {
+            moved = ObjReader.isMeshMoved(this.path);
+        } catch (IOException ex) {
+            Logger.getLogger(Mesh.class.getName())
+                    .log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -215,17 +228,20 @@ public class Mesh {
     final void shift() {
         int deltaX = 0, deltaY = 0;
         for (AbstractSplit split : splits) {
-            if (split.xPosition() > deltaX) {
+            if (SplitLeft.class.isInstance(split)) {
                 deltaX = split.xPosition();
             }
-            if (split.yPosition() > deltaY) {
+            if (SplitUp.class.isInstance(split)) {
                 deltaY = split.yPosition();
             }
         }
-        for (Vertex vertex : this.vertices) {
-            vertex.setX(vertex.getX() + deltaX);
-            vertex.setY(vertex.getY() + deltaY);
+        if (deltaX > 0 || deltaY > 0) {
+            for (Vertex vertex : this.vertices) {
+                vertex.setX(vertex.getX() + deltaX);
+                vertex.setY(vertex.getY() + deltaY);
+            }
         }
+        this.moved = true;
     }
 
     /**
@@ -245,7 +261,7 @@ public class Mesh {
      */
     public final void importMesh() {
         try {
-            ObjReader.readMesh(this.path, this.vertices, this.faces);
+            ObjReader.readMesh(this.path, this);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -282,8 +298,6 @@ public class Mesh {
         return this.path.getFileName().toString();
     }
 
-
-
     /**
      * Getter of the attribute vertices.
      *
@@ -298,7 +312,7 @@ public class Mesh {
      *
      * @param borders
      */
-    public final void setBorders(List<Border> borders) {
+    public final void setBorders(final List<Border> borders) {
         this.borders = borders;
     }
 
@@ -340,17 +354,28 @@ public class Mesh {
 
     /**
      * Getter of the attribute splits.
+     *
      * @return the splits of the mesh.
      */
     public final List<AbstractSplit> getSplits() {
         return splits;
     }
+
     /**
      * Getter of the attribute path.
+     *
      * @return the path of the mesh.
      */
     public final Path getPath() {
         return path;
     }
 
+    /**
+     * Getter of the attribute moved.
+     *
+     * @return true if the mesh has already been moved.
+     */
+    public final boolean isMoved() {
+        return moved;
+    }
 }

@@ -18,7 +18,7 @@ package gin.melec;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,59 +49,90 @@ public class ObjReader {
     }
 
     private static class ObjReaderHolder {
+
         private static final ObjReader INSTANCE = new ObjReader();
     }
 
     /**
      * Read a .obj file and make from it a mesh (vertices + faces).
+     *
      * @param path , the path of the file .obj
-     * @param vertices , the list in which the method put the readed vertices.
-     * @param faces , the list in which the method put the readed faces.
+     * @param mesh , the mesh to load.
      * @throws IOException , when their is an error with the lecture of the file
      */
-    public static void readMesh(final Path path, final Set vertices,
-            final Set faces) throws IOException {
+    public static void readMesh(final Path path, final Mesh mesh)
+            throws IOException {
+        final List<Vertex> tmpVertices;
+
         final InputStream ips = new FileInputStream(path.toString());
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);
-
-        final List<Vertex> tmpVertices = new ArrayList();
-        String currentLine;
-        String[] splitedLine;
-        int id = 1;
-
-        while ((currentLine = buR.readLine()) != null) {
-            splitedLine = currentLine.split(" ");
-            if (splitedLine[0].equals("v")) {
-                tmpVertices.add(new Vertex(id, Float.parseFloat(splitedLine[1]),
-                        Float.parseFloat(splitedLine[2]),
-                        Float.parseFloat(splitedLine[3])));
-                id++;
+        try{
+            tmpVertices = new ArrayList();
+            String currentLine;
+            String[] splitedLine;
+            int id = 1;
+            while ((currentLine = buR.readLine()) != null) {
+                splitedLine = currentLine.split(" ");
+                if (splitedLine[0].equals("v")) {
+                    tmpVertices.add(new Vertex(id, Float.parseFloat(splitedLine[1]),
+                            Float.parseFloat(splitedLine[2]),
+                            Float.parseFloat(splitedLine[3])));
+                    id++;
+                } else if (splitedLine[0].equals("f")) {
+                    mesh.getFaces().add(new Face(
+                            tmpVertices.get(
+                                    Integer.parseInt(splitedLine[1]) - 1),
+                            tmpVertices.get(
+                                    Integer.parseInt(splitedLine[2]) - 1),
+                            tmpVertices.get(
+                                    Integer.parseInt(splitedLine[3]) - 1)));
+                }
             }
-            else if (splitedLine[0].equals("f")) {
-                faces.add(new Face(
-                        tmpVertices.get(Integer.parseInt(splitedLine[1]) - 1),
-                        tmpVertices.get(Integer.parseInt(splitedLine[2]) - 1),
-                        tmpVertices.get(Integer.parseInt(splitedLine[3]) - 1)));
-            }
+        } finally {
+            buR.close();
         }
-        buR.close();
-        vertices.addAll(tmpVertices);
+        mesh.getVertices().addAll(tmpVertices);
+    }
+
+    public static boolean isMeshMoved(final Path path)
+            throws FileNotFoundException, IOException {
+        String currentLine;
+        boolean result = false;
+
+        final InputStream ips = new FileInputStream(path.toString());
+        final InputStreamReader ipsr = new InputStreamReader(ips);
+        final BufferedReader buR = new BufferedReader(ipsr);
+        try {
+            while ((currentLine = buR.readLine()) != null) {
+                if (currentLine.contains("#movedBySOC")) {
+                    result = true;
+                    break;
+                }
+            }
+        } finally {
+            buR.close();
+        }
+        return result;
     }
 
     /**
      * Read a border file.
+     *
      * @param path , the path of the file describing the border.
      * @return a list of vertices making the border.
      * @throws IOException if their is an error while reading the file.
      */
     public static List deserializeBorders(final Path path) throws IOException {
         List<Border> borders = null;
-        try (ObjectInputStream ois = new ObjectInputStream(
-                new FileInputStream(path.toString()))) {
+        final ObjectInputStream ois = new ObjectInputStream(
+                new FileInputStream(path.toString()));
+        try {
             borders = (ArrayList) ois.readObject();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ObjReader.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            ois.close();
         }
 
         return borders;

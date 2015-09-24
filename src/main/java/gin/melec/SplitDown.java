@@ -25,9 +25,9 @@ import static gin.melec.AbstractSplit.WINDOW;
  */
 public class SplitDown extends AbstractSplit {
 
-
     /**
      * Public constructor for a split with a position.
+     *
      * @param position , the position of the border.
      */
     public SplitDown(final int position) {

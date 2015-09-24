@@ -94,21 +94,21 @@ public class MeshTest {
 //    }
 
 
-    @Test
-    public void testCreateBorders() throws IOException {
-        System.out.println("CreateBorders");
-        AbstractSplit rightSplit = new SplitRight(102);
-        List splits = new ArrayList(); splits.add(rightSplit);
-        Mesh circularMesh = new Mesh(splits);
-        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_CircularBorder1.obj"
-                , circularMesh.getVertices(), circularMesh.getFaces());
-
-        circularMesh.createBorders();
-        circularMesh.exportBorders("/home/tom/testSerialisation.srz");
-        List<Border> bordersLues = ObjReader.readBorders("/home/tom/testSerialisation.srz");
-
-        System.out.println("PauseDebugg");
-    }
+//    @Test
+//    public void testCreateBorders() throws IOException {
+//        System.out.println("CreateBorders");
+//        AbstractSplit rightSplit = new SplitRight(102);
+//        List splits = new ArrayList(); splits.add(rightSplit);
+//        Mesh circularMesh = new Mesh(splits);
+//        ObjReader.readMesh("./src/test/java/gin/melec/MeshForTests/A_CircularBorder1.obj"
+//                , circularMesh.getVertices(), circularMesh.getFaces());
+//
+//        circularMesh.createBorders();
+//        circularMesh.exportBorders("/home/tom/testSerialisation.srz");
+//        List<Border> bordersLues = ObjReader.readBorders("/home/tom/testSerialisation.srz");
+//
+//        System.out.println("PauseDebugg");
+//    }
 //
 //
 //    @Test

@@ -51,8 +51,8 @@ public class ObjWriter {
     /**
      * Replace the given mesh by the new mesh contained in the array.
      *
-     * @param meshPath , the path of the old mesh.
-     * @param mesh , the array containing the new mesh.
+     * @param path , the path of the mesh.
+     * @param mesh , the mesh to write.
      * @throws IOException , thrown by the writer.
      */
     public static void writeMesh(final Path path, final Mesh mesh)
@@ -60,17 +60,19 @@ public class ObjWriter {
         final FileWriter fiW = new FileWriter(path.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
-
-        // Better than a toString function in Mesh, because of the memory this
-        // will use.
-        for (Object element : mesh.getVertices()) {
-            prW.write(element.toString() + "\n");
+        try{
+            if (mesh.isMoved()) {
+                prW.write("#movedBySOC\n");
+            }
+            for (Object element : mesh.getVertices()) {
+                prW.write(element.toString() + "\n");
+            }
+            for (Object element : mesh.getFaces()) {
+                prW.write(element.toString() + "\n");
+            }
+        }finally {
+            prW.close();
         }
-        for (Object element : mesh.getFaces()) {
-            prW.write(element.toString() + "\n");
-        }
-
-        prW.close();
     }
 
     /**
@@ -82,10 +84,12 @@ public class ObjWriter {
      */
     static void serializeBorders(final Path path, final List<Border> borders)
             throws IOException {
-
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(path.toString()))) {
+        final ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(path.toString()));
+        try{
             oos.writeObject(borders);
+        } finally {
+            oos.close();
         }
 
     }

@@ -44,18 +44,20 @@ public class MeshMover {
         private static final MeshMover INSTANCE = new MeshMover();
     }
 
-    static void putBackMeshes(final List<List> allMeshes) {
+    public static void moveMeshes(final List<List> allMeshes) {
+        int nbMoved = 0;
         for (List<Mesh> meshes : allMeshes) {
             for (Mesh mesh : meshes) {
-                if (!MeshMover.isAlreadyMoved(mesh)) {
-                    mesh.shift();
-                }
+                    if (!mesh.isMoved()) {
+                        mesh.importMesh();
+                        if (!mesh.isMoved()) {
+                            mesh.shift();
+                            mesh.exportMesh();
+                            nbMoved++;
+                        }
+                    }
             }
         }
-    }
-
-    private static boolean isAlreadyMoved(final Mesh mesh) {
-        return false;
-        // TODO find a way to check this
+        IJ.showMessage(nbMoved + " meshes have been moved.");
     }
 }

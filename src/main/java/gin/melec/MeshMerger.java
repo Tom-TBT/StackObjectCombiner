@@ -40,24 +40,42 @@ public class MeshMerger {
         private static final MeshMerger INSTANCE = new MeshMerger();
     }
 
-    static void work(List<List> allMeshes) {
+    static void work(final List<List> allMeshes) {
         Mesh mesh1, mesh2;
         String choices[];
         choices = getChoices(allMeshes);
-        GenericDialog gDial = new GenericDialog("Choose_meshes");
-        gDial.addChoice("Part 1", choices, choices[0]);
-        gDial.addChoice("Part 2", choices, choices[1]);
-        gDial.showDialog();
-        mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
-        mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
-        // merge meshes
+        if (choices.length < 2) {
+            IJ.showMessage("Their is not enough meshes to merge.\n"
+                    + "See the documentation for more informations.");
+        } else {
+            GenericDialog gDial = new GenericDialog("Choose_meshes");
+            gDial.addChoice("Part 1", choices, choices[0]);
+            gDial.addChoice("Part 2", choices, choices[1]);
+            gDial.showDialog();
+            mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
+            mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
+            if ((allMeshes.get(0).contains(mesh1) && allMeshes.get(0).
+                    contains(mesh2))
+                    || (allMeshes.get(1).contains(mesh1) && allMeshes.get(1).
+                    contains(mesh2))
+                    || (allMeshes.get(2).contains(mesh1) && allMeshes.get(2).
+                    contains(mesh2))
+                    || (allMeshes.get(3).contains(mesh1) && allMeshes.get(3).
+                    contains(mesh2))) {
+                IJ.error("Two meshes from a same part can't be merged");
+                return;
+            }
+            IJ.showMessage("On construction !");
+        }
     }
 
     private static String[] getChoices(List<List> allMeshes) {
-        List<String> choices = new ArrayList();
+        final List<String> choices = new ArrayList();
         for (List<Mesh> listMesh : allMeshes) {
             for (Mesh mesh : listMesh) {
-                choices.add(mesh.toString());
+                if (mesh.isMoved()) {
+                    choices.add(mesh.toString());
+                }
             }
         }
         return choices.toArray(new String[0]);
