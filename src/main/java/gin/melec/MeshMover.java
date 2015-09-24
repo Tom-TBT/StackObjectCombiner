@@ -1,0 +1,61 @@
+/*
+ * Copyright (C) 2015 ImageJ
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package gin.melec;
+
+import ij.IJ;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author Tom Boissonnet
+ * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
+ */
+public class MeshMover {
+
+    private MeshMover() {
+    }
+
+    public static MeshMover getInstance() {
+        return MeshMoverHolder.INSTANCE;
+    }
+
+    private static class MeshMoverHolder {
+
+        private static final MeshMover INSTANCE = new MeshMover();
+    }
+
+    static void putBackMeshes(final List<List> allMeshes) {
+        for (List<Mesh> meshes : allMeshes) {
+            for (Mesh mesh : meshes) {
+                if (!MeshMover.isAlreadyMoved(mesh)) {
+                    mesh.shift();
+                }
+            }
+        }
+    }
+
+    private static boolean isAlreadyMoved(final Mesh mesh) {
+        return false;
+        // TODO find a way to check this
+    }
+}

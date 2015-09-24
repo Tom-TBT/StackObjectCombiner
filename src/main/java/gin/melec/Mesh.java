@@ -277,6 +277,13 @@ public class Mesh {
         }
     }
 
+    @Override
+    public String toString() {
+        return this.path.getFileName().toString();
+    }
+
+
+
     /**
      * Getter of the attribute vertices.
      *

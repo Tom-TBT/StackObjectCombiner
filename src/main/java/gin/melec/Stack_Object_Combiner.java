@@ -16,7 +16,6 @@
  */
 package gin.melec;
 
-// Basics import of imageJ
 import ij.IJ;
 import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
@@ -36,12 +35,16 @@ import java.util.logging.Logger;
  */
 public class Stack_Object_Combiner implements PlugIn {
 
-    private static final List<AbstractSplit> SPLITS_UP_LEFT = new ArrayList();
-    private static final List<AbstractSplit> SPLITS_UP_MIDDLE = new ArrayList();
+    private static final List<AbstractSplit> UP_LEFT_SPLITS = new ArrayList();
+    private static final List<AbstractSplit> UP_RIGHT_SPLITS = new ArrayList();
+    private static final List<AbstractSplit> DOWN_LEFT_SPLITS = new ArrayList();
+    private static final List<AbstractSplit> DOWN_RIGHT_SPLITS = new ArrayList();
 
-    private static final List<Mesh> ALL_MESHES = new ArrayList();
     private static final List<Mesh> UP_LEFT_MESHES = new ArrayList();
-    private static final List<Mesh> UP_MIDDLE_MESHES = new ArrayList();
+    private static final List<Mesh> UP_RIGHT_MESHES = new ArrayList();
+    private static final List<Mesh> DOWN_LEFT_MESHES = new ArrayList();
+    private static final List<Mesh> DOWN_RIGHT_MESHES = new ArrayList();
+    private static final List<List> ALL_MESHES = new ArrayList();
 
     /**
      * The start of the plugin.
@@ -49,108 +52,109 @@ public class Stack_Object_Combiner implements PlugIn {
      * @param arg , parameter for the plugin.
      */
     @Override
-    public final void run(String arg) {
-        Path workingDirectory = Paths.get(IJ.getDirectory("Give the file containing the"
-                + " .obj file to combine"));
-        dialogBoxSplit();
+    public final void run(final String arg) {
+        final Path workingDirectory = Paths.get(IJ.getDirectory("Give the file "
+                + "containing the .obj files"));
+        getSplits();
+        getMeshes(workingDirectory);
 
-        IJ.showProgress(0.0);
-        try {
-            DirectoryStream<Path> listing = Files.newDirectoryStream(workingDirectory, "A_*.obj");
-            for (Path name : listing) {
-                Mesh mesh = new Mesh(SPLITS_UP_LEFT, name);
-                UP_LEFT_MESHES.add(mesh);
-                ALL_MESHES.add(mesh);
-            }
-            listing = Files.newDirectoryStream(workingDirectory, "B_*.obj");
-            for (Path name : listing) {
-                Mesh mesh = new Mesh(SPLITS_UP_MIDDLE, name);
-                UP_MIDDLE_MESHES.add(mesh);
-                ALL_MESHES.add(mesh);
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Stack_Object_Combiner.class.getName()).log(Level.SEVERE, null, ex);
+        boolean notCanceled = true;
+        while (notCanceled) {
+            notCanceled = proposeAction();
         }
-        List<Mesh> meshes = dialogBoxChooseMeshes(workingDirectory);
-        Mesh mesh1 = meshes.get(0), mesh2 = meshes.get(1);
-        mesh1.importMesh(); mesh2.importMesh();
-        //mesh1.shift(); mesh2.shift();
-        mesh1.exportMesh(); mesh2.exportMesh();
-        mesh1.createBorders();
-        mesh2.createBorders();
-        System.out.println("Fini");
-
-        IJ.showProgress(100.0);
-
     }
 
-    private void dialogBoxSplit() {
-        int splitLeft = 0, splitUp = 0, splitRight = 0, splitDown = 0;
-        GenericDialog gd = new GenericDialog("Stack_Object_Combiner");
-        gd.hideCancelButton();
-        gd.addNumericField("Split Left", splitLeft, 0);
-        gd.addNumericField("Split Up", splitUp, 0);
-        gd.addNumericField("Split Right", splitRight, 0);
-        gd.addNumericField("Split Down", splitDown, 0);
-        gd.showDialog();
-        splitLeft = (int) gd.getNextNumber();
-        splitUp = (int) gd.getNextNumber();
-        splitRight = (int) gd.getNextNumber();
-        splitDown = (int) gd.getNextNumber();
-
-        SPLITS_UP_LEFT.add(new SplitRight(splitLeft));
-        SPLITS_UP_MIDDLE.add(new SplitLeft(splitLeft));
-    }
-
-    private List<Mesh> dialogBoxChooseMeshes(Path workingDirectory) {
-        // TODO add verifications on files and which should be associate
-        List<String> list = new ArrayList(); final String[] choices;
-        String meshName1, meshName2; List<Mesh> result;
-        try {
-            final DirectoryStream<Path> listing = Files.newDirectoryStream(
-                    workingDirectory, "*.obj");
-            for (Path name : listing) {
-                list.add(name.getFileName().toString());
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Stack_Object_Combiner.class.getName()).
-                    log(Level.SEVERE, null, ex);
-        }
-
-        choices = new String[list.size()];
-        list.toArray(choices);
-
-        GenericDialog gd = new GenericDialog("Choose_meshes");
-        gd.hideCancelButton();
-        gd.addChoice("Part 1", choices, choices[0]);
-        gd.addChoice("Part 2", choices, choices[1]);
-        gd.showDialog();
-        meshName1 = gd.getNextChoice();
-        meshName2 = gd.getNextChoice();
-        result = new ArrayList();
-        result.add(findMesh(meshName1));
-        result.add(findMesh(meshName2));
-
-        return result;
-    }
-
-    private Mesh findMesh(final String meshName) {
-        Mesh result = null;
-        for (Mesh mesh : ALL_MESHES) {
-            if (mesh.getPath().toString().contains(meshName)) {
-                result = mesh;
-                break;
-            }
+    /**
+     * Ask to the user if he want to replace the meshes or if he want merge two
+     * meshes. The user can also cancel the dialog to quit the plugin.
+     *
+     * @return true if the user choosed an action, else return false because the
+     * user choosed to canceled the plugin.
+     */
+    private boolean proposeAction() {
+        boolean result;
+        final GenericDialog gDial = new GenericDialog("Stack_Object_Combiner");
+        gDial.addMessage("Choose the action to perform");
+        gDial.enableYesNoCancel("Replace the meshes", "Merge two meshes");
+        gDial.showDialog();
+        if (gDial.wasCanceled()) {
+            result = false;
+        } else if (gDial.wasOKed()) {
+            MeshMover.putBackMeshes(ALL_MESHES);
+            result = true;
+        } else {
+            MeshMerger.work(ALL_MESHES);
+            result = true;
         }
         return result;
     }
 
     /**
-     * Iterate on all the meshes to call their shift method.
+     * Open a dialog box that ask for the position of the splits.
      */
-    private void shiftMeshes() {
-        for (final Mesh mesh : ALL_MESHES) {
-            mesh.shift();
+    private void getSplits() {
+        int verticalSplit = 0, horizontalSplit = 0;
+        final GenericDialog gDial = new GenericDialog("Indicate the positions "
+                + "of the splits");
+        gDial.hideCancelButton();
+        gDial.addNumericField("Vertical split", verticalSplit, 0);
+        gDial.addNumericField("Horizontal split", horizontalSplit, 0);
+        gDial.showDialog();
+        verticalSplit = (int) gDial.getNextNumber();
+        horizontalSplit = (int) gDial.getNextNumber();
+        // TODO think to a control
+        if (verticalSplit > 0) {
+            UP_LEFT_SPLITS.add(new SplitRight(verticalSplit));
+            UP_RIGHT_SPLITS.add(new SplitLeft(verticalSplit));
+            DOWN_LEFT_SPLITS.add(new SplitRight(verticalSplit));
+            DOWN_RIGHT_SPLITS.add(new SplitLeft(verticalSplit));
+        }
+        if (horizontalSplit > 0) {
+            UP_LEFT_SPLITS.add(new SplitDown(horizontalSplit));
+            UP_RIGHT_SPLITS.add(new SplitDown(horizontalSplit));
+            DOWN_LEFT_SPLITS.add(new SplitUp(horizontalSplit));
+            DOWN_RIGHT_SPLITS.add(new SplitUp(horizontalSplit));
+        }
+    }
+
+    /**
+     * Add to the meshes lists the meshes contained in the given directory.
+     *
+     * @param workingDirectory , the directory containing the .obj files.
+     */
+    private void getMeshes(final Path workingDirectory) {
+        DirectoryStream<Path> listing;
+        try {
+            listing = Files.newDirectoryStream(workingDirectory, "A_*.obj");
+            for (Path name : listing) {
+                final Mesh mesh = new Mesh(UP_LEFT_SPLITS, name);
+                UP_LEFT_MESHES.add(mesh);
+            }
+            ALL_MESHES.add(UP_LEFT_MESHES);
+
+            listing = Files.newDirectoryStream(workingDirectory, "B_*.obj");
+            for (Path name : listing) {
+                final Mesh mesh = new Mesh(UP_RIGHT_SPLITS, name);
+                UP_RIGHT_MESHES.add(mesh);
+            }
+            ALL_MESHES.add(UP_RIGHT_MESHES);
+
+            listing = Files.newDirectoryStream(workingDirectory, "C_*.obj");
+            for (Path name : listing) {
+                final Mesh mesh = new Mesh(DOWN_LEFT_SPLITS, name);
+                DOWN_LEFT_MESHES.add(mesh);
+            }
+            ALL_MESHES.add(DOWN_LEFT_MESHES);
+
+            listing = Files.newDirectoryStream(workingDirectory, "D_*.obj");
+            for (Path name : listing) {
+                final Mesh mesh = new Mesh(DOWN_RIGHT_SPLITS, name);
+                DOWN_RIGHT_MESHES.add(mesh);
+            }
+            ALL_MESHES.add(DOWN_RIGHT_MESHES);
+        } catch (IOException ex) {
+            Logger.getLogger(Stack_Object_Combiner.class.getName()).
+                    log(Level.SEVERE, null, ex);
         }
     }
 
@@ -159,9 +163,8 @@ public class Stack_Object_Combiner implements PlugIn {
      *
      * @param args ,arguments.
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         new ij.ImageJ();
         new Stack_Object_Combiner().run("");
     }
-
 }
