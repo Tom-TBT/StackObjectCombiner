@@ -19,7 +19,9 @@ package gin.melec;
 import ij.IJ;
 import ij.gui.GenericDialog;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -48,25 +50,129 @@ public class MeshMerger {
             IJ.showMessage("Their is not enough meshes to merge.\n"
                     + "See the documentation for more informations.");
         } else {
-            GenericDialog gDial = new GenericDialog("Choose_meshes");
-            gDial.addChoice("Part 1", choices, choices[0]);
-            gDial.addChoice("Part 2", choices, choices[1]);
-            gDial.showDialog();
-            mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
-            mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
-            if ((allMeshes.get(0).contains(mesh1) && allMeshes.get(0).
-                    contains(mesh2))
-                    || (allMeshes.get(1).contains(mesh1) && allMeshes.get(1).
-                    contains(mesh2))
-                    || (allMeshes.get(2).contains(mesh1) && allMeshes.get(2).
-                    contains(mesh2))
-                    || (allMeshes.get(3).contains(mesh1) && allMeshes.get(3).
-                    contains(mesh2))) {
-                IJ.error("Two meshes from a same part can't be merged");
-                return;
+            boolean notFinished = true;
+            while (notFinished) {
+                GenericDialog gDial = new GenericDialog("Choose_meshes");
+                gDial.addChoice("Part 1", choices, choices[0]);
+                gDial.addChoice("Part 2", choices, choices[1]);
+                gDial.showDialog();
+                if (gDial.wasCanceled()) {
+                    return;
+                }
+                mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
+                mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
+                if ((allMeshes.get(0).contains(mesh1) && allMeshes.get(0).
+                        contains(mesh2))
+                        || (allMeshes.get(1).contains(mesh1) && allMeshes.get(1).
+                        contains(mesh2))
+                        || (allMeshes.get(2).contains(mesh1) && allMeshes.get(2).
+                        contains(mesh2))
+                        || (allMeshes.get(3).contains(mesh1) && allMeshes.get(3).
+                        contains(mesh2))) {
+                    IJ.error("Two meshes from a same part can't be merged");
+                } else {
+                    IJ.showMessage("On construction !");
+                    mesh1.importMesh();
+                    mesh1.createBorders();
+                    if (mesh1.getBorders().isEmpty()) {
+                        IJ.showMessage(mesh1.getFile().getName()
+                                + " don't cross to the border");
+                    } else {
+                        mesh2.importMesh();
+                        mesh2.createBorders();
+                        if (mesh2.getBorders().isEmpty()) {
+                            IJ.showMessage(mesh2.getFile().getName()
+                                    + " don't cross to the border");
+                        } else {
+                            final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
+                                    mesh2.getBorders());
+                            final List<Face> newFaces = new ArrayList();
+                            final List<Face> newFaces2 = new ArrayList();
+                            for (Border[] couple : couples) {
+                                newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
+                                newFaces2.addAll(Linker.createFacesBetween(couple[1], couple[0]));
+                            }
+                            //exportFusion(mesh1,mesh2,newFaces);
+                            exportFusion(mesh1,mesh2,newFaces2);
+                        }
+                    }
+                }
             }
-            IJ.showMessage("On construction !");
         }
+    }
+
+    private static void exportFusion(Mesh mesh1, Mesh mesh2, List<Face> newFaces) {
+        for (Vertex vertex : mesh1.getVertices()) {
+            System.out.println(vertex);
+        }
+        for (Vertex vertex : mesh2.getVertices()) {
+            vertex.incrementId(mesh1.getVertices().size());
+            System.out.println(vertex);
+        }
+        for (Face face : mesh1.getFaces()) {
+            System.out.println(face);
+        }
+        for (Face face : mesh2.getFaces()) {
+            System.out.println(face);
+        }
+        for (Face face : newFaces) {
+            System.out.println(face);
+        }
+
+    }
+
+    private static Set<Border[]> pairBorders(List<Border> borders1,
+            List<Border> borders2) {
+        Set result = new HashSet();
+        boolean interchanged = false;
+        if (borders1.size() > borders2.size()) {
+            final List<Border> tmp = borders1;
+            borders1 = borders2;
+            borders2 = tmp;
+            interchanged = true;
+        }
+        final List<List<Border>> orderCloserFromB1s = orderCloserBorders(borders1,
+                borders2);
+        for (int i = 0; i < orderCloserFromB1s.size(); i++) {
+            final Border border1 = borders1.get(i);
+            final Border border2 = orderCloserFromB1s.get(i).get(0);
+            final Border[] borderArray = new Border[2];
+            if (interchanged) {
+                borderArray[0] = border2;
+                borderArray[1] = border1;
+            } else {
+                borderArray[0] = border1;
+                borderArray[1] = border2;
+            }
+            result.add(borderArray);
+        }
+        return result;
+    }
+
+    static private List orderCloserBorders(final List<Border> borders1,
+            final List<Border> borders2) {
+        final List<List> result = new ArrayList();
+        for (Border border1 : borders1) {
+            final List<Border> distances = new ArrayList();
+            for (Border border2 : borders2) {
+                if ((border1.isCircular() && border2.isCircular())
+                        || (!border1.isCircular() && !border2.isCircular())) {
+                    if (distances.isEmpty()) {
+                        distances.add(border2);
+                    } else {
+                        int i = 0;
+                        final double distance = border2.distanceTo(border1);
+                        while (distance
+                                > distances.get(i).distanceTo(border1)) {
+                            i++;
+                        }
+                        distances.add(i, border2);
+                    }
+                }
+            }
+            result.add(distances);
+        }
+        return result;
     }
 
     private static String[] getChoices(List<List> allMeshes) {

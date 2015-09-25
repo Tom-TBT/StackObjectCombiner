@@ -37,12 +37,22 @@ public class Border implements Serializable {
     /**
      * The sequence of vertex forming the border.
      */
-    protected LinkedList<Vertex> vertexSequence;
+    private LinkedList<Vertex> vertexSequence;
 
     /**
-     * The sub borders of a border.
+     * The real lenght of the border.
      */
-    private List<SubBorder> subBorders;
+    private double cumulLenght;
+
+    /**
+     * The center of the border.
+     */
+    private Vertex center;
+
+    /**
+     * The center of the border.
+     */
+    private boolean circular;
 
     /**
      * Public constructor for the border. This constructor is used when the
@@ -53,7 +63,6 @@ public class Border implements Serializable {
      */
     public Border(final Mesh mesh) {
         this.vertexSequence = new LinkedList();
-        this.subBorders = new ArrayList();
 
         Vertex currentVertex = null;
         Vertex firstVertex = null, secondVertex = null;
@@ -70,6 +79,7 @@ public class Border implements Serializable {
         vertexSequence.add(firstVertex);
         mesh.setNeighbourhoodToVertex(firstVertex);
         for (final Vertex vertex : firstVertex.getNeighbours()) {
+            mesh.setNeighbourhoodToVertex(vertex);
             if (vertex.belongToBorder()) {
                 secondVertex = vertex;
                 break;
@@ -86,7 +96,6 @@ public class Border implements Serializable {
      */
     public Border() {
         this.vertexSequence = new LinkedList();
-        this.subBorders = new ArrayList();
     }
 
     /**
@@ -167,8 +176,9 @@ public class Border implements Serializable {
      * Divide the border into sub-borders. A border can be decompose from 1 to
      * many subborders, in case of a multiple crossing of the split.
      */
-    public final void separateSubBorders() {
+    public final List separateSubBorders() {
         boolean isCircular = true;
+        List result = new ArrayList();
         // Moving the first vertex to an outside vertex if it exist.
         for (Vertex vertex : this.vertexSequence) {
             if (!this.split.isClose(vertex)) {
@@ -176,28 +186,82 @@ public class Border implements Serializable {
                 isCircular = false;
             }
         }
-        SubBorder currentSubBorder = null;
+        Border currentSubBorder = null;
 
         for (Vertex vertex : this.vertexSequence) {
             if (currentSubBorder == null && this.split.isClose(vertex)) {
-                currentSubBorder = new SubBorder();
-                currentSubBorder.setCircular(isCircular);
+                currentSubBorder = new Border();
                 currentSubBorder.addNextVertex(vertex);
             } else if (currentSubBorder != null) {
                 if (this.split.isClose(vertex)) {
                     currentSubBorder.addNextVertex(vertex);
                 } else {
                     currentSubBorder.prepare();
-                    subBorders.add(currentSubBorder);
+                    result.add(currentSubBorder);
                     currentSubBorder = null;
                 }
             }
         }
         if (currentSubBorder != null) {
             currentSubBorder.prepare();
-            subBorders.add(currentSubBorder);
+            result.add(currentSubBorder);
         }
+        return result;
+    }
 
+    /**
+     * This method prepare the attributes of the border. This set up for example
+     * the lenght, or the position of the center of the border. These parameters
+     * are used for automatic matching of the borders.
+     */
+    private final void prepare() {
+        cumulLenght = 0;
+        float x = 0, y = 0, z = 0;
+        for (int i = 0; i < vertexSequence.size() - 1; i++) {
+            cumulLenght += vertexSequence.get(i)
+                    .distanceTo(vertexSequence.get(i + 1));
+            x += vertexSequence.get(i).getX();
+            y += vertexSequence.get(i).getY();
+            z += vertexSequence.get(i).getZ();
+        }
+        x += vertexSequence.getLast().getX();
+        y += vertexSequence.getLast().getY();
+        z += vertexSequence.getLast().getZ();
+        x = x / vertexSequence.size();
+        y = y / vertexSequence.size();
+        z = z / vertexSequence.size();
+        this.center = new Vertex(0, x, y, z);
+
+        this.circular = this.getFirstVertex().getNeighbours()
+                .contains(this.getLastVertex());
+    }
+
+    /**
+     * Compute the distance between two borders. The distance depend of the
+     * lenght of the two borders, the distance between their first and last
+     * vertex if the border is not circular, and it finally depend of the
+     * distance between their centers.
+     * @param border , the border to compare to this one.
+     * @return the distance between the two borders.
+     */
+    protected final double distanceTo(final Border border) {
+        double result = 0;
+
+        result += Math.abs(this.cumulLenght - border.cumulLenght);
+        result += this.center.distanceTo(border.center);
+        if (!this.circular && !border.circular) {
+            // Compute the distance between the first plus the last vertex of
+            // the two borders.
+            result += Math.min(this.getFirstVertex().
+                    distanceTo(border.getFirstVertex())
+                    + this.getLastVertex()
+                            .distanceTo(border.getLastVertex()), // And
+                    this.getFirstVertex()
+                            .distanceTo(border.getLastVertex())
+                            + this.getLastVertex()
+                                    .distanceTo(border.getFirstVertex()));
+        }
+        return result;
     }
 
     /**
@@ -205,7 +269,7 @@ public class Border implements Serializable {
      * borders to join need to be aligned (in term of vertex sequence). Used
      * only on circular borders.
      */
-    public final void changeFirstVertex(final Vertex vertex) {
+    private final void changeFirstVertex(final Vertex vertex) {
         final LinkedList endSequence = new LinkedList<Vertex>();
         final LinkedList newStartSequence = new LinkedList<Vertex>();
 
@@ -225,5 +289,62 @@ public class Border implements Serializable {
         newStartSequence.addAll(endSequence);
 
         this.vertexSequence = newStartSequence;
+    }
+
+    /**
+     * Revert the sequence of the border. Used when borders to join need to be
+     * aligned (in term of vertex sequence).
+     */
+    public final void revertSequence() {
+        final LinkedList newSequence = new LinkedList<Vertex>();
+        for (Iterator it = this.vertexSequence.descendingIterator();
+                it.hasNext();) {
+            newSequence.add(it.next());
+        }
+        this.vertexSequence = newSequence;
+    }
+
+    /**
+     * This method take a border as reference, and align the border on. Can then
+     * change the first vertex of the border, and the order of the sequence.
+     *
+     * @param border , the border on which this border is aligned.
+     */
+    public final void alignOn(Border border) {
+        Vertex firstVertex1 = this.getFirstVertex();
+        final Vertex firstVertex2 = border.getFirstVertex();
+        Vertex previousVertex1, nextVertex1, nextVertex2;
+
+        //TODO if (this.isCircular) {
+        for (Iterator<Vertex> it = this.vertexSequence.iterator();
+                it.hasNext();) {
+            Vertex candidate = it.next();
+            if (candidate.distanceTo(firstVertex2)
+                    < firstVertex1.distanceTo(firstVertex2)) {
+                firstVertex1 = candidate;
+            }
+        }
+        if (firstVertex1 != this.getFirstVertex()) {
+            previousVertex1 = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertex1) - 1);
+        } else {
+            previousVertex1 = this.vertexSequence.getLast();
+        }
+        if (firstVertex1 != this.vertexSequence.getLast()) {
+            nextVertex1 = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertex1) + 1);
+        } else {
+            nextVertex1 = this.vertexSequence.getFirst();
+        }
+        nextVertex2 = border.getVertexSequence().get(1);
+
+        if (nextVertex1.distanceTo(nextVertex2)
+                > previousVertex1.distanceTo(nextVertex2)) {
+            this.revertSequence();
+        }
+        this.changeFirstVertex(firstVertex1);
+        //}
+    }
+
+    public final boolean isCircular() {
+        return circular;
     }
 }

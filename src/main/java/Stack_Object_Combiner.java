@@ -27,14 +27,12 @@ import gin.melec.SplitUp;
 import ij.IJ;
 import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
+import ij.Prefs;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Tom Boissonnet
@@ -42,15 +40,42 @@ import java.util.logging.Logger;
  */
 public class Stack_Object_Combiner implements PlugIn {
 
+    /**
+     * List of splits in the A_ part.
+     */
     private static final List<AbstractSplit> A_SPLITS = new ArrayList();
+    /**
+     * List of splits in the B_ part.
+     */
     private static final List<AbstractSplit> B_SPLITS = new ArrayList();
+    /**
+     * List of splits in the C_ part.
+     */
     private static final List<AbstractSplit> C_SPLITS = new ArrayList();
+    /**
+     * List of splits in the D_ part.
+     */
     private static final List<AbstractSplit> D_SPLITS = new ArrayList();
 
+    /**
+     * List of meshes in the A_ part.
+     */
     private static final List<Mesh> A_MESHES = new ArrayList();
+    /**
+     * List of meshes in the B_ part.
+     */
     private static final List<Mesh> B_MESHES = new ArrayList();
+    /**
+     * List of meshes in the C_ part.
+     */
     private static final List<Mesh> C_MESHES = new ArrayList();
+    /**
+     * List of meshes in the D_ part.
+     */
     private static final List<Mesh> D_MESHES = new ArrayList();
+    /**
+     * List of all meshes (A part + B part + C part + D part).
+     */
     private static final List<List> ALL_MESHES = new ArrayList();
 
     /**
@@ -163,8 +188,10 @@ public class Stack_Object_Combiner implements PlugIn {
      * @return true if the panel hasn't been canceled.
      */
     private boolean getSplits(final File workingDirectory,
-            final FilenameFilter objFilters[]) {
-        int verticalSplit = 0, horizontalSplit = 0;
+            final FilenameFilter[] objFilters) {
+        Prefs.set("my.persistent.name", "Grizzly Adams");
+        long verticalSplit = Math.round(Prefs.get("SOC.verticalSplit", 0));
+        long horizontalSplit = Math.round(Prefs.get("SOC.horizontalSplit", 0));
         boolean result = true;
         boolean verticalExist = false, horizontalExist = false;
         final GenericDialog gDial = new GenericDialog("Indicate the positions "
@@ -213,6 +240,7 @@ public class Stack_Object_Combiner implements PlugIn {
         } else {
             if (verticalExist) {
                 verticalSplit = (int) gDial.getNextNumber();
+                Prefs.set("SOC.verticalSplit", verticalSplit);
                 A_SPLITS.add(new SplitRight(verticalSplit));
                 B_SPLITS.add(new SplitLeft(verticalSplit));
                 C_SPLITS.add(new SplitRight(verticalSplit));
@@ -220,11 +248,13 @@ public class Stack_Object_Combiner implements PlugIn {
             }
             if (horizontalExist) {
                 horizontalSplit = (int) gDial.getNextNumber();
+                Prefs.set("SOC.horizontalSplit", horizontalSplit);
                 A_SPLITS.add(new SplitDown(horizontalSplit));
                 B_SPLITS.add(new SplitDown(horizontalSplit));
                 C_SPLITS.add(new SplitUp(horizontalSplit));
                 D_SPLITS.add(new SplitUp(horizontalSplit));
             }
+            Prefs.savePreferences();
         }
         return result;
     }
@@ -233,8 +263,10 @@ public class Stack_Object_Combiner implements PlugIn {
      * Add to the meshes lists the meshes contained in the given directory.
      *
      * @param workingDirectory , the directory containing the .obj files.
+     * @param objFilters , the filters for our files.
      */
-    private void getMeshes(final File workingDirectory, final FilenameFilter objFilters[]) {
+    private void getMeshes(final File workingDirectory,
+            final FilenameFilter[] objFilters) {
         File[] listing;
             listing = workingDirectory.listFiles(objFilters[0]); // Filter A_
             for (File file : listing) {

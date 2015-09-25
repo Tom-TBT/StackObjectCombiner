@@ -39,7 +39,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     private static final DecimalFormatSymbols DFS = new DecimalFormatSymbols();
 
     static {
-        DF.setMaximumFractionDigits(3);
+        DF.setMaximumFractionDigits(5);
         DFS.setDecimalSeparator('.');
         DF.setDecimalFormatSymbols(DFS);
     }
@@ -171,6 +171,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         final List<Face> facesRemaining = new ArrayList();
         tmpNeighbours.addAll(this.neighbours);
         facesRemaining.addAll(this.faces);
+
         final Vertex firstVertex = tmpNeighbours.get(0);
         Vertex currentVertex = firstVertex;
         Face currentFace = firstVertex.getFaceIncluding(facesRemaining);

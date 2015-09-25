@@ -30,7 +30,7 @@ public class SplitDown extends AbstractSplit {
      *
      * @param position , the position of the border.
      */
-    public SplitDown(final int position) {
+    public SplitDown(final long position) {
         super(position);
     }
 
@@ -40,12 +40,12 @@ public class SplitDown extends AbstractSplit {
     }
 
     @Override
-    protected final int xPosition() {
+    protected final long xPosition() {
         return 0;
     }
 
     @Override
-    protected final int yPosition() {
+    protected final long yPosition() {
         return position;
     }
 

@@ -27,7 +27,7 @@ public class SplitUp extends AbstractSplit {
      * Public constructor for a split with a position.
      * @param position , the position of the border.
      */
-    public SplitUp(final int position) {
+    public SplitUp(final long position) {
         super(position);
     }
 
@@ -37,12 +37,12 @@ public class SplitUp extends AbstractSplit {
     }
 
     @Override
-    protected final int xPosition() {
+    protected final long xPosition() {
         return 0;
     }
 
     @Override
-    protected final int yPosition() {
+    protected final long yPosition() {
         return position;
     }
 

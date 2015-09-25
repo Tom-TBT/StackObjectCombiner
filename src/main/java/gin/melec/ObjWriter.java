@@ -44,7 +44,6 @@ public class ObjWriter {
     }
 
     private static class ObjWriterHolder {
-
         private static final ObjWriter INSTANCE = new ObjWriter();
     }
 
@@ -60,7 +59,7 @@ public class ObjWriter {
         final FileWriter fiW = new FileWriter(file.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
-        try{
+        try {
             if (mesh.isMoved()) {
                 prW.write("#movedBySOC\n");
             }
@@ -70,7 +69,7 @@ public class ObjWriter {
             for (Object element : mesh.getFaces()) {
                 prW.write(element.toString() + "\n");
             }
-        }finally {
+        } finally {
             prW.close();
         }
     }
@@ -86,7 +85,7 @@ public class ObjWriter {
             throws IOException {
         final ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(file.toString()));
-        try{
+        try {
             oos.writeObject(borders);
         } finally {
             oos.close();

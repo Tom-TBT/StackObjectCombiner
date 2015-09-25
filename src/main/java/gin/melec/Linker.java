@@ -77,8 +77,22 @@ public class Linker {
      * @param destination , the destination border.
      * @return a set of links between the two borders.
      */
-    public static final Set linkTo(final Border origin,
-            final Border destination) {
+    public static final List createFacesBetween(Border origin,
+            Border destination) {
+
+        // We always want to link first the border that has the more vertices,
+        // to the border that had the fewer vertices.
+        boolean inverted = false;
+        if (origin.getVertexSequence().size()
+                < destination.getVertexSequence().size()) {
+            inverted = true;
+            final Border tmp = origin;
+            origin = destination;
+            destination = tmp;
+        }
+
+        destination.alignOn(origin);
+
         final TreeSet<Link> links = new TreeSet();
 
         // Linking the origin vertices to the destination vertices
@@ -134,7 +148,8 @@ public class Linker {
             origPrevious = origCurrent;
             destPrevious = destCurrent;
         }
-//        if (this.isCircular) {
+//        if (origin.isCircular()) {  // If borders are circular, they need two
+//                                    // more faces to close them.
 //            List<Vertex> vertexToLink = findVertexLinked(this.getFirstVertex(),
 //                    this.getLastVertex(), border.getFirstVertex(),
 //                    border.getLastVertex());
@@ -143,8 +158,17 @@ public class Linker {
 //                    this.getVertexSequence().indexOf(vertexToLink.get(0)),
 //                    border.getVertexSequence().indexOf(vertexToLink.get(1))));
 //        }
+
         links.addAll(newLinks);
-        return links;
+
+        if (inverted) {
+            // If the borders were inverted, the links needs also to be inverted
+            for (Link link : links) {
+                link = new Link (link.getDestination(), link.getOrigin(),
+                        link.getIndexDestination(), link.getIndexOrigin());
+            }
+        }
+        return exportLinks(links);
     }
 
     /**
@@ -156,10 +180,10 @@ public class Linker {
      * @param links , the set of the links.
      * @return a list of the vertex that are linkable.
      */
-    static List findCandidates(Vertex vertex, TreeSet<Link> links) {
-        List<Vertex> candidates = new ArrayList();
+    private static List findCandidates(Vertex vertex, TreeSet<Link> links) {
+        final List<Vertex> candidates = new ArrayList();
 
-        Iterator<Link> it = links.descendingIterator();
+        final Iterator<Link> it = links.descendingIterator();
         Link currentLink = it.next();
         Vertex candidate1 = null, candidate2 = currentLink.getOrigin();
         while(it.hasNext()) {
@@ -201,13 +225,13 @@ public class Linker {
      * @param idShift , the shift to apply to the destination's id in faces.
      * @return the faces created from the links.
      */
-    public static List exportLinks(final Set links, final int idShift) {
+    public static List exportLinks(final Set links) {
         final List<Face> newFaces = new ArrayList();
 
         Vertex origCurrent, origPrevious, destCurrent, destPrevious;
         Link linkCurrent;
         Iterator<Link> linkIterator = links.iterator();
-        Link tmpLink = linkIterator.next();
+        final Link tmpLink = linkIterator.next();
         origPrevious = tmpLink.getOrigin();
         destPrevious = tmpLink.getDestination();
         linkIterator = links.iterator(); // Reset the iterator
@@ -216,11 +240,8 @@ public class Linker {
             origCurrent = linkCurrent.getOrigin();
             destCurrent = linkCurrent.getDestination();
             if (!origCurrent.equals(origPrevious)) {
-                destCurrent.incrementId(idShift);
                 newFaces.add(new Face(origCurrent, origPrevious, destCurrent));
             } else if (!destCurrent.equals(destPrevious)) {
-                destCurrent.incrementId(idShift);
-                destPrevious.incrementId(idShift);
                 newFaces.add(new Face(origCurrent, destPrevious, destCurrent));
             }
             origPrevious = origCurrent;

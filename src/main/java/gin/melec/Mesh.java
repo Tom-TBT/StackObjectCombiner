@@ -104,7 +104,7 @@ public class Mesh {
      *
      * @param vertex , the vertex to set the faces.
      */
-    public final void setNeighbourhoodToVertex(final Vertex vertex) {
+    protected final void setNeighbourhoodToVertex(final Vertex vertex) {
         for (Face face : this.faces) {
             if (face.getVertex1().equals(vertex)) {
                 vertex.getFaces().add(face);
@@ -150,7 +150,7 @@ public class Mesh {
      * Once a border is finish, this method is called to add all vertex related
      * to the border to the garbage.
      */
-    final void completeGarbage() {
+    private void completeGarbage() {
         final List<Vertex> vertexToCheck = new ArrayList(this.garbage);
         for (Vertex vertex : vertexToCheck) {
             vertex.addNeighborToGarbage(this.garbage, this.primers);
@@ -193,23 +193,29 @@ public class Mesh {
      * primers. The iteration of the detection of the borders stop once the
      * primers set is empty.
      */
-    public final void createBorders() {
+    protected final void createBorders() {
         createPrimers();
-        doPrimersNeighbours();
-        while (!primers.isEmpty()) {
-            final Border border = new Border(this);
-            Vertex nextVertex = border.getLastVertex();
-            while (!nextVertex.equals(border.getFirstVertex())) {
-                nextVertex = this.findNextVertex(border);
-                border.addNextVertex(nextVertex);
+        if (!this.primers.isEmpty()) {
+            doPrimersNeighbours();
+            while (!primers.isEmpty()) {
+                final Border border = new Border(this);
+                Vertex nextVertex = border.getLastVertex();
+                while (!nextVertex.equals(border.getFirstVertex())) {
+                    nextVertex = this.findNextVertex(border);
+                    if (!nextVertex.equals(border.getFirstVertex())) {
+                        border.addNextVertex(nextVertex);
+                    }
+                }
+                completeGarbage();
+                primers.removeAll(this.garbage);
+                this.garbage.clear();
+                this.borders.add(border);
             }
-            completeGarbage();
-            primers.removeAll(this.garbage);
-            this.garbage.clear();
-            this.borders.add(border);
-        }
-        for (Border border : this.borders) {
-            border.separateSubBorders();
+            final List<Border> tmpBorders = new ArrayList();
+            for (Border border : this.borders) {
+                tmpBorders.addAll(border.separateSubBorders());
+            }
+            this.borders = tmpBorders;
         }
     }
 
@@ -225,8 +231,8 @@ public class Mesh {
     /**
      * This method shift the mesh, depending of its own splits.
      */
-    final void shift() {
-        int deltaX = 0, deltaY = 0;
+    protected final void shift() {
+        long deltaX = 0, deltaY = 0;
         for (AbstractSplit split : splits) {
             if (SplitLeft.class.isInstance(split)) {
                 deltaX = split.xPosition();
@@ -248,7 +254,7 @@ public class Mesh {
      * Use the ObjWriter to write the vertices and the faces in the file of the
      * mesh.
      */
-    public final void exportMesh() {
+    protected final void exportMesh() {
         try {
             ObjWriter.writeMesh(this.file, this);
         } catch (IOException ex) {
@@ -259,7 +265,7 @@ public class Mesh {
     /**
      * Use the ObjReader to import into the mesh the vertices and the faces.
      */
-    public final void importMesh() {
+    protected final void importMesh() {
         try {
             ObjReader.readMesh(this.file, this);
         } catch (IOException ex) {
@@ -272,7 +278,7 @@ public class Mesh {
      *
      * @param filePath , the filename to use.
      */
-    public final void exportBorders() {
+    protected final void exportBorders() {
         try {
             ObjWriter.serializeBorders(this.file, borders);
         } catch (IOException ex) {
@@ -285,7 +291,7 @@ public class Mesh {
      *
      * @param filePath ,the path of the file in which the borders are contained.
      */
-    public final void importBorders() {
+    protected final void importBorders() {
         try {
             this.borders = ObjReader.deserializeBorders(this.file);
         } catch (IOException ex) {
@@ -305,15 +311,6 @@ public class Mesh {
      */
     public final TreeSet<Vertex> getVertices() {
         return vertices;
-    }
-
-    /**
-     * TODO check utility
-     *
-     * @param borders
-     */
-    public final void setBorders(final List<Border> borders) {
-        this.borders = borders;
     }
 
     /**
@@ -366,7 +363,7 @@ public class Mesh {
      *
      * @return the path of the mesh.
      */
-    public final File getPath() {
+    public final File getFile() {
         return file;
     }
 

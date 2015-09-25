@@ -30,7 +30,7 @@ public class SplitRight extends AbstractSplit {
      * Public constructor for a split with a position.
      * @param position , the position of the border.
      */
-    public SplitRight(final int position) {
+    public SplitRight(final long position) {
         super(position);
     }
 
@@ -40,12 +40,12 @@ public class SplitRight extends AbstractSplit {
     }
 
     @Override
-    protected final int xPosition() {
+    protected final long xPosition() {
         return position;
     }
 
     @Override
-    protected final int yPosition() {
+    protected final long yPosition() {
         return 0;
     }
 

@@ -36,14 +36,14 @@ public abstract class AbstractSplit implements Serializable {
     /**
      * The position of the split.
      */
-    protected int position;
+    protected long position;
 
     /**
      * Public constructor for a split with a position.
      *
      * @param position , the position of the border.
      */
-    public AbstractSplit(final int position) {
+    public AbstractSplit(final long position) {
         this.position = position;
     }
 
@@ -68,7 +68,7 @@ public abstract class AbstractSplit implements Serializable {
      *
      * @return the position of the border.
      */
-    public final int getPosition() {
+    public final long getPosition() {
         return position;
     }
 
@@ -95,14 +95,14 @@ public abstract class AbstractSplit implements Serializable {
      *
      * @return the position of the split.
      */
-    protected abstract int xPosition();
+    protected abstract long xPosition();
 
     /**
      * Give the position of the split in his y Position.
      *
      * @return the position of the split.
      */
-    protected abstract int yPosition();
+    protected abstract long yPosition();
 
     /**
      * Give the distance between the split and the vertex depending the axe of
