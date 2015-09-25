@@ -16,9 +16,9 @@
  */
 package gin.melec;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,7 +70,7 @@ public class Mesh {
     /**
      * The path to this mesh's file.
      */
-    private Path path;
+    private File file;
 
     /**
      * The boolean that indicate if the mesh has already been moved.
@@ -82,8 +82,8 @@ public class Mesh {
      *
      * @param splits , the splits of the mesh.
      */
-    public Mesh(final List<AbstractSplit> splits, final Path path) {
-        this.path = path;
+    public Mesh(final List<AbstractSplit> splits, final File file) {
+        this.file = file;
         this.faces = new TreeSet();
         this.vertices = new TreeSet();
         this.garbage = new HashSet();
@@ -92,7 +92,7 @@ public class Mesh {
         this.primers = new TreeSet();
 
         try {
-            moved = ObjReader.isMeshMoved(this.path);
+            moved = ObjReader.isMeshMoved(this.file);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName())
                     .log(Level.SEVERE, null, ex);
@@ -250,7 +250,7 @@ public class Mesh {
      */
     public final void exportMesh() {
         try {
-            ObjWriter.writeMesh(this.path, this);
+            ObjWriter.writeMesh(this.file, this);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -261,7 +261,7 @@ public class Mesh {
      */
     public final void importMesh() {
         try {
-            ObjReader.readMesh(this.path, this);
+            ObjReader.readMesh(this.file, this);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -274,7 +274,7 @@ public class Mesh {
      */
     public final void exportBorders() {
         try {
-            ObjWriter.serializeBorders(this.path, borders);
+            ObjWriter.serializeBorders(this.file, borders);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -287,7 +287,7 @@ public class Mesh {
      */
     public final void importBorders() {
         try {
-            this.borders = ObjReader.deserializeBorders(this.path);
+            this.borders = ObjReader.deserializeBorders(this.file);
         } catch (IOException ex) {
             Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -295,7 +295,7 @@ public class Mesh {
 
     @Override
     public String toString() {
-        return this.path.getFileName().toString();
+        return this.file.getName();
     }
 
     /**
@@ -366,8 +366,8 @@ public class Mesh {
      *
      * @return the path of the mesh.
      */
-    public final Path getPath() {
-        return path;
+    public final File getPath() {
+        return file;
     }
 
     /**

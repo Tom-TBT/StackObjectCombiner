@@ -17,13 +17,13 @@
 package gin.melec;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -60,11 +60,11 @@ public class ObjReader {
      * @param mesh , the mesh to load.
      * @throws IOException , when their is an error with the lecture of the file
      */
-    public static void readMesh(final Path path, final Mesh mesh)
+    public static void readMesh(final File file, final Mesh mesh)
             throws IOException {
         final List<Vertex> tmpVertices;
 
-        final InputStream ips = new FileInputStream(path.toString());
+        final InputStream ips = new FileInputStream(file.toString());
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);
         try{
@@ -95,12 +95,12 @@ public class ObjReader {
         mesh.getVertices().addAll(tmpVertices);
     }
 
-    public static boolean isMeshMoved(final Path path)
+    public static boolean isMeshMoved(final File file)
             throws FileNotFoundException, IOException {
         String currentLine;
         boolean result = false;
 
-        final InputStream ips = new FileInputStream(path.toString());
+        final InputStream ips = new FileInputStream(file.toString());
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);
         try {
@@ -123,10 +123,10 @@ public class ObjReader {
      * @return a list of vertices making the border.
      * @throws IOException if their is an error while reading the file.
      */
-    public static List deserializeBorders(final Path path) throws IOException {
+    public static List deserializeBorders(final File file) throws IOException {
         List<Border> borders = null;
         final ObjectInputStream ois = new ObjectInputStream(
-                new FileInputStream(path.toString()));
+                new FileInputStream(file.toString()));
         try {
             borders = (ArrayList) ois.readObject();
         } catch (ClassNotFoundException ex) {

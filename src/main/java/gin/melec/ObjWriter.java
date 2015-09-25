@@ -17,12 +17,12 @@
 package gin.melec;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -55,9 +55,9 @@ public class ObjWriter {
      * @param mesh , the mesh to write.
      * @throws IOException , thrown by the writer.
      */
-    public static void writeMesh(final Path path, final Mesh mesh)
+    public static void writeMesh(final File file, final Mesh mesh)
             throws IOException {
-        final FileWriter fiW = new FileWriter(path.toString());
+        final FileWriter fiW = new FileWriter(file.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
         try{
@@ -82,10 +82,10 @@ public class ObjWriter {
      * @param borders , the borders to write.
      * @throws IOException if their is an error while writing.
      */
-    static void serializeBorders(final Path path, final List<Border> borders)
+    static void serializeBorders(final File file, final List<Border> borders)
             throws IOException {
         final ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(path.toString()));
+                new FileOutputStream(file.toString()));
         try{
             oos.writeObject(borders);
         } finally {

@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import gin.melec.AbstractSplit;
 import gin.melec.Mesh;
 import gin.melec.MeshMerger;
@@ -28,11 +27,9 @@ import gin.melec.SplitUp;
 import ij.IJ;
 import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,15 +60,74 @@ public class Stack_Object_Combiner implements PlugIn {
      */
     @Override
     public final void run(final String arg) {
-        final Path workingDirectory = Paths.get(IJ.getDirectory("Give the file "
+        final FilenameFilter[] objFilters = getFilters();
+
+        final File workingDirectory = new File(IJ.getDirectory("Give the file "
                 + "containing the .obj files"));
-        if (getSplits(workingDirectory)) {
-            getMeshes(workingDirectory);
+        if (getSplits(workingDirectory, objFilters)) {
+            getMeshes(workingDirectory, objFilters);
             boolean notCanceled = true;
             while (notCanceled) {
                 notCanceled = proposeAction();
             }
         }
+
+    }
+
+    /**
+     * This method create FilenameFilters we need to filter the .obj files with
+     * the prefix A_, B_, C_ or D_.
+     *
+     * @return the filenameFilters.
+     */
+    private FilenameFilter[] getFilters() {
+        FilenameFilter[] result = new FilenameFilter[4];
+        result[0] = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                if (lowercaseName.endsWith(".obj")
+                        && name.startsWith("A_")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        result[1] = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                if (lowercaseName.endsWith(".obj")
+                        && name.startsWith("B_")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        result[2] = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                if (lowercaseName.endsWith(".obj")
+                        && name.startsWith("C_")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        result[3] = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                if (lowercaseName.endsWith(".obj")
+                        && name.startsWith("D_")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        return result;
     }
 
     /**
@@ -103,9 +159,11 @@ public class Stack_Object_Combiner implements PlugIn {
      * Open a dialog box that ask for the position of the splits.
      *
      * @param workingDirectory , the current directory.
+     * @param objFilters , the filters of our files.
      * @return true if the panel hasn't been canceled.
      */
-    private boolean getSplits(final Path workingDirectory) {
+    private boolean getSplits(final File workingDirectory,
+            final FilenameFilter objFilters[]) {
         int verticalSplit = 0, horizontalSplit = 0;
         boolean result = true;
         boolean verticalExist = false, horizontalExist = false;
@@ -113,31 +171,37 @@ public class Stack_Object_Combiner implements PlugIn {
                 + "of the splits.");
 
         // TODO think to a control
-        DirectoryStream<Path> listing;
-        try {
-            listing = Files.newDirectoryStream(workingDirectory, "D_*.obj");
-            if (listing.iterator().hasNext()) { // If files in D exists
+        File[] listing;
+        listing = workingDirectory.listFiles(objFilters[3]); // Filter D_
+        for (File file : listing) {
+            if (file.isFile()) { // If files in D exists
                 gDial.addNumericField("Vertical split", verticalSplit, 0);
                 gDial.addNumericField("Horizontal split", horizontalSplit, 0);
                 verticalExist = true;
                 horizontalExist = true;
-            } else {
-                listing = Files.newDirectoryStream(workingDirectory, "B_*.obj");
-                if (listing.iterator().hasNext()) { // If files in B exists
+                break;
+            }
+        }
+        if (!verticalExist && !horizontalExist) { // If their was no D_ file
+            listing = workingDirectory.listFiles(objFilters[1]); // Filter B_
+            for (File file : listing) {
+                if (file.isFile()) { // If files in B exists
                     gDial.addNumericField("Vertical split", verticalSplit, 0);
                     verticalExist = true;
-                }
-                listing = Files.newDirectoryStream(workingDirectory, "C_*.obj");
-                if (listing.iterator().hasNext()) { // If files in C exists
-                    gDial.addNumericField("Horizontal split", horizontalSplit
-                            , 0);
-                    horizontalExist = true;
+                    break;
                 }
             }
-        } catch (IOException ex) {
-            Logger.getLogger(Stack_Object_Combiner.class.getName()).
-                    log(Level.SEVERE, null, ex);
+            listing = workingDirectory.listFiles(objFilters[2]); // Filter C_
+            for (File file : listing) {
+                if (file.isFile()) { // If files in C exists
+                    gDial.addNumericField("Horizontal split",
+                            horizontalSplit, 0);
+                    horizontalExist = true;
+                    break;
+                }
+            }
         }
+
         if (!horizontalExist && !verticalExist) {
             gDial.addMessage("No meshes can be found.\n"
                     + "Check the documentation for more informations.");
@@ -170,40 +234,46 @@ public class Stack_Object_Combiner implements PlugIn {
      *
      * @param workingDirectory , the directory containing the .obj files.
      */
-    private void getMeshes(final Path workingDirectory) {
-        DirectoryStream<Path> listing;
-        try {
-            listing = Files.newDirectoryStream(workingDirectory, "A_*.obj");
-            for (Path name : listing) {
-                final Mesh mesh = new Mesh(A_SPLITS, name);
-                A_MESHES.add(mesh);
+    private void getMeshes(final File workingDirectory, final FilenameFilter objFilters[]) {
+        File[] listing;
+            listing = workingDirectory.listFiles(objFilters[0]); // Filter A_
+            for (File file : listing) {
+                if (file.isFile()) {
+                    final Mesh mesh = new Mesh(A_SPLITS, file);
+                    A_MESHES.add(mesh);
+                }
+
             }
             ALL_MESHES.add(A_MESHES);
 
-            listing = Files.newDirectoryStream(workingDirectory, "B_*.obj");
-            for (Path name : listing) {
-                final Mesh mesh = new Mesh(B_SPLITS, name);
-                B_MESHES.add(mesh);
+            listing = workingDirectory.listFiles(objFilters[1]); // Filter B_
+            for (File file : listing) {
+                if (file.isFile()) {
+                    final Mesh mesh = new Mesh(B_SPLITS, file);
+                    B_MESHES.add(mesh);
+                }
+
             }
             ALL_MESHES.add(B_MESHES);
 
-            listing = Files.newDirectoryStream(workingDirectory, "C_*.obj");
-            for (Path name : listing) {
-                final Mesh mesh = new Mesh(C_SPLITS, name);
-                C_MESHES.add(mesh);
+            listing = workingDirectory.listFiles(objFilters[2]); // Filter C_
+            for (File file : listing) {
+                if (file.isFile()) {
+                    final Mesh mesh = new Mesh(C_SPLITS, file);
+                    C_MESHES.add(mesh);
+                }
+
             }
             ALL_MESHES.add(C_MESHES);
 
-            listing = Files.newDirectoryStream(workingDirectory, "D_*.obj");
-            for (Path name : listing) {
-                final Mesh mesh = new Mesh(D_SPLITS, name);
-                D_MESHES.add(mesh);
+            listing = workingDirectory.listFiles(objFilters[3]); // Filter D_
+            for (File file : listing) {
+                if (file.isFile()) {
+                    final Mesh mesh = new Mesh(D_SPLITS, file);
+                    D_MESHES.add(mesh);
+                }
             }
             ALL_MESHES.add(D_MESHES);
-        } catch (IOException ex) {
-            Logger.getLogger(Stack_Object_Combiner.class.getName()).
-                    log(Level.SEVERE, null, ex);
-        }
     }
 
     /**
