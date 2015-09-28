@@ -71,7 +71,6 @@ public class MeshMerger {
                         contains(mesh2))) {
                     IJ.error("Two meshes from a same part can't be merged");
                 } else {
-                    IJ.showMessage("On construction !");
                     mesh1.importMesh();
                     mesh1.createBorders();
                     if (mesh1.getBorders().isEmpty()) {

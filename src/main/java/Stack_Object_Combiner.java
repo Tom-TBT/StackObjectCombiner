@@ -87,8 +87,8 @@ public class Stack_Object_Combiner implements PlugIn {
     public final void run(final String arg) {
         final FilenameFilter[] objFilters = getFilters();
 
-        final File workingDirectory = new File(IJ.getDirectory("Give the file "
-                + "containing the .obj files"));
+        final File workingDirectory = new File(IJ.getDirectory("Give the folder"
+                + " containing the .obj files"));
         if (getSplits(workingDirectory, objFilters)) {
             getMeshes(workingDirectory, objFilters);
             boolean notCanceled = true;
@@ -174,7 +174,8 @@ public class Stack_Object_Combiner implements PlugIn {
             MeshMover.moveMeshes(ALL_MESHES);
             result = true;
         } else {
-            MeshMerger.work(ALL_MESHES);
+            IJ.showMessage("On construction !");
+            //MeshMerger.work(ALL_MESHES);
             result = true;
         }
         return result;
