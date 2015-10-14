@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import ij.IJ;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,8 @@ import java.util.TreeSet;
  */
 public class Linker {
 
+    private static final int INCREM = 10;
+
     private Linker() {
     }
 
@@ -43,8 +46,9 @@ public class Linker {
     }
 
     /**
-     * This method choose between 4 vertex the two that will form a link, to
-     * cut a quadrilateral in two triangles.
+     * This method choose between 4 vertex the two that will form a link, to cut
+     * a quadrilateral in two triangles.
+     *
      * @param ori1 , the first vertex candidate as origin.
      * @param ori2 , the second vertex candidate as origin.
      * @param dest1 , the first vertex candidate as destination.
@@ -73,6 +77,7 @@ public class Linker {
      * Link the border origin to the border destination. Every link made will
      * have as origin a vertex from the origin border, and as destination a
      * vertex from the destination border.
+     *
      * @param origin , the origin border.
      * @param destination , the destination border.
      * @return a set of links between the two borders.
@@ -94,36 +99,44 @@ public class Linker {
         destination.alignOn(origin);
 
         final TreeSet<Link> links = new TreeSet();
+        List<Vertex> origSequence = origin.getVertexSequence();
+        List<Vertex> destSequence = destination.getVertexSequence();
+        Vertex prevOrigSpot;
+        Vertex nextOrigSpot = origin.getFirstVertex();
+        Vertex prevDestSpot;
+        Vertex nextDestSpot = destination.getFirstVertex();
+        // add new next link
+        links.add(new Link(nextOrigSpot, nextDestSpot));
+        int j = INCREM;
+        boolean notFinished = true;
+        while (notFinished) {
+            if (j > origSequence.size()) {
+                j = origSequence.size() - 1;
+                notFinished = false;
+            }
+            // Creating the subsets
+            prevOrigSpot = nextOrigSpot;
+            nextOrigSpot = origSequence.get(j);
+            prevDestSpot = nextDestSpot;
+            nextDestSpot = nextOrigSpot.findCloserIn(destSequence.
+                    subList(destSequence.
+                            indexOf(prevDestSpot), destSequence.size()));
 
-        // Linking the origin vertices to the destination vertices
-        for (Vertex vertex : origin.getVertexSequence()) {
-            Vertex linked = destination.getFirstVertex();
-            for (Vertex candidat : destination.getVertexSequence()) {
-                if (vertex.distanceTo(candidat) < vertex.distanceTo(linked)) {
-                    linked = candidat;
-                }
-            }
-            links.add(new Link(vertex, linked,
-                    origin.getVertexSequence().indexOf(vertex),
-                    destination.getVertexSequence().indexOf(linked)));
+            // add new next link
+            links.add(new Link(nextOrigSpot, nextDestSpot));
+
+            List<Vertex> subListDest = new ArrayList(destSequence.
+                    subList(destSequence.indexOf(prevDestSpot) + 1,
+                            destSequence.indexOf(nextDestSpot)));
+            List<Vertex> subListOrig = new ArrayList(origSequence.
+                    subList(origSequence.indexOf(prevOrigSpot), j + 1));
+
+            // getLinks form by the two subsets
+            links.addAll(getLinksFromSubsets(subListOrig, subListDest));
+            j += INCREM;
+            IJ.log(Integer.toString(j));
         }
-        // Linking the destination vertices to the origin vertices
-        Iterator<Vertex> it = destination.getVertexSequence().iterator();
-        Vertex previousVertex = it.next();
-        Vertex currentVertex = it.next();
-        while (it.hasNext()) {
-            if (!Linker.containVertex(currentVertex, links)) {
-                List<Vertex> candidates = Linker.findCandidates(previousVertex
-                        , links);
-                Vertex linked = currentVertex.whichCloser(candidates.get(0)
-                        , candidates.get(1));
-                links.add(new Link(linked, currentVertex,
-                    origin.getVertexSequence().indexOf(linked),
-                    destination.getVertexSequence().indexOf(currentVertex)));
-            }
-            previousVertex = currentVertex;
-            currentVertex = it.next();
-        }
+        SetIndexToLinks(links, origSequence, destSequence);
 
         final Set<Link> newLinks = new HashSet();
         Vertex origCurrent, origPrevious, destCurrent, destPrevious;
@@ -137,12 +150,11 @@ public class Linker {
             destCurrent = linkCurrent.getDestination();
             if (!origCurrent.equals(origPrevious)
                     && !destCurrent.equals(destPrevious)) {
+                // The if mean that the links have iterate on the two borders
+                // at the same time -> A link is missing
                 final List<Vertex> vertexToLink = findVertexLinked(origCurrent,
                         origPrevious, destCurrent, destPrevious);
-                newLinks.add(new Link(vertexToLink.get(0), vertexToLink.get(1),
-                        origin.getVertexSequence().indexOf(vertexToLink.get(0)),
-                        destination.getVertexSequence()
-                        .indexOf(vertexToLink.get(1))));
+                newLinks.add(new Link(vertexToLink.get(0), vertexToLink.get(1)));
 
             }
             origPrevious = origCurrent;
@@ -160,11 +172,12 @@ public class Linker {
 //        }
 
         links.addAll(newLinks);
+        SetIndexToLinks(links, origSequence, destSequence);
 
         if (inverted) {
             // If the borders were inverted, the links needs also to be inverted
             for (Link link : links) {
-                link = new Link (link.getDestination(), link.getOrigin(),
+                link = new Link(link.getDestination(), link.getOrigin(),
                         link.getIndexDestination(), link.getIndexOrigin());
             }
         }
@@ -176,6 +189,7 @@ public class Linker {
      * their is still some vertex to link, but it can't be link in a way that
      * links cross each other. So this method find the vertex that can be
      * linked.
+     *
      * @param vertex , the previous vertex which is already linked.
      * @param links , the set of the links.
      * @return a list of the vertex that are linkable.
@@ -186,7 +200,7 @@ public class Linker {
         final Iterator<Link> it = links.descendingIterator();
         Link currentLink = it.next();
         Vertex candidate1 = null, candidate2 = currentLink.getOrigin();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             currentLink = it.next();
             candidate1 = currentLink.getOrigin();
             if (currentLink.getDestination().equals(vertex)) {
@@ -202,6 +216,7 @@ public class Linker {
     /**
      * Return a boolean that indicates if the set of links contain as origin or
      * destination the vertex given.
+     *
      * @param vertex , the vertex to check.
      * @param links , the set of links to check.
      * @return true if the vertex is in a link, else false.
@@ -219,10 +234,54 @@ public class Linker {
         return result;
     }
 
+    private static TreeSet<Link> getLinksFromSubsets(final List<Vertex> origin,
+            List<Vertex> destination) {
+        TreeSet<Link> result = new TreeSet();
+        int i = 1, j = 0;
+        while (i < origin.size() - 1) {
+            Vertex prevOrigVertex = origin.get(i - 1);
+            Vertex nextOrigVertex = origin.get(i);
+            Vertex closerVertex = null;
+            for (Vertex candidate : destination) {
+                if (closerVertex == null) {
+                    closerVertex = candidate;
+                } else if (nextOrigVertex.distanceTo(candidate)
+                        < nextOrigVertex.distanceTo(closerVertex)) {
+                    closerVertex = candidate;
+                }
+            }
+            result.add(new Link(nextOrigVertex, closerVertex));
+            j = destination.indexOf(closerVertex);
+            List<Vertex> subDestination = destination.subList(0, j);
+            int k = 0;
+            while (subDestination.size() > 0 && k < subDestination.size()) {
+                Vertex vertexDest = subDestination.get(k);
+                if (vertexDest.distanceTo(prevOrigVertex)
+                        < vertexDest.distanceTo(nextOrigVertex)) {
+                    // link to 1er et ajout ds set
+                    result.add(new Link(prevOrigVertex, vertexDest));
+                } else {
+                    // All the remaining vertex need to be linked to the other
+                    while (k < subDestination.size()) {
+                        vertexDest = subDestination.get(k);
+                        // link to 2eme et ajout ds set
+                        result.add(new Link(nextOrigVertex, vertexDest));
+                        k++;
+                    }
+                }
+                k++;
+            }
+            destination = destination.subList(j, destination.size());
+            i++;
+        }
+
+        return result;
+    }
+
     /**
      * Export the links of the set into faces.
+     *
      * @param links , the set where the links are stocked.
-     * @param idShift , the shift to apply to the destination's id in faces.
      * @return the faces created from the links.
      */
     public static List exportLinks(final Set links) {
@@ -248,5 +307,22 @@ public class Linker {
             destPrevious = destCurrent;
         }
         return newFaces;
+    }
+
+    /**
+     * Set the index of the vertex in the set of links. The index will allow the
+     * set to order the links.
+     *
+     * @param links , the set of links.
+     * @param origSequence , the sequence containing the origin of the links.
+     * @param destSequence , the sequence containing the origin of the links.
+     */
+    private static void SetIndexToLinks(Set<Link> links,
+            List<Vertex> origSequence, List<Vertex> destSequence) {
+        for (Link link : links) {
+            link.setIndexOrigin(origSequence.indexOf(link.getOrigin()));
+            link.setIndexDestination(destSequence.indexOf(
+                    link.getDestination()));
+        }
     }
 }
