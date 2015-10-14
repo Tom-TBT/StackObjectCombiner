@@ -241,6 +241,7 @@ public class Border implements Serializable {
      * lenght of the two borders, the distance between their first and last
      * vertex if the border is not circular, and it finally depend of the
      * distance between their centers.
+     *
      * @param border , the border to compare to this one.
      * @return the distance between the two borders.
      */
@@ -255,11 +256,11 @@ public class Border implements Serializable {
             result += Math.min(this.getFirstVertex().
                     distanceTo(border.getFirstVertex())
                     + this.getLastVertex()
-                            .distanceTo(border.getLastVertex()), // And
+                    .distanceTo(border.getLastVertex()), // And
                     this.getFirstVertex()
-                            .distanceTo(border.getLastVertex())
-                            + this.getLastVertex()
-                                    .distanceTo(border.getFirstVertex()));
+                    .distanceTo(border.getLastVertex())
+                    + this.getLastVertex()
+                    .distanceTo(border.getFirstVertex()));
         }
         return result;
     }
@@ -302,46 +303,60 @@ public class Border implements Serializable {
             newSequence.add(it.next());
         }
         this.vertexSequence = newSequence;
+        if (this.isCircular()) {
+            // The previous first vertex need to be put back in 1st
+            this.vertexSequence.add(this.vertexSequence.removeFirst());
+        }
     }
 
     /**
      * This method take a border as reference, and align the border on. Can then
-     * change the first vertex of the border, and the order of the sequence.
+     * change the first vertex of the border, and the order of the sequence. If
+     * the borders are circular, the first vertex of the border given is used as
+     * a reference and the first vertex of the sequence of this border is
+     * choosed as the closer vertex to the reference. If the borders are linear,
+     * it just check if this border need to be inverted.
      *
      * @param border , the border on which this border is aligned.
      */
     public final void alignOn(Border border) {
-        Vertex firstVertex1 = this.getFirstVertex();
-        final Vertex firstVertex2 = border.getFirstVertex();
-        Vertex previousVertex1, nextVertex1, nextVertex2;
+        Vertex firstVertexThis = this.getFirstVertex();
+        final Vertex firstVertexRef = border.getFirstVertex();
+        Vertex previousVertexThis, nextVertexThis, nextVertexRef;
 
-        //TODO if (this.isCircular) {
-        for (Iterator<Vertex> it = this.vertexSequence.iterator();
-                it.hasNext();) {
-            Vertex candidate = it.next();
-            if (candidate.distanceTo(firstVertex2)
-                    < firstVertex1.distanceTo(firstVertex2)) {
-                firstVertex1 = candidate;
+        if (this.isCircular() && border.isCircular()) {
+            for (Vertex candidate : this.vertexSequence) {
+                if (candidate.distanceTo(firstVertexRef)
+                        < firstVertexThis.distanceTo(firstVertexRef)) {
+                    firstVertexThis = candidate;
+                }
             }
-        }
-        if (firstVertex1 != this.getFirstVertex()) {
-            previousVertex1 = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertex1) - 1);
-        } else {
-            previousVertex1 = this.vertexSequence.getLast();
-        }
-        if (firstVertex1 != this.vertexSequence.getLast()) {
-            nextVertex1 = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertex1) + 1);
-        } else {
-            nextVertex1 = this.vertexSequence.getFirst();
-        }
-        nextVertex2 = border.getVertexSequence().get(1);
+            if (firstVertexThis != this.getFirstVertex()) {
+                previousVertexThis = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertexThis) - 1);
+            } else {
+                previousVertexThis = this.vertexSequence.getLast();
+            }
+            if (firstVertexThis != this.vertexSequence.getLast()) {
+                nextVertexThis = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertexThis) + 1);
+            } else {
+                nextVertexThis = this.vertexSequence.getFirst();
+            }
+            nextVertexRef = border.getVertexSequence().get(1);
 
-        if (nextVertex1.distanceTo(nextVertex2)
-                > previousVertex1.distanceTo(nextVertex2)) {
-            this.revertSequence();
+            if (nextVertexThis.distanceTo(nextVertexRef)
+                    > previousVertexThis.distanceTo(nextVertexRef)) {
+                this.revertSequence();
+            }
+            this.changeFirstVertex(firstVertexThis);
+        } else if (!this.isCircular() && !border.isCircular()){
+            if (this.getFirstVertex().distanceTo(border.getFirstVertex())
+                    > this.getLastVertex().distanceTo(border.getFirstVertex())) {
+                this.revertSequence();
+            }
+        } else {
+            // TODO Exception, not two borders are linear or circular.
         }
-        this.changeFirstVertex(firstVertex1);
-        //}
+
     }
 
     public final boolean isCircular() {

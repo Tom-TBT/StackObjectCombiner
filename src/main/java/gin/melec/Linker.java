@@ -80,17 +80,17 @@ public class Linker {
     public static final List createFacesBetween(Border origin,
             Border destination) {
 
-        // We always want to link first the border that has the more vertices,
-        // to the border that had the fewer vertices.
+        // We always want to link first the border that has the fewer vertices,
+        // to the border that had the more vertices.
         boolean inverted = false;
         if (origin.getVertexSequence().size()
-                < destination.getVertexSequence().size()) {
+                > destination.getVertexSequence().size()) {
             inverted = true;
             final Border tmp = origin;
             origin = destination;
             destination = tmp;
         }
-
+        // The borders are aligned.
         destination.alignOn(origin);
 
         final TreeSet<Link> links = new TreeSet();

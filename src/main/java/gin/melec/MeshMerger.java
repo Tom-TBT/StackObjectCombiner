@@ -48,6 +48,7 @@ public class MeshMerger {
         choices = getChoices(allMeshes);
         if (choices.length < 2) {
             IJ.showMessage("Their is not enough meshes to merge.\n"
+                    + choices.length + " meshes found.\n"
                     + "See the documentation for more informations.");
         } else {
             boolean notFinished = true;
@@ -69,7 +70,8 @@ public class MeshMerger {
                         contains(mesh2))
                         || (allMeshes.get(3).contains(mesh1) && allMeshes.get(3).
                         contains(mesh2))) {
-                    IJ.error("Two meshes from a same part can't be merged");
+                    IJ.error("Two meshes from a same part can't be merged\n"
+                            + "See the documentation for more informations.");
                 } else {
                     mesh1.importMesh();
                     mesh1.createBorders();
@@ -148,7 +150,7 @@ public class MeshMerger {
         return result;
     }
 
-    static private List orderCloserBorders(final List<Border> borders1,
+    private static List orderCloserBorders(final List<Border> borders1,
             final List<Border> borders2) {
         final List<List> result = new ArrayList();
         for (Border border1 : borders1) {
