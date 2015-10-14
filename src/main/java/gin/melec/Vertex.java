@@ -105,6 +105,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      * Recursive function to add every neighbor and their neighbor
      * to the garbage of the mesh the vertices belong to.
      * @param garbage , the garbage where vertices are added.
+     * @param primers, the set containing all the vertices that can be added.
      */
     public final void addNeighborToGarbage(final Set garbage, final Set primers) {
         garbage.add(this);
@@ -309,5 +310,17 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      */
     public final Set<Face> getFaces() {
         return faces;
+    }
+
+    public final Vertex findCloserIn(List<Vertex> vertexSequence) {
+        Vertex result = null;
+        for (Vertex vertex : vertexSequence) {
+            if (result == null) {
+                result = vertex;
+            } else if (this.distanceTo(vertex) < this.distanceTo(result)){
+                result = vertex;
+            }
+        }
+        return result;
     }
 }

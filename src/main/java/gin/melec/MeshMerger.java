@@ -74,13 +74,17 @@ public class MeshMerger {
                             + "See the documentation for more informations.");
                 } else {
                     mesh1.importMesh();
+                    IJ.log(mesh1.getFile().getName() + " imported");
                     mesh1.createBorders();
+                    IJ.log(mesh1.getFile().getName() + " border created");
                     if (mesh1.getBorders().isEmpty()) {
                         IJ.showMessage(mesh1.getFile().getName()
                                 + " don't cross to the border");
                     } else {
                         mesh2.importMesh();
+                        IJ.log(mesh2.getFile().getName() + " imported");
                         mesh2.createBorders();
+                        IJ.log(mesh2.getFile().getName() + " border created");
                         if (mesh2.getBorders().isEmpty()) {
                             IJ.showMessage(mesh2.getFile().getName()
                                     + " don't cross to the border");

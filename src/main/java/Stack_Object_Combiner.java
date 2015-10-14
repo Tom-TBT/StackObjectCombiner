@@ -23,14 +23,12 @@ import gin.melec.SplitDown;
 import gin.melec.SplitLeft;
 import gin.melec.SplitRight;
 import gin.melec.SplitUp;
-
 import ij.IJ;
+import ij.Prefs;
 import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
-import ij.Prefs;
 import java.io.File;
 import java.io.FilenameFilter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -174,8 +172,8 @@ public class Stack_Object_Combiner implements PlugIn {
             MeshMover.moveMeshes(ALL_MESHES);
             result = true;
         } else {
-            IJ.showMessage("On construction !");
-            //MeshMerger.work(ALL_MESHES);
+            //IJ.showMessage("On construction !");
+            MeshMerger.work(ALL_MESHES);
             result = true;
         }
         return result;

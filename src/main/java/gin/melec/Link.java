@@ -23,6 +23,8 @@ package gin.melec;
  */
 public class Link implements Comparable<Link> {
 
+    private static int INCREMENT = 0;
+
     /**
      * The vertex from where the link is initiate. In a set of links, the origin
      * always come from the same border.
@@ -38,11 +40,11 @@ public class Link implements Comparable<Link> {
     /**
      * The index of the origin in the border list.
      */
-    private final int indexOrigin;
+    private int indexOrigin;
     /**
      * The index of the destination in the border list.
      */
-    private final int indexDestination;
+    private int indexDestination;
 
     /**
      * Public constructor of a link. A link is formed with two vertex : a vertex
@@ -51,15 +53,31 @@ public class Link implements Comparable<Link> {
      * two links (interface comparable).
      * @param origin , the vertex from where the link originate.
      * @param destination , the second vertex linked.
-     * @param indexOrigin , the index of the origin in his sequence.
-     * @param indexDestination , the index of the destination in his sequence.
      */
-    public Link(final Vertex origin, final Vertex destination,
-            final int indexOrigin, final int indexDestination) {
+    public Link(final Vertex origin, final Vertex destination) {
         this.origin = origin;
         this.destination = destination;
-        this.indexOrigin = indexOrigin;
-        this.indexDestination = indexDestination;
+        this.indexOrigin = INCREMENT;
+        this.indexDestination = INCREMENT;
+        INCREMENT++;
+    }
+
+    /**
+     * Public constructor of a link. A link is formed with two vertex : a vertex
+     * from where the link originate (origin), and a second, the destination.
+     * The index are the index in their sequence, and they are used to compare
+     * two links (interface comparable).
+     * @param origin , the vertex from where the link originate.
+     * @param destination , the second vertex linked.
+     * @param indexOrig , the index of the origin in his sequence.
+     * @param indexDest , the index of the destination in his sequence.
+     */
+    public Link(final Vertex origin, final Vertex destination,
+            final int indexOrig, final int indexDest) {
+        this.origin = origin;
+        this.destination = destination;
+        this.indexOrigin = indexOrig;
+        this.indexDestination = indexDest;
     }
 
     /**
@@ -120,6 +138,14 @@ public class Link implements Comparable<Link> {
         return resultat;
     }
 
+    public void setIndexOrigin(int indexOrigin) {
+        this.indexOrigin = indexOrigin;
+    }
+
+    public void setIndexDestination(int indexDestination) {
+        this.indexDestination = indexDestination;
+    }
+
     @Override
     public final int hashCode() {
         int hash = 5;
@@ -152,4 +178,6 @@ public class Link implements Comparable<Link> {
         }
         return true;
     }
+
+
 }
