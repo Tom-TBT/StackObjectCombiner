@@ -98,7 +98,7 @@ public class Linker {
         // The borders are aligned.
         destination.alignOn(origin);
 
-        final TreeSet<Link> links = new TreeSet();
+        TreeSet<Link> links = new TreeSet();
         List<Vertex> origSequence = origin.getVertexSequence();
         List<Vertex> destSequence = destination.getVertexSequence();
         Vertex prevOrigSpot;
@@ -137,6 +137,12 @@ public class Linker {
             IJ.log(Integer.toString(j));
         }
         SetIndexToLinks(links, origSequence, destSequence);
+        Set<Link> tmpLinks = new TreeSet(links);
+        links = new TreeSet();
+        for (Link link : tmpLinks) {
+            links.add(link);
+        }
+
 
         final Set<Link> newLinks = new HashSet();
         Vertex origCurrent, origPrevious, destCurrent, destPrevious;
@@ -160,19 +166,14 @@ public class Linker {
             origPrevious = origCurrent;
             destPrevious = destCurrent;
         }
-//        if (origin.isCircular()) {  // If borders are circular, they need two
-//                                    // more faces to close them.
-//            List<Vertex> vertexToLink = findVertexLinked(this.getFirstVertex(),
-//                    this.getLastVertex(), border.getFirstVertex(),
-//                    border.getLastVertex());
-//            newLinks.add(new Link(vertexToLink.get(0),
-//                    vertexToLink.get(1),
-//                    this.getVertexSequence().indexOf(vertexToLink.get(0)),
-//                    border.getVertexSequence().indexOf(vertexToLink.get(1))));
-//        }
 
         links.addAll(newLinks);
         SetIndexToLinks(links, origSequence, destSequence);
+        tmpLinks = new TreeSet(links);
+        links = new TreeSet();
+        for (Link link : tmpLinks) {
+            links.add(link);
+        }
 
         if (inverted) {
             // If the borders were inverted, the links needs also to be inverted
@@ -181,7 +182,14 @@ public class Linker {
                         link.getIndexDestination(), link.getIndexOrigin());
             }
         }
-        return exportLinks(links);
+        List newFaces = exportLinks(links);
+        if (origin.isCircular()) {
+            newFaces.add(new Face (origin.getFirstVertex()
+                    , origin.getLastVertex(), destination.getFirstVertex()));
+            newFaces.add(new Face (origin.getLastVertex()
+                    , destination.getLastVertex(), destination.getFirstVertex()));
+        }
+        return newFaces;
     }
 
     /**
@@ -238,7 +246,7 @@ public class Linker {
             List<Vertex> destination) {
         TreeSet<Link> result = new TreeSet();
         int i = 1, j = 0;
-        while (i < origin.size() - 1) {
+        while (i < origin.size()) {
             Vertex prevOrigVertex = origin.get(i - 1);
             Vertex nextOrigVertex = origin.get(i);
             Vertex closerVertex = null;
