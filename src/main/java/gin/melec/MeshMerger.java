@@ -92,13 +92,10 @@ public class MeshMerger {
                             final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
                                     mesh2.getBorders());
                             final List<Face> newFaces = new ArrayList();
-                            final List<Face> newFaces2 = new ArrayList();
                             for (Border[] couple : couples) {
                                 newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
-                                newFaces2.addAll(Linker.createFacesBetween(couple[1], couple[0]));
                             }
-                            //exportFusion(mesh1,mesh2,newFaces);
-                            exportFusion(mesh1,mesh2,newFaces2);
+                            exportFusion(mesh1,mesh2,newFaces);
                         }
                     }
                 }
@@ -167,7 +164,7 @@ public class MeshMerger {
                     } else {
                         int i = 0;
                         final double distance = border2.distanceTo(border1);
-                        while (distance
+                        while (i < distances.size() && distance
                                 > distances.get(i).distanceTo(border1)) {
                             i++;
                         }

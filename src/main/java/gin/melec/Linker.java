@@ -110,7 +110,7 @@ public class Linker {
         int j = INCREM;
         boolean notFinished = true;
         while (notFinished) {
-            if (j > origSequence.size()) {
+            if (j >= origSequence.size()) {
                 j = origSequence.size() - 1;
                 notFinished = false;
             }
@@ -118,6 +118,8 @@ public class Linker {
             prevOrigSpot = nextOrigSpot;
             nextOrigSpot = origSequence.get(j);
             prevDestSpot = nextDestSpot;
+            // Select the next dest spot in a sublist starting from the last
+            // spot, to the end of the list
             nextDestSpot = nextOrigSpot.findCloserIn(destSequence.
                     subList(destSequence.
                             indexOf(prevDestSpot), destSequence.size()));
@@ -125,14 +127,23 @@ public class Linker {
             // add new next link
             links.add(new Link(nextOrigSpot, nextDestSpot));
 
-            List<Vertex> subListDest = new ArrayList(destSequence.
-                    subList(destSequence.indexOf(prevDestSpot) + 1,
-                            destSequence.indexOf(nextDestSpot)));
             List<Vertex> subListOrig = new ArrayList(origSequence.
                     subList(origSequence.indexOf(prevOrigSpot), j + 1));
+            List<Vertex> subListDest;
+            if (prevDestSpot.equals(nextDestSpot)) {
+                subListDest = new ArrayList();
+                subListDest.add(nextDestSpot);
 
-            // getLinks form by the two subsets
-            links.addAll(getLinksFromSubsets(subListOrig, subListDest));
+                links.addAll(getLinksFromSubsets(subListOrig, subListDest));
+            } else {
+                subListDest = new ArrayList(destSequence.
+                    subList(destSequence.indexOf(prevDestSpot) + 1,
+                            destSequence.indexOf(nextDestSpot)));
+                if (!subListDest.isEmpty()) {
+                    links.addAll(getLinksFromSubsets(subListOrig, subListDest));
+                }
+            }
+
             j += INCREM;
             IJ.log(Integer.toString(j));
         }
@@ -249,15 +260,8 @@ public class Linker {
         while (i < origin.size()) {
             Vertex prevOrigVertex = origin.get(i - 1);
             Vertex nextOrigVertex = origin.get(i);
-            Vertex closerVertex = null;
-            for (Vertex candidate : destination) {
-                if (closerVertex == null) {
-                    closerVertex = candidate;
-                } else if (nextOrigVertex.distanceTo(candidate)
-                        < nextOrigVertex.distanceTo(closerVertex)) {
-                    closerVertex = candidate;
-                }
-            }
+            Vertex closerVertex = nextOrigVertex.findCloserIn(destination);
+
             result.add(new Link(nextOrigVertex, closerVertex));
             j = destination.indexOf(closerVertex);
             List<Vertex> subDestination = destination.subList(0, j);
