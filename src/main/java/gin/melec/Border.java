@@ -175,6 +175,7 @@ public class Border implements Serializable {
     /**
      * Divide the border into sub-borders. A border can be decompose from 1 to
      * many subborders, in case of a multiple crossing of the split.
+     * @return a list of the separated borders.
      */
     public final List separateSubBorders() {
         boolean isCircular = true;
@@ -196,6 +197,9 @@ public class Border implements Serializable {
                 if (this.split.isClose(vertex)) {
                     currentSubBorder.addNextVertex(vertex);
                 } else {
+                    if (!isCircular) {
+                        //this.split.removeTails(currentSubBorder);
+                    }
                     currentSubBorder.prepare();
                     result.add(currentSubBorder);
                     currentSubBorder = null;
@@ -203,6 +207,9 @@ public class Border implements Serializable {
             }
         }
         if (currentSubBorder != null) {
+            if (!isCircular) {
+                //this.split.removeTails(currentSubBorder);
+            }
             currentSubBorder.prepare();
             result.add(currentSubBorder);
         }
@@ -348,7 +355,7 @@ public class Border implements Serializable {
                 this.revertSequence();
             }
             this.changeFirstVertex(firstVertexThis);
-        } else if (!this.isCircular() && !border.isCircular()){
+        } else if (!this.isCircular() && !border.isCircular()) {
             if (this.getFirstVertex().distanceTo(border.getFirstVertex())
                     > this.getLastVertex().distanceTo(border.getFirstVertex())) {
                 this.revertSequence();

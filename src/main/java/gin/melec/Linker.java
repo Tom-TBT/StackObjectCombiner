@@ -16,7 +16,6 @@
  */
 package gin.melec;
 
-import ij.IJ;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -145,7 +144,6 @@ public class Linker {
             }
 
             j += INCREM;
-            IJ.log(Integer.toString(j));
         }
         SetIndexToLinks(links, origSequence, destSequence);
         Set<Link> tmpLinks = new TreeSet(links);
@@ -201,56 +199,6 @@ public class Linker {
                     , destination.getLastVertex(), destination.getFirstVertex()));
         }
         return newFaces;
-    }
-
-    /**
-     * Used once links have been made from one border to an other. After this,
-     * their is still some vertex to link, but it can't be link in a way that
-     * links cross each other. So this method find the vertex that can be
-     * linked.
-     *
-     * @param vertex , the previous vertex which is already linked.
-     * @param links , the set of the links.
-     * @return a list of the vertex that are linkable.
-     */
-    private static List findCandidates(Vertex vertex, TreeSet<Link> links) {
-        final List<Vertex> candidates = new ArrayList();
-
-        final Iterator<Link> it = links.descendingIterator();
-        Link currentLink = it.next();
-        Vertex candidate1 = null, candidate2 = currentLink.getOrigin();
-        while (it.hasNext()) {
-            currentLink = it.next();
-            candidate1 = currentLink.getOrigin();
-            if (currentLink.getDestination().equals(vertex)) {
-                break;
-            }
-        }
-        candidates.add(candidate1);
-        candidates.add(candidate2);
-
-        return candidates;
-    }
-
-    /**
-     * Return a boolean that indicates if the set of links contain as origin or
-     * destination the vertex given.
-     *
-     * @param vertex , the vertex to check.
-     * @param links , the set of links to check.
-     * @return true if the vertex is in a link, else false.
-     */
-    private static boolean containVertex(final Vertex vertex,
-            final Set<Link> links) {
-        boolean result = false;
-        for (Link link : links) {
-            if (link.getOrigin().equals(vertex)
-                    || link.getDestination().equals(vertex)) {
-                result = true;
-                break;
-            }
-        }
-        return result;
     }
 
     private static TreeSet<Link> getLinksFromSubsets(final List<Vertex> origin,

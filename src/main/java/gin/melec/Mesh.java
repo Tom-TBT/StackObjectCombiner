@@ -16,8 +16,8 @@
  */
 package gin.melec;
 
+import ij.IJ;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -153,7 +153,7 @@ public class Mesh {
     private void completeGarbage() {
         final List<Vertex> vertexToCheck = new ArrayList(this.garbage);
         for (Vertex vertex : vertexToCheck) {
-            vertex.addNeighborToGarbage(this.garbage, this.primers);
+            vertex.addNeighborToGarbage(this.garbage);
         }
     }
 
@@ -197,8 +197,10 @@ public class Mesh {
         createPrimers();
         if (!this.primers.isEmpty()) {
             doPrimersNeighbours();
+            IJ.log("Primers created");
             while (!primers.isEmpty()) {
                 final Border border = new Border(this);
+                IJ.log("New border");
                 Vertex nextVertex = border.getLastVertex();
                 while (!nextVertex.equals(border.getFirstVertex())) {
                     nextVertex = this.findNextVertex(border);
@@ -206,11 +208,14 @@ public class Mesh {
                         border.addNextVertex(nextVertex);
                     }
                 }
+                IJ.log("Border ok");
                 completeGarbage();
                 primers.removeAll(this.garbage);
+                IJ.log("primers size " + primers.size());
                 this.garbage.clear();
                 this.borders.add(border);
             }
+            IJ.log("mesh done");
             final List<Border> tmpBorders = new ArrayList();
             for (Border border : this.borders) {
                 tmpBorders.addAll(border.separateSubBorders());
@@ -224,7 +229,7 @@ public class Mesh {
      */
     private void createPrimers() {
         for (AbstractSplit split : splits) {
-            primers.addAll(split.findBorderVertices(vertices));
+            primers.addAll(split.findLimitVertices(vertices));
         }
     }
 

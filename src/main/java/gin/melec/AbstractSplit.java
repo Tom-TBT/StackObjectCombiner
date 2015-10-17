@@ -17,6 +17,8 @@
 package gin.melec;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -31,7 +33,9 @@ public abstract class AbstractSplit implements Serializable {
      * The maximal distance to the split from which a vertex does no longer
      * belong to the border.
      */
-    protected static final int WINDOW = 4;
+    protected static final double WINDOW = 4;
+
+    private static final double TAIL_LIMIT = 2;
 
     /**
      * The position of the split.
@@ -53,7 +57,7 @@ public abstract class AbstractSplit implements Serializable {
      * @param vertices , the list of the vertex to filter.
      * @return the list of the vertex belonging to the border.
      */
-    public final Set findBorderVertices(final Set<Vertex> vertices) {
+    public final Set findLimitVertices(final Set<Vertex> vertices) {
         final TreeSet<Vertex> closeVertices = new TreeSet();
         for (Vertex vertex : vertices) {
             if (this.isClose(vertex)) {
@@ -120,4 +124,35 @@ public abstract class AbstractSplit implements Serializable {
      * @return true if the vertex is close, else false.
      */
     protected abstract boolean isClose(final Vertex vertex);
+
+    /**
+     * A method that remove the tails of a border. Only used on linear border.
+     * @param currentSubBorder , the border for which the tails are removed.
+     */
+    protected final void removeTails(final Border currentSubBorder) {
+        List<Vertex> sequence = currentSubBorder.getVertexSequence();
+        Set trash = new HashSet();
+        int i;
+        i = 0;
+        while (i < sequence.size()) {
+            Vertex current = sequence.get(i);
+            if (this.distanceTo(current) > TAIL_LIMIT) {
+                trash.add(current);
+            } else {
+                break;
+            }
+            i++;
+        }
+        i = sequence.size() - 1;
+        while (i >= 0) {
+            Vertex current = sequence.get(i);
+            if (this.distanceTo(current) > TAIL_LIMIT) {
+                trash.add(current);
+            } else {
+                break;
+            }
+            i--;
+        }
+        sequence.removeAll(trash);
+    }
 }
