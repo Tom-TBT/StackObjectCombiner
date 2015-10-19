@@ -79,7 +79,7 @@ public class Mesh {
 
     /**
      * Public constructor for a mesh.
-     *
+     * @param file , the file containing the mesh.
      * @param splits , the splits of the mesh.
      */
     public Mesh(final List<AbstractSplit> splits, final File file) {
@@ -164,7 +164,7 @@ public class Mesh {
      * @param border , the border for which we search the next vertex.
      * @return the next vertex to add to the border.
      */
-    private final Vertex findNextVertex(final Border border) {
+    private Vertex findNextVertex(final Border border) {
         Vertex nextVertex = border.getSecondLastVertex();
         Face currentFace = null;
         final Set<Face> facesRemaining = new HashSet();
@@ -379,5 +379,15 @@ public class Mesh {
      */
     public final boolean isMoved() {
         return moved;
+    }
+
+    /**
+     * Clear the faces and the vertices of the mesh. It is used to release
+     * memory because of the size of these arrays.
+     */
+    void clear() {
+        this.borders.clear();
+        this.faces.clear();
+        this.vertices.clear();
     }
 }

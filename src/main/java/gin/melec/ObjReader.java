@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,18 +58,21 @@ public class ObjReader {
     /**
      * Read a .obj file and make from it a mesh (vertices + faces).
      *
-     * @param path , the path of the file .obj
+     * @param file , the file of the file .obj
      * @param mesh , the mesh to load.
      * @throws IOException , when their is an error with the lecture of the file
+     * @throws java.text.ParseException if their is an error while parsing the
+     * values of the vertices.
      */
     public static void readMesh(final File file, final Mesh mesh)
-            throws IOException {
+            throws IOException, ParseException {
         final List<Vertex> tmpVertices;
 
         final InputStream ips = new FileInputStream(file.toString());
         final InputStreamReader ipsr = new InputStreamReader(ips);
         final BufferedReader buR = new BufferedReader(ipsr);
         try{
+            NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
             tmpVertices = new ArrayList();
             String currentLine;
             String[] splitedLine;
@@ -75,9 +80,15 @@ public class ObjReader {
             while ((currentLine = buR.readLine()) != null) {
                 splitedLine = currentLine.split(" ");
                 if (splitedLine[0].equals("v")) {
-                    tmpVertices.add(new Vertex(id, Float.parseFloat(splitedLine[1]),
-                            Float.parseFloat(splitedLine[2]),
-                            Float.parseFloat(splitedLine[3])));
+                    if (id == 1) {
+                        if (splitedLine[1].contains(",")) {
+                            format = NumberFormat.getInstance(Locale.FRANCE);
+                        }
+                    }
+                    tmpVertices.add(new Vertex(id,
+                            format.parse(splitedLine[1]).floatValue(),
+                            format.parse(splitedLine[2]).floatValue(),
+                            format.parse(splitedLine[3]).floatValue()));
                     id++;
                 } else if (splitedLine[0].equals("f")) {
                     mesh.getFaces().add(new Face(
@@ -95,6 +106,13 @@ public class ObjReader {
         mesh.getVertices().addAll(tmpVertices);
     }
 
+    /**
+     * Check if the mesh has already been moved by the plugin.
+     * @param file , the file of the mesh.
+     * @return true if the mesh has already been moved by the plugin.
+     * @throws FileNotFoundException if the file does not exist.
+     * @throws IOException if their is an error of lecture.
+     */
     public static boolean isMeshMoved(final File file)
             throws FileNotFoundException, IOException {
         String currentLine;

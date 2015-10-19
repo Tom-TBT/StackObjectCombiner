@@ -201,6 +201,14 @@ public class Linker {
         return newFaces;
     }
 
+    /**
+     * With the two list of vertex, create links switch the position of the
+     * vertex. The links are made in a way that the can't cross each other.
+     * At the end, each vertex is linked to at least one other vertex.
+     * @param origin , the vertex from which the links originate.
+     * @param destination , the vertex that are linked.
+     * @return a set of the links created by this method.
+     */
     private static TreeSet<Link> getLinksFromSubsets(final List<Vertex> origin,
             List<Vertex> destination) {
         TreeSet<Link> result = new TreeSet();

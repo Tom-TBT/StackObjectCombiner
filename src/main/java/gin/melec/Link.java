@@ -138,10 +138,20 @@ public class Link implements Comparable<Link> {
         return resultat;
     }
 
+    /**
+     * Setter for the attribute indexOrigin. Used because the constructor set
+     * this attribute with an increment.
+     * @param indexOrigin , the new index of the origin.
+     */
     public void setIndexOrigin(int indexOrigin) {
         this.indexOrigin = indexOrigin;
     }
 
+    /**
+     * Setter for the attribute indexDestintation. Used because the constructor
+     * set this attribute with an increment.
+     * @param indexDestination , the new index of the destination.
+     */
     public void setIndexDestination(int indexDestination) {
         this.indexDestination = indexDestination;
     }

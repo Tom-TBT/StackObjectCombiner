@@ -312,6 +312,11 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         return faces;
     }
 
+    /**
+     * Return the closer vertex from a list to this one.
+     * @param vertexSequence , the list of vertex to be compared.
+     * @return the closer vertex of this vertex.
+     */
     public final Vertex findCloserIn(List<Vertex> vertexSequence) {
         Vertex result = null;
         for (Vertex vertex : vertexSequence) {

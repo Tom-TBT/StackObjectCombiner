@@ -50,7 +50,7 @@ public class ObjWriter {
     /**
      * Replace the given mesh by the new mesh contained in the array.
      *
-     * @param path , the path of the mesh.
+     * @param file , the file of the mesh.
      * @param mesh , the mesh to write.
      * @throws IOException , thrown by the writer.
      */

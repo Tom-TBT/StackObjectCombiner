@@ -16,7 +16,6 @@
  */
 package gin.melec;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,9 +46,9 @@ public class Face implements Comparable<Face>{
      * Public constructor of a face, taking id of three vertex. Vertex are
      * ordered with their id.
      *
-     * @param id1 , first vertex of the face.
-     * @param id2 , second vertex of the face.
-     * @param id3 , third vertex of the face.
+     * @param v1 , first vertex of the face.
+     * @param v2 , second vertex of the face.
+     * @param v3 , third vertex of the face.
      */
     public Face(final Vertex v1, final Vertex v2,
             final Vertex v3) {
@@ -65,13 +64,14 @@ public class Face implements Comparable<Face>{
 
     @Override
     public final String toString() {
-        return "f" + " " + vertex1.getId() + " " + vertex2.getId() + " " + vertex3.getId();
+        return "f" + " " + vertex1.getId() + " " + vertex2.getId() + " "
+                + vertex3.getId();
     }
 
     /**
      * This method search the first neighbour of the given vertex (by it's id).
      *
-     * @param idOrigin , the id of the vertex for which we search neighbour.
+     * @param vertex , the vertex for which we search neighbour.
      * @return the id of the first neighbour.
      */
     public final Vertex getFirstNeighbour(final Vertex vertex) {
@@ -100,6 +100,13 @@ public class Face implements Comparable<Face>{
         return result;
     }
 
+    /**
+     * Return the vertex contained by this face, that is not given as a
+     * parameter.
+     * @param v1, the first vertex that is checked.
+     * @param v2, the second vertex that is checked.
+     * @return the vertex of this face that is not v1 and v2.
+     */
     Vertex getThirdVertex(Vertex v1, Vertex v2) {
         Vertex result;
         if (!this.vertex1.equals(v1) && !this.vertex1.equals(v2)) {
@@ -115,18 +122,12 @@ public class Face implements Comparable<Face>{
     /**
      * Check if the face contain or not the vertex given by it's id.
      *
-     * @param idVertex , the id of the vertex to check.
+     * @param vertex , the vertex to check.
      * @return true if the face contain the vertex, else false.
      */
     public final boolean include(final Vertex vertex) {
-        boolean result;
-        if (vertex.equals(this.vertex1) || vertex.equals(this.vertex2)
-                || vertex.equals(this.vertex3)) {
-            result = true;
-        } else {
-            result = false;
-        }
-        return result;
+        return vertex.equals(this.vertex1) || vertex.equals(this.vertex2)
+                || vertex.equals(this.vertex3);
     }
 
     @Override

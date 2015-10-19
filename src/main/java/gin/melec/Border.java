@@ -366,6 +366,11 @@ public class Border implements Serializable {
 
     }
 
+    /**
+     * Method that indicate if the border is circular or not.
+     * @return true if the border is circular, else false (and the border is
+     * linear).
+     */
     public final boolean isCircular() {
         return circular;
     }

@@ -17,10 +17,7 @@
 package gin.melec;
 
 import ij.IJ;
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -41,6 +38,11 @@ public class MeshMover {
         private static final MeshMover INSTANCE = new MeshMover();
     }
 
+    /**
+     * This method is called when the user want to move the meshes of his
+     * repertory.
+     * @param allMeshes , the meshes of the repertory.
+     */
     public static void moveMeshes(final List<List> allMeshes) {
         int nbMoved = 0;
         for (List<Mesh> meshes : allMeshes) {

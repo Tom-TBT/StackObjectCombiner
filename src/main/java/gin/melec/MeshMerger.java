@@ -42,11 +42,16 @@ public class MeshMerger {
         private static final MeshMerger INSTANCE = new MeshMerger();
     }
 
+    /**
+     * Method called when we want to merge meshes.
+     * @param allMeshes , the list of the meshes existing for this session.
+     */
     public static void work(final List<List> allMeshes) {
         Mesh mesh1, mesh2;
         String choices[];
         choices = getChoices(allMeshes);
         if (choices.length < 2) {
+            // It is impossible to merge less than two meshes.
             IJ.showMessage("Their is not enough meshes to merge.\n"
                     + choices.length + " meshes found.\n"
                     + "See the documentation for more informations.");
@@ -96,6 +101,8 @@ public class MeshMerger {
                                 newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
                             }
                             exportFusion(mesh1,mesh2,newFaces);
+                            mesh1.clear();
+                            mesh2.clear();
                         }
                     }
                 }
@@ -123,6 +130,15 @@ public class MeshMerger {
 
     }
 
+    /**
+     * Pair the borders of the two meshes switch their distances. Distances are
+     * computed with the lenght of the border and their position. Also check
+     * that the borders are the same type (linear can not be paired with a
+     * circular border).
+     * @param borders1 , the borders of the first mesh.
+     * @param borders2 , the borders of the second mesh.
+     * @return a set of paired borders.
+     */
     private static Set<Border[]> pairBorders(List<Border> borders1,
             List<Border> borders2) {
         Set result = new HashSet();
@@ -151,6 +167,13 @@ public class MeshMerger {
         return result;
     }
 
+    /**
+     * For each border1, order the borders2 in an array switch their distance
+     * to the border1.
+     * @param borders1 , the reference borders.
+     * @param borders2 , the borders ordered.
+     * @return a list containing the borders ordered by distance.
+     */
     private static List orderCloserBorders(final List<Border> borders1,
             final List<Border> borders2) {
         final List<List> result = new ArrayList();
@@ -177,6 +200,13 @@ public class MeshMerger {
         return result;
     }
 
+    /**
+     * Return a list of string containing the name of the meshes that can be
+     * merged. Only the meshes that have been moved by the plugin can appear
+     * in the list.
+     * @param allMeshes , the list containing all the meshes of the file.
+     * @return the array of string of the name of the meshes.
+     */
     private static String[] getChoices(List<List> allMeshes) {
         final List<String> choices = new ArrayList();
         for (List<Mesh> listMesh : allMeshes) {
@@ -189,6 +219,12 @@ public class MeshMerger {
         return choices.toArray(new String[0]);
     }
 
+    /**
+     * Return the mesh given by it's name.
+     * @param meshName , the name of the mesh we search.
+     * @param allMeshes , the list containing the meshes.
+     * @return the meshes with the given name.
+     */
     private static Mesh getMesh(String meshName, List<List> allMeshes) {
         Mesh result = null;
         for (List<Mesh> listMesh : allMeshes) {
