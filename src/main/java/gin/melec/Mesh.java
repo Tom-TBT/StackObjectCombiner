@@ -19,6 +19,7 @@ package gin.melec;
 import ij.IJ;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -270,7 +271,7 @@ public class Mesh {
     /**
      * Use the ObjReader to import into the mesh the vertices and the faces.
      */
-    protected final void importMesh() {
+    protected final void importMesh() throws ParseException {
         try {
             ObjReader.readMesh(this.file, this);
         } catch (IOException ex) {

@@ -18,6 +18,8 @@ package gin.melec;
 
 import ij.IJ;
 import ij.gui.GenericDialog;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -44,10 +46,10 @@ public class MeshMerger {
 
     /**
      * Method called when we want to merge meshes.
+     *
      * @param allMeshes , the list of the meshes existing for this session.
      */
-    public static void work(final List<List> allMeshes) {
-        Mesh mesh1, mesh2;
+    public static void work(final List<List> allMeshes) throws IOException {
         String choices[];
         choices = getChoices(allMeshes);
         if (choices.length < 2) {
@@ -65,8 +67,8 @@ public class MeshMerger {
                 if (gDial.wasCanceled()) {
                     return;
                 }
-                mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
-                mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
+                final Mesh mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
+                final Mesh mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
                 if ((allMeshes.get(0).contains(mesh1) && allMeshes.get(0).
                         contains(mesh2))
                         || (allMeshes.get(1).contains(mesh1) && allMeshes.get(1).
@@ -78,18 +80,47 @@ public class MeshMerger {
                     IJ.error("Two meshes from a same part can't be merged\n"
                             + "See the documentation for more informations.");
                 } else {
-                    mesh1.importMesh();
-                    IJ.log(mesh1.getFile().getName() + " imported");
-                    mesh1.createBorders();
-                    IJ.log(mesh1.getFile().getName() + " border created");
+                    Thread thread1 = new Thread() {
+                        {
+                            setPriority(Thread.NORM_PRIORITY);
+                        }
+
+                        @Override
+                        public void run() {
+                            mesh1.importMesh();
+                            IJ.log(mesh1.getFile().getName() + " imported");
+                            mesh1.createBorders();
+                            IJ.log(mesh1.getFile().getName() + " border created");
+                        }
+                    };
+                    Thread thread2 = new Thread() {
+                        {
+                            setPriority(Thread.NORM_PRIORITY);
+                        }
+
+                        @Override
+                        public void run() {
+                            mesh2.importMesh();
+                            IJ.log(mesh2.getFile().getName() + " imported");
+                            mesh2.createBorders();
+                            IJ.log(mesh2.getFile().getName() + " border created");
+                        }
+                    };
+                    thread1.start();
+                    thread2.start();
+
+                    try {
+                        thread1.join();
+                        thread2.join();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+
                     if (mesh1.getBorders().isEmpty()) {
                         IJ.showMessage(mesh1.getFile().getName()
                                 + " don't cross to the border");
                     } else {
-                        mesh2.importMesh();
-                        IJ.log(mesh2.getFile().getName() + " imported");
-                        mesh2.createBorders();
-                        IJ.log(mesh2.getFile().getName() + " border created");
+
                         if (mesh2.getBorders().isEmpty()) {
                             IJ.showMessage(mesh2.getFile().getName()
                                     + " don't cross to the border");
@@ -100,7 +131,7 @@ public class MeshMerger {
                             for (Border[] couple : couples) {
                                 newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
                             }
-                            exportFusion(mesh1,mesh2,newFaces);
+                            exportFusion(mesh1, mesh2, newFaces);
                             mesh1.clear();
                             mesh2.clear();
                         }
@@ -110,23 +141,36 @@ public class MeshMerger {
         }
     }
 
-    private static void exportFusion(Mesh mesh1, Mesh mesh2, List<Face> newFaces) {
+    private static void exportFusion(Mesh mesh1, Mesh mesh2, List<Face> newFaces) throws IOException {
+        final GenericDialog gDial = new GenericDialog("Enter the name of the "
+                + "new mesh");
+        gDial.addStringField("Name", mesh1.getFile().getName(), 30);
+        gDial.hideCancelButton();
+        gDial.showDialog();
+        String newName = gDial.getNextString();
+        System.out.println(mesh1.getFile().getParent());
+
+        List<Vertex> verticesToWrite = new ArrayList();
+        List<Face> facesToWrite = new ArrayList();
+
         for (Vertex vertex : mesh1.getVertices()) {
-            System.out.println(vertex);
+            verticesToWrite.add(vertex);
         }
         for (Vertex vertex : mesh2.getVertices()) {
             vertex.incrementId(mesh1.getVertices().size());
-            System.out.println(vertex);
+            verticesToWrite.add(vertex);
         }
         for (Face face : mesh1.getFaces()) {
-            System.out.println(face);
+            facesToWrite.add(face);
         }
         for (Face face : mesh2.getFaces()) {
-            System.out.println(face);
+            facesToWrite.add(face);
         }
         for (Face face : newFaces) {
-            System.out.println(face);
+            facesToWrite.add(face);
         }
+        ObjWriter.writeResult(verticesToWrite, facesToWrite
+                , newName, new File(mesh1.getFile().getParent()));
 
     }
 
@@ -135,6 +179,7 @@ public class MeshMerger {
      * computed with the lenght of the border and their position. Also check
      * that the borders are the same type (linear can not be paired with a
      * circular border).
+     *
      * @param borders1 , the borders of the first mesh.
      * @param borders2 , the borders of the second mesh.
      * @return a set of paired borders.
@@ -168,8 +213,9 @@ public class MeshMerger {
     }
 
     /**
-     * For each border1, order the borders2 in an array switch their distance
-     * to the border1.
+     * For each border1, order the borders2 in an array switch their distance to
+     * the border1.
+     *
      * @param borders1 , the reference borders.
      * @param borders2 , the borders ordered.
      * @return a list containing the borders ordered by distance.
@@ -202,8 +248,9 @@ public class MeshMerger {
 
     /**
      * Return a list of string containing the name of the meshes that can be
-     * merged. Only the meshes that have been moved by the plugin can appear
-     * in the list.
+     * merged. Only the meshes that have been moved by the plugin can appear in
+     * the list.
+     *
      * @param allMeshes , the list containing all the meshes of the file.
      * @return the array of string of the name of the meshes.
      */
@@ -221,6 +268,7 @@ public class MeshMerger {
 
     /**
      * Return the mesh given by it's name.
+     *
      * @param meshName , the name of the mesh we search.
      * @param allMeshes , the list containing the meshes.
      * @return the meshes with the given name.

@@ -29,8 +29,11 @@ import ij.gui.GenericDialog;
 import ij.plugin.PlugIn;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Tom Boissonnet
@@ -91,7 +94,11 @@ public class Stack_Object_Combiner implements PlugIn {
             getMeshes(workingDirectory, objFilters);
             boolean notCanceled = true;
             while (notCanceled) {
-                notCanceled = proposeAction();
+                try {
+                    notCanceled = proposeAction();
+                } catch (IOException ex) {
+                    Logger.getLogger(Stack_Object_Combiner.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
 
@@ -160,7 +167,7 @@ public class Stack_Object_Combiner implements PlugIn {
      * @return true if the user choosed an action, else return false because the
      * user choosed to canceled the plugin.
      */
-    private boolean proposeAction() {
+    private boolean proposeAction() throws IOException {
         boolean result;
         final GenericDialog gDial = new GenericDialog("Stack Object Combiner");
         gDial.addMessage("Choose the action to perform");
@@ -188,7 +195,6 @@ public class Stack_Object_Combiner implements PlugIn {
      */
     private boolean getSplits(final File workingDirectory,
             final FilenameFilter[] objFilters) {
-        Prefs.set("my.persistent.name", "Grizzly Adams");
         long verticalSplit = Math.round(Prefs.get("SOC.verticalSplit", 0));
         long horizontalSplit = Math.round(Prefs.get("SOC.horizontalSplit", 0));
         boolean result = true;

@@ -63,11 +63,11 @@ public class ObjWriter {
             if (mesh.isMoved()) {
                 prW.write("#movedBySOC\n");
             }
-            for (Object element : mesh.getVertices()) {
-                prW.write(element.toString() + "\n");
+            for (Vertex vertex : mesh.getVertices()) {
+                prW.write(vertex.toString() + "\n");
             }
-            for (Object element : mesh.getFaces()) {
-                prW.write(element.toString() + "\n");
+            for (Face face : mesh.getFaces()) {
+                prW.write(face.toString() + "\n");
             }
         } finally {
             prW.close();
@@ -91,5 +91,30 @@ public class ObjWriter {
             oos.close();
         }
 
+    }
+
+
+    static void writeResult(final List<Vertex> vertices, final List<Face> faces,
+            final String newName, final File parentDirectory) throws IOException {
+        final File resultDirectory = new File (parentDirectory, "results");
+        if (!resultDirectory.exists()) {
+            resultDirectory.mkdir();
+        }
+        final File newMesh = new File(resultDirectory, newName);
+
+        final FileWriter fiW = new FileWriter(newMesh.toString());
+        final BufferedWriter bfW = new BufferedWriter(fiW);
+        final PrintWriter prW = new PrintWriter(bfW);
+        try {
+            prW.write("#movedBySOC\n");
+            for (Vertex vertex : vertices) {
+                prW.write(vertex.toString() + "\n");
+            }
+            for (Face face : faces) {
+                prW.write(face.toString() + "\n");
+            }
+        } finally {
+            prW.close();
+        }
     }
 }
