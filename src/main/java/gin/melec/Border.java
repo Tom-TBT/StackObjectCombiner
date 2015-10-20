@@ -221,7 +221,7 @@ public class Border implements Serializable {
      * the lenght, or the position of the center of the border. These parameters
      * are used for automatic matching of the borders.
      */
-    private final void prepare() {
+    private void prepare() {
         cumulLenght = 0;
         float x = 0, y = 0, z = 0;
         for (int i = 0; i < vertexSequence.size() - 1; i++) {
@@ -277,7 +277,7 @@ public class Border implements Serializable {
      * borders to join need to be aligned (in term of vertex sequence). Used
      * only on circular borders.
      */
-    private final void changeFirstVertex(final Vertex vertex) {
+    private void changeFirstVertex(final Vertex vertex) {
         final LinkedList endSequence = new LinkedList<Vertex>();
         final LinkedList newStartSequence = new LinkedList<Vertex>();
 

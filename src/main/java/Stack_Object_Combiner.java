@@ -30,10 +30,9 @@ import ij.plugin.PlugIn;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Tom Boissonnet
@@ -91,17 +90,20 @@ public class Stack_Object_Combiner implements PlugIn {
         final File workingDirectory = new File(IJ.getDirectory("Give the folder"
                 + " containing the .obj files"));
         if (getSplits(workingDirectory, objFilters)) {
-            getMeshes(workingDirectory, objFilters);
-            boolean notCanceled = true;
-            while (notCanceled) {
-                try {
+            try {
+                getMeshes(workingDirectory, objFilters);
+                boolean notCanceled = true;
+                while (notCanceled) {
                     notCanceled = proposeAction();
-                } catch (IOException ex) {
-                    Logger.getLogger(Stack_Object_Combiner.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            } catch (InterruptedException ex) {
+                IJ.handleException(ex);
+            } catch (ParseException ex) {
+                IJ.handleException(ex);
             }
         }
-
     }
 
     /**
@@ -113,48 +115,35 @@ public class Stack_Object_Combiner implements PlugIn {
     private FilenameFilter[] getFilters() {
         FilenameFilter[] result = new FilenameFilter[4];
         result[0] = new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
-                if (lowercaseName.endsWith(".obj")
-                        && name.startsWith("A_")) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return lowercaseName.endsWith(".obj")
+                        && name.startsWith("A_");
             }
         };
         result[1] = new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
-                if (lowercaseName.endsWith(".obj")
-                        && name.startsWith("B_")) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return lowercaseName.endsWith(".obj")
+                        && name.startsWith("B_");
             }
         };
         result[2] = new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
-                if (lowercaseName.endsWith(".obj")
-                        && name.startsWith("C_")) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return lowercaseName.endsWith(".obj")
+                        && name.startsWith("C_");
             }
         };
         result[3] = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
-                if (lowercaseName.endsWith(".obj")
-                        && name.startsWith("D_")) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return lowercaseName.endsWith(".obj")
+                        && name.startsWith("D_");
             }
         };
         return result;
@@ -167,7 +156,8 @@ public class Stack_Object_Combiner implements PlugIn {
      * @return true if the user choosed an action, else return false because the
      * user choosed to canceled the plugin.
      */
-    private boolean proposeAction() throws IOException {
+    private boolean proposeAction() throws IOException,
+            ParseException, InterruptedException {
         boolean result;
         final GenericDialog gDial = new GenericDialog("Stack Object Combiner");
         gDial.addMessage("Choose the action to perform");
@@ -271,46 +261,46 @@ public class Stack_Object_Combiner implements PlugIn {
      * @param objFilters , the filters for our files.
      */
     private void getMeshes(final File workingDirectory,
-            final FilenameFilter[] objFilters) {
+            final FilenameFilter[] objFilters) throws IOException {
         File[] listing;
-            listing = workingDirectory.listFiles(objFilters[0]); // Filter A_
-            for (File file : listing) {
-                if (file.isFile()) {
-                    final Mesh mesh = new Mesh(A_SPLITS, file);
-                    A_MESHES.add(mesh);
-                }
-
+        listing = workingDirectory.listFiles(objFilters[0]); // Filter A_
+        for (File file : listing) {
+            if (file.isFile()) {
+                final Mesh mesh = new Mesh(A_SPLITS, file);
+                A_MESHES.add(mesh);
             }
-            ALL_MESHES.add(A_MESHES);
 
-            listing = workingDirectory.listFiles(objFilters[1]); // Filter B_
-            for (File file : listing) {
-                if (file.isFile()) {
-                    final Mesh mesh = new Mesh(B_SPLITS, file);
-                    B_MESHES.add(mesh);
-                }
+        }
+        ALL_MESHES.add(A_MESHES);
 
+        listing = workingDirectory.listFiles(objFilters[1]); // Filter B_
+        for (File file : listing) {
+            if (file.isFile()) {
+                final Mesh mesh = new Mesh(B_SPLITS, file);
+                B_MESHES.add(mesh);
             }
-            ALL_MESHES.add(B_MESHES);
 
-            listing = workingDirectory.listFiles(objFilters[2]); // Filter C_
-            for (File file : listing) {
-                if (file.isFile()) {
-                    final Mesh mesh = new Mesh(C_SPLITS, file);
-                    C_MESHES.add(mesh);
-                }
+        }
+        ALL_MESHES.add(B_MESHES);
 
+        listing = workingDirectory.listFiles(objFilters[2]); // Filter C_
+        for (File file : listing) {
+            if (file.isFile()) {
+                final Mesh mesh = new Mesh(C_SPLITS, file);
+                C_MESHES.add(mesh);
             }
-            ALL_MESHES.add(C_MESHES);
 
-            listing = workingDirectory.listFiles(objFilters[3]); // Filter D_
-            for (File file : listing) {
-                if (file.isFile()) {
-                    final Mesh mesh = new Mesh(D_SPLITS, file);
-                    D_MESHES.add(mesh);
-                }
+        }
+        ALL_MESHES.add(C_MESHES);
+
+        listing = workingDirectory.listFiles(objFilters[3]); // Filter D_
+        for (File file : listing) {
+            if (file.isFile()) {
+                final Mesh mesh = new Mesh(D_SPLITS, file);
+                D_MESHES.add(mesh);
             }
-            ALL_MESHES.add(D_MESHES);
+        }
+        ALL_MESHES.add(D_MESHES);
     }
 
     /**

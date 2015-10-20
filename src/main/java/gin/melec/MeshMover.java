@@ -17,6 +17,8 @@
 package gin.melec;
 
 import ij.IJ;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -42,8 +44,11 @@ public class MeshMover {
      * This method is called when the user want to move the meshes of his
      * repertory.
      * @param allMeshes , the meshes of the repertory.
+     * @throws java.text.ParseException
+     * @throws java.io.IOException
      */
-    public static void moveMeshes(final List<List> allMeshes) {
+    public static void moveMeshes(final List<List> allMeshes)
+            throws ParseException, IOException {
         int nbMoved = 0;
         for (List<Mesh> meshes : allMeshes) {
             for (Mesh mesh : meshes) {

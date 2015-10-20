@@ -20,6 +20,7 @@ import ij.IJ;
 import ij.gui.GenericDialog;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -48,8 +49,12 @@ public class MeshMerger {
      * Method called when we want to merge meshes.
      *
      * @param allMeshes , the list of the meshes existing for this session.
+     * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
+     * @throws java.text.ParseException
      */
-    public static void work(final List<List> allMeshes) throws IOException {
+    public static void work(final List<List> allMeshes) throws ParseException,
+            IOException, InterruptedException {
         String choices[];
         choices = getChoices(allMeshes);
         if (choices.length < 2) {
@@ -80,6 +85,10 @@ public class MeshMerger {
                     IJ.error("Two meshes from a same part can't be merged\n"
                             + "See the documentation for more informations.");
                 } else {
+                    mesh1.importMesh();
+                    IJ.log(mesh1.getFile().getName() + " imported");
+                    mesh2.importMesh();
+                    IJ.log(mesh2.getFile().getName() + " imported");
                     Thread thread1 = new Thread() {
                         {
                             setPriority(Thread.NORM_PRIORITY);
@@ -87,10 +96,8 @@ public class MeshMerger {
 
                         @Override
                         public void run() {
-                            mesh1.importMesh();
-                            IJ.log(mesh1.getFile().getName() + " imported");
+                            IJ.log("Working on " + mesh1.getFile().getName());
                             mesh1.createBorders();
-                            IJ.log(mesh1.getFile().getName() + " border created");
                         }
                     };
                     Thread thread2 = new Thread() {
@@ -100,21 +107,14 @@ public class MeshMerger {
 
                         @Override
                         public void run() {
-                            mesh2.importMesh();
-                            IJ.log(mesh2.getFile().getName() + " imported");
+                            IJ.log("Working on " + mesh2.getFile().getName());
                             mesh2.createBorders();
-                            IJ.log(mesh2.getFile().getName() + " border created");
                         }
                     };
                     thread1.start();
                     thread2.start();
-
-                    try {
-                        thread1.join();
-                        thread2.join();
-                    } catch (InterruptedException ie) {
-                        throw new RuntimeException(ie);
-                    }
+                    thread1.join();
+                    thread2.join();
 
                     if (mesh1.getBorders().isEmpty()) {
                         IJ.showMessage(mesh1.getFile().getName()
@@ -128,10 +128,13 @@ public class MeshMerger {
                             final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
                                     mesh2.getBorders());
                             final List<Face> newFaces = new ArrayList();
+                            IJ.log("Computing the new faces");
                             for (Border[] couple : couples) {
                                 newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
                             }
+                            IJ.log("Saving the new object");
                             exportFusion(mesh1, mesh2, newFaces);
+                            IJ.log("Done");
                             mesh1.clear();
                             mesh2.clear();
                         }
@@ -148,8 +151,6 @@ public class MeshMerger {
         gDial.hideCancelButton();
         gDial.showDialog();
         String newName = gDial.getNextString();
-        System.out.println(mesh1.getFile().getParent());
-
         List<Vertex> verticesToWrite = new ArrayList();
         List<Face> facesToWrite = new ArrayList();
 
@@ -169,8 +170,7 @@ public class MeshMerger {
         for (Face face : newFaces) {
             facesToWrite.add(face);
         }
-        ObjWriter.writeResult(verticesToWrite, facesToWrite
-                , newName, new File(mesh1.getFile().getParent()));
+        ObjWriter.writeResult(verticesToWrite, facesToWrite, newName, new File(mesh1.getFile().getParent()));
 
     }
 

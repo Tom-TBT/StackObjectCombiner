@@ -25,8 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -80,10 +78,13 @@ public class Mesh {
 
     /**
      * Public constructor for a mesh.
+     *
      * @param file , the file containing the mesh.
      * @param splits , the splits of the mesh.
+     * @throws java.io.IOException
      */
-    public Mesh(final List<AbstractSplit> splits, final File file) {
+    public Mesh(final List<AbstractSplit> splits, final File file)
+            throws IOException {
         this.file = file;
         this.faces = new TreeSet();
         this.vertices = new TreeSet();
@@ -92,12 +93,7 @@ public class Mesh {
         this.splits = splits;
         this.primers = new TreeSet();
 
-        try {
-            moved = ObjReader.isMeshMoved(this.file);
-        } catch (IOException ex) {
-            Logger.getLogger(Mesh.class.getName())
-                    .log(Level.SEVERE, null, ex);
-        }
+        this.moved = ObjReader.isMeshMoved(this.file);
     }
 
     /**
@@ -198,10 +194,9 @@ public class Mesh {
         createPrimers();
         if (!this.primers.isEmpty()) {
             doPrimersNeighbours();
-            IJ.log("Primers created");
             while (!primers.isEmpty()) {
                 final Border border = new Border(this);
-                IJ.log("New border");
+                IJ.log("New border for " + this.file.getName());
                 Vertex nextVertex = border.getLastVertex();
                 while (!nextVertex.equals(border.getFirstVertex())) {
                     nextVertex = this.findNextVertex(border);
@@ -209,14 +204,13 @@ public class Mesh {
                         border.addNextVertex(nextVertex);
                     }
                 }
-                IJ.log("Border ok");
                 completeGarbage();
                 primers.removeAll(this.garbage);
-                IJ.log("primers size " + primers.size());
                 this.garbage.clear();
                 this.borders.add(border);
             }
-            IJ.log("mesh done");
+            IJ.log(this.borders.size() + " borders detected for "
+                    + this.file.getName());
             final List<Border> tmpBorders = new ArrayList();
             for (Border border : this.borders) {
                 tmpBorders.addAll(border.separateSubBorders());
@@ -259,50 +253,38 @@ public class Mesh {
     /**
      * Use the ObjWriter to write the vertices and the faces in the file of the
      * mesh.
+     * @throws java.io.IOException
      */
-    protected final void exportMesh() {
-        try {
-            ObjWriter.writeMesh(this.file, this);
-        } catch (IOException ex) {
-            Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    protected final void exportMesh() throws IOException {
+        ObjWriter.writeMesh(this.file, this);
     }
 
     /**
      * Use the ObjReader to import into the mesh the vertices and the faces.
+     *
+     * @throws java.text.ParseException
+     * @throws java.io.IOException
      */
-    protected final void importMesh() throws ParseException {
-        try {
-            ObjReader.readMesh(this.file, this);
-        } catch (IOException ex) {
-            Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    protected final void importMesh() throws ParseException, IOException {
+        ObjReader.readMesh(this.file, this);
     }
 
     /**
      * This method is used to export in a file the borders of this mesh.
      *
-     * @param filePath , the filename to use.
+     * @throws java.io.IOException
      */
-    protected final void exportBorders() {
-        try {
-            ObjWriter.serializeBorders(this.file, borders);
-        } catch (IOException ex) {
-            Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    protected final void exportBorders() throws IOException {
+        ObjWriter.serializeBorders(this.file, borders);
     }
 
     /**
      * Import the borders from a given file.
      *
-     * @param filePath ,the path of the file in which the borders are contained.
+     * @throws java.io.IOException
      */
-    protected final void importBorders() {
-        try {
-            this.borders = ObjReader.deserializeBorders(this.file);
-        } catch (IOException ex) {
-            Logger.getLogger(Mesh.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    protected final void importBorders() throws IOException {
+        this.borders = ObjReader.deserializeBorders(this.file);
     }
 
     @Override

@@ -212,7 +212,7 @@ public class Linker {
     private static TreeSet<Link> getLinksFromSubsets(final List<Vertex> origin,
             List<Vertex> destination) {
         TreeSet<Link> result = new TreeSet();
-        int i = 1, j = 0;
+        int i = 1, j;
         while (i < origin.size()) {
             Vertex prevOrigVertex = origin.get(i - 1);
             Vertex nextOrigVertex = origin.get(i);

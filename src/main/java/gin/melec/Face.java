@@ -85,10 +85,10 @@ public class Face implements Comparable<Face>{
     }
 
     /**
-     * This method search the second neighbour of the given vertex (by it's id).
+     * This method search the second neighbour of the given vertex.
      *
-     * @param idOrigin , the id of the vertex for which we search neighbour.
-     * @return the id of the second neighbour.
+     * @param vertex , the vertex for which we search neighbour.
+     * @return the second neighbour.
      */
     public final Vertex getSecondNeighbour(final Vertex vertex) {
         Vertex result;
@@ -169,10 +169,7 @@ public class Face implements Comparable<Face>{
         if (!this.vertex2.equals(other.vertex2)) {
             return false;
         }
-        if (!this.vertex3.equals(other.vertex3)) {
-            return false;
-        }
-        return true;
+        return this.vertex3.equals(other.vertex3);
     }
 
     /**

@@ -182,11 +182,8 @@ public class Link implements Comparable<Link> {
                 || this.destination != other.origin)) {
             return false;
         }
-        if (this.destination != other.destination
-                && this.destination != other.origin) {
-            return false;
-        }
-        return true;
+        return !(this.destination != other.destination
+                && this.destination != other.origin);
     }
 
 
