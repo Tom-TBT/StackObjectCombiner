@@ -96,11 +96,8 @@ public class ObjWriter {
 
     static void writeResult(final List<Vertex> vertices, final List<Face> faces,
             final String newName, final File parentDirectory) throws IOException {
-        final File resultDirectory = new File (parentDirectory, "results");
-        if (!resultDirectory.exists()) {
-            resultDirectory.mkdir();
-        }
-        final File newMesh = new File(resultDirectory, newName);
+
+        final File newMesh = new File(parentDirectory, newName);
 
         final FileWriter fiW = new FileWriter(newMesh.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);

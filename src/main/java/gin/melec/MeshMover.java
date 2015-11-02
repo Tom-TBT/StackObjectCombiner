@@ -44,23 +44,54 @@ public class MeshMover {
      * This method is called when the user want to move the meshes of his
      * repertory.
      * @param allMeshes , the meshes of the repertory.
+     * @param allSplits , the splits.
      * @throws java.text.ParseException
      * @throws java.io.IOException
      */
-    public static void moveMeshes(final List<List> allMeshes)
+    public static void moveMeshes(final List<List> allMeshes,
+            final List<AbstractSplit> allSplits)
             throws ParseException, IOException {
         int nbMoved = 0;
-        for (List<Mesh> meshes : allMeshes) {
-            for (Mesh mesh : meshes) {
-                    if (!mesh.isMoved()) {
-                        mesh.importMesh();
-                        if (!mesh.isMoved()) {
-                            mesh.shift();
-                            mesh.exportMesh();
-                            nbMoved++;
-                        }
-                    }
+        for (Object obj : allMeshes.get(0)) {
+            Mesh mesh = (Mesh) obj;
+            mesh.importMesh();
+            if (!mesh.isMoved()) {
+                mesh.shift(null);
+                mesh.exportMesh();
+                nbMoved++;
             }
+            mesh.clear();
+        }
+        for (Object obj : allMeshes.get(1)) {
+            Mesh mesh = (Mesh) obj;
+            mesh.importMesh();
+            if (!mesh.isMoved()) {
+                mesh.shift(allSplits.get(1));
+                mesh.exportMesh();
+                nbMoved++;
+            }
+            mesh.clear();
+        }
+        for (Object obj : allMeshes.get(2)) {
+            Mesh mesh = (Mesh) obj;
+            mesh.importMesh();
+            if (!mesh.isMoved()) {
+                mesh.shift(allSplits.get(3));
+                mesh.exportMesh();
+                nbMoved++;
+            }
+            mesh.clear();
+        }
+        for (Object obj : allMeshes.get(3)) {
+            Mesh mesh = (Mesh) obj;
+            mesh.importMesh();
+            if (!mesh.isMoved()) {
+                mesh.shift(allSplits.get(1));
+                mesh.shift(allSplits.get(3));
+                mesh.exportMesh();
+                nbMoved++;
+            }
+            mesh.clear();
         }
         IJ.showMessage(nbMoved + " meshes have been moved.");
     }

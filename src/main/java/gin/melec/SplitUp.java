@@ -23,14 +23,6 @@ package gin.melec;
  */
 public class SplitUp extends AbstractSplit {
 
-    /**
-     * Public constructor for a split with a position.
-     * @param position , the position of the border.
-     */
-    public SplitUp(final long position) {
-        super(position);
-    }
-
     @Override
     protected float distanceTo(final Vertex vertex) {
         return Math.abs(this.position - vertex.getY());

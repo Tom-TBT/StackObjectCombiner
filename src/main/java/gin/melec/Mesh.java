@@ -61,12 +61,6 @@ public class Mesh {
     private TreeSet<Vertex> primers;
 
     /**
-     * Switch the position of the mesh and switch the type of scene, meshes can
-     * have up to 4 different splits.
-     */
-    private List<AbstractSplit> splits;
-
-    /**
      * The path to this mesh's file.
      */
     private File file;
@@ -83,14 +77,13 @@ public class Mesh {
      * @param splits , the splits of the mesh.
      * @throws java.io.IOException
      */
-    public Mesh(final List<AbstractSplit> splits, final File file)
+    public Mesh(final File file)
             throws IOException {
         this.file = file;
         this.faces = new TreeSet();
         this.vertices = new TreeSet();
         this.garbage = new HashSet();
         this.borders = new ArrayList();
-        this.splits = splits;
         this.primers = new TreeSet();
 
         this.moved = ObjReader.isMeshMoved(this.file);
@@ -150,7 +143,7 @@ public class Mesh {
     private void completeGarbage() {
         final List<Vertex> vertexToCheck = new ArrayList(this.garbage);
         for (Vertex vertex : vertexToCheck) {
-            vertex.addNeighborToGarbage(this.garbage);
+            vertex.addNeighborToGarbage(this.garbage, this.primers);
         }
     }
 
@@ -179,6 +172,7 @@ public class Mesh {
                     nextVertex);
         }
         this.setNeighbourhoodToVertex(nextVertex);
+        this.garbage.add(nextVertex);
         return nextVertex;
     }
 
@@ -189,13 +183,18 @@ public class Mesh {
      * border has been detected, the vertex already detected are removed to the
      * primers. The iteration of the detection of the borders stop once the
      * primers set is empty.
+     *
+     * @param split , the split for which we create the borders.
      */
-    protected final void createBorders() {
-        createPrimers();
+    protected final void createBorders(final AbstractSplit split) {
+        createPrimers(split);
         if (!this.primers.isEmpty()) {
             doPrimersNeighbours();
             while (!primers.isEmpty()) {
-                final Border border = new Border(this);
+                final Border border = new Border(this, split);
+                if (border.getFirstVertex() == null) {
+                    break;
+                }
                 IJ.log("New border for " + this.file.getName());
                 Vertex nextVertex = border.getLastVertex();
                 while (!nextVertex.equals(border.getFirstVertex())) {
@@ -221,29 +220,32 @@ public class Mesh {
 
     /**
      * Add the vertex that can initiate a border to the primers set.
+     *
+     * @param split , the split used for the primers.
      */
-    private void createPrimers() {
-        for (AbstractSplit split : splits) {
-            primers.addAll(split.findLimitVertices(vertices));
-        }
+    private void createPrimers(final AbstractSplit split) {
+        primers.addAll(split.findLimitVertices(vertices));
     }
 
     /**
      * This method shift the mesh, depending of its own splits.
+     * @param split , the split that give the shift to apply.
      */
-    protected final void shift() {
+    protected final void shift(final AbstractSplit split) {
         long deltaX = 0, deltaY = 0;
-        for (AbstractSplit split : splits) {
-            if (SplitLeft.class.isInstance(split)) {
-                deltaX = split.xPosition();
-            }
-            if (SplitUp.class.isInstance(split)) {
-                deltaY = split.yPosition();
-            }
+        if (SplitLeft.class.isInstance(split)) {
+            deltaX = split.xPosition();
         }
-        if (deltaX > 0 || deltaY > 0) {
+        if (SplitUp.class.isInstance(split)) {
+            deltaY = split.yPosition();
+        }
+        if (deltaX > 0) {
             for (Vertex vertex : this.vertices) {
                 vertex.setX(vertex.getX() + deltaX);
+            }
+        }
+        if (deltaY > 0) {
+            for (Vertex vertex : this.vertices) {
                 vertex.setY(vertex.getY() + deltaY);
             }
         }
@@ -253,6 +255,7 @@ public class Mesh {
     /**
      * Use the ObjWriter to write the vertices and the faces in the file of the
      * mesh.
+     *
      * @throws java.io.IOException
      */
     protected final void exportMesh() throws IOException {
@@ -335,15 +338,6 @@ public class Mesh {
      */
     public final TreeSet<Vertex> getPrimers() {
         return primers;
-    }
-
-    /**
-     * Getter of the attribute splits.
-     *
-     * @return the splits of the mesh.
-     */
-    public final List<AbstractSplit> getSplits() {
-        return splits;
     }
 
     /**

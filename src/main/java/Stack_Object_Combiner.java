@@ -43,19 +43,23 @@ public class Stack_Object_Combiner implements PlugIn {
     /**
      * List of splits in the A_ part.
      */
-    private static final List<AbstractSplit> A_SPLITS = new ArrayList();
+    private static final AbstractSplit RIGHT_SPLIT = new SplitRight();
     /**
      * List of splits in the B_ part.
      */
-    private static final List<AbstractSplit> B_SPLITS = new ArrayList();
+    private static final AbstractSplit LEFT_SPLIT = new SplitLeft();
     /**
      * List of splits in the C_ part.
      */
-    private static final List<AbstractSplit> C_SPLITS = new ArrayList();
+    private static final AbstractSplit UP_SPLIT = new SplitUp();
     /**
      * List of splits in the D_ part.
      */
-    private static final List<AbstractSplit> D_SPLITS = new ArrayList();
+    private static final AbstractSplit DOWN_SPLIT = new SplitDown();
+    /**
+     * List of all splits (A part + B part + C part + D part).
+     */
+    private static final List<AbstractSplit> ALL_SPLITS = new ArrayList();
 
     /**
      * List of meshes in the A_ part.
@@ -91,10 +95,11 @@ public class Stack_Object_Combiner implements PlugIn {
                 + " containing the .obj files"));
         if (getSplits(workingDirectory, objFilters)) {
             try {
-                getMeshes(workingDirectory, objFilters);
                 boolean notCanceled = true;
                 while (notCanceled) {
+                    getMeshes(workingDirectory, objFilters);
                     notCanceled = proposeAction();
+                    clearMeshes();
                 }
             } catch (IOException ex) {
                 IJ.handleException(ex);
@@ -102,6 +107,8 @@ public class Stack_Object_Combiner implements PlugIn {
                 IJ.handleException(ex);
             } catch (ParseException ex) {
                 IJ.handleException(ex);
+            } finally {
+                clearMeshes();
             }
         }
     }
@@ -166,11 +173,11 @@ public class Stack_Object_Combiner implements PlugIn {
         if (gDial.wasCanceled()) {
             result = false;
         } else if (gDial.wasOKed()) {
-            MeshMover.moveMeshes(ALL_MESHES);
+            MeshMover.moveMeshes(ALL_MESHES, ALL_SPLITS);
             result = true;
         } else {
             //IJ.showMessage("On construction !");
-            MeshMerger.work(ALL_MESHES);
+            MeshMerger.work(ALL_MESHES, ALL_SPLITS);
             result = true;
         }
         return result;
@@ -236,20 +243,20 @@ public class Stack_Object_Combiner implements PlugIn {
             if (verticalExist) {
                 verticalSplit = (int) gDial.getNextNumber();
                 Prefs.set("SOC.verticalSplit", verticalSplit);
-                A_SPLITS.add(new SplitRight(verticalSplit));
-                B_SPLITS.add(new SplitLeft(verticalSplit));
-                C_SPLITS.add(new SplitRight(verticalSplit));
-                D_SPLITS.add(new SplitLeft(verticalSplit));
+                RIGHT_SPLIT.setPosition(verticalSplit);
+                LEFT_SPLIT.setPosition(verticalSplit);
             }
             if (horizontalExist) {
                 horizontalSplit = (int) gDial.getNextNumber();
                 Prefs.set("SOC.horizontalSplit", horizontalSplit);
-                A_SPLITS.add(new SplitDown(horizontalSplit));
-                B_SPLITS.add(new SplitDown(horizontalSplit));
-                C_SPLITS.add(new SplitUp(horizontalSplit));
-                D_SPLITS.add(new SplitUp(horizontalSplit));
+                UP_SPLIT.setPosition(horizontalSplit);
+                DOWN_SPLIT.setPosition(horizontalSplit);
             }
             Prefs.savePreferences();
+            ALL_SPLITS.add(RIGHT_SPLIT);
+            ALL_SPLITS.add(LEFT_SPLIT);
+            ALL_SPLITS.add(DOWN_SPLIT);
+            ALL_SPLITS.add(UP_SPLIT);
         }
         return result;
     }
@@ -266,7 +273,7 @@ public class Stack_Object_Combiner implements PlugIn {
         listing = workingDirectory.listFiles(objFilters[0]); // Filter A_
         for (File file : listing) {
             if (file.isFile()) {
-                final Mesh mesh = new Mesh(A_SPLITS, file);
+                final Mesh mesh = new Mesh(file);
                 A_MESHES.add(mesh);
             }
 
@@ -276,7 +283,7 @@ public class Stack_Object_Combiner implements PlugIn {
         listing = workingDirectory.listFiles(objFilters[1]); // Filter B_
         for (File file : listing) {
             if (file.isFile()) {
-                final Mesh mesh = new Mesh(B_SPLITS, file);
+                final Mesh mesh = new Mesh(file);
                 B_MESHES.add(mesh);
             }
 
@@ -286,7 +293,7 @@ public class Stack_Object_Combiner implements PlugIn {
         listing = workingDirectory.listFiles(objFilters[2]); // Filter C_
         for (File file : listing) {
             if (file.isFile()) {
-                final Mesh mesh = new Mesh(C_SPLITS, file);
+                final Mesh mesh = new Mesh(file);
                 C_MESHES.add(mesh);
             }
 
@@ -296,7 +303,7 @@ public class Stack_Object_Combiner implements PlugIn {
         listing = workingDirectory.listFiles(objFilters[3]); // Filter D_
         for (File file : listing) {
             if (file.isFile()) {
-                final Mesh mesh = new Mesh(D_SPLITS, file);
+                final Mesh mesh = new Mesh(file);
                 D_MESHES.add(mesh);
             }
         }
@@ -311,5 +318,13 @@ public class Stack_Object_Combiner implements PlugIn {
     public static void main(final String[] args) {
         new ij.ImageJ();
         new Stack_Object_Combiner().run("");
+    }
+
+    private void clearMeshes() {
+        A_MESHES.clear();
+        B_MESHES.clear();
+        C_MESHES.clear();
+        D_MESHES.clear();
+        ALL_MESHES.clear();
     }
 }

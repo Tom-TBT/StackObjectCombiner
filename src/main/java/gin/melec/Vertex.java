@@ -107,11 +107,11 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      * @param garbage , the garbage where vertices are added.
      * @param primers, the set containing all the vertices that can be added.
      */
-    public final void addNeighborToGarbage(final Set garbage) {
+    public final void addNeighborToGarbage(final Set garbage, final Set primers) {
         garbage.add(this);
-        for (Vertex neighbor : this.neighbours) {
-            if (!garbage.contains(neighbor)) {
-                neighbor.addNeighborToGarbage(garbage);
+        for (Vertex neighbour : this.neighbours) {
+            if (!garbage.contains(neighbour) && primers.contains(neighbour)) {
+                neighbour.addNeighborToGarbage(garbage, primers);
             }
         }
     }

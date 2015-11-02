@@ -43,15 +43,6 @@ public abstract class AbstractSplit implements Serializable {
     protected long position;
 
     /**
-     * Public constructor for a split with a position.
-     *
-     * @param position , the position of the border.
-     */
-    public AbstractSplit(final long position) {
-        this.position = position;
-    }
-
-    /**
      * Find the vertices who belong to the border.
      *
      * @param vertices , the list of the vertex to filter.
@@ -75,6 +66,11 @@ public abstract class AbstractSplit implements Serializable {
     public final long getPosition() {
         return position;
     }
+
+    public void setPosition(long position) {
+        this.position = position;
+    }
+
 
     /**
      * A protected method called to search in a collection the closer vertex to

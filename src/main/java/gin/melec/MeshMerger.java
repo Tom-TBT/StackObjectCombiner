@@ -49,11 +49,13 @@ public class MeshMerger {
      * Method called when we want to merge meshes.
      *
      * @param allMeshes , the list of the meshes existing for this session.
+     * @param allSplits , the list of the splits existing for this session.
      * @throws java.io.IOException
      * @throws java.lang.InterruptedException
      * @throws java.text.ParseException
      */
-    public static void work(final List<List> allMeshes) throws ParseException,
+    public static void work(final List<List> allMeshes,
+            final List<AbstractSplit> allSplits) throws ParseException,
             IOException, InterruptedException {
         String choices[];
         choices = getChoices(allMeshes);
@@ -63,82 +65,105 @@ public class MeshMerger {
                     + choices.length + " meshes found.\n"
                     + "See the documentation for more informations.");
         } else {
-            boolean notFinished = true;
-            while (notFinished) {
-                GenericDialog gDial = new GenericDialog("Choose_meshes");
-                gDial.addChoice("Part 1", choices, choices[0]);
-                gDial.addChoice("Part 2", choices, choices[1]);
-                gDial.showDialog();
-                if (gDial.wasCanceled()) {
-                    return;
-                }
-                final Mesh mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
-                final Mesh mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
-                if ((allMeshes.get(0).contains(mesh1) && allMeshes.get(0).
-                        contains(mesh2))
-                        || (allMeshes.get(1).contains(mesh1) && allMeshes.get(1).
-                        contains(mesh2))
-                        || (allMeshes.get(2).contains(mesh1) && allMeshes.get(2).
-                        contains(mesh2))
-                        || (allMeshes.get(3).contains(mesh1) && allMeshes.get(3).
-                        contains(mesh2))) {
-                    IJ.error("Two meshes from a same part can't be merged\n"
-                            + "See the documentation for more informations.");
+        GenericDialog gDial = new GenericDialog("Choose_meshes");
+        gDial.addChoice("Part 1", choices, choices[0]);
+        gDial.addChoice("Part 2", choices, choices[1]);
+        gDial.showDialog();
+        if (gDial.wasCanceled()) {
+            return;
+        }
+        final Mesh mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
+        final Mesh mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
+        final AbstractSplit split1, split2;
+        if (allMeshes.get(0).contains(mesh1) && allMeshes.get(1).
+                contains(mesh2)) {
+            split1 = allSplits.get(0);
+            split2 = allSplits.get(1);
+        } else if (allMeshes.get(1).contains(mesh1) && allMeshes.get(0).
+                contains(mesh2)) {
+            split1 = allSplits.get(1);
+            split2 = allSplits.get(0);
+        } else if (allMeshes.get(2).contains(mesh1) && allMeshes.get(3).
+                contains(mesh2)) {
+            split1 = allSplits.get(0);
+            split2 = allSplits.get(1);
+        } else if (allMeshes.get(3).contains(mesh1) && allMeshes.get(2).
+                contains(mesh2)) {
+            split1 = allSplits.get(1);
+            split2 = allSplits.get(0);
+        } else if (allMeshes.get(0).contains(mesh1) && allMeshes.get(2).
+                contains(mesh2)) {
+            split1 = allSplits.get(2);
+            split2 = allSplits.get(3);
+        } else if (allMeshes.get(1).contains(mesh1) && allMeshes.get(3).
+                contains(mesh2)) {
+            split1 = allSplits.get(2);
+            split2 = allSplits.get(3);
+        } else if (allMeshes.get(2).contains(mesh1) && allMeshes.get(0).
+                contains(mesh2)) {
+            split1 = allSplits.get(3);
+            split2 = allSplits.get(2);
+        } else if (allMeshes.get(3).contains(mesh1) && allMeshes.get(1).
+                contains(mesh2)) {
+            split1 = allSplits.get(3);
+            split2 = allSplits.get(2);
+        } else {
+            IJ.error("Two meshes from a same part can't be merged\n"
+                    + "See the documentation for more informations.");
+            return;
+        }
+            mesh1.importMesh();
+            IJ.log(mesh1.getFile().getName() + " imported");
+            mesh2.importMesh();
+            IJ.log(mesh2.getFile().getName() + " imported");
+//            Thread thread1 = new Thread() {
+//                {
+//                    setPriority(Thread.NORM_PRIORITY);
+//                }
+//
+//                @Override
+//                public void run() {
+                    IJ.log("Working on " + mesh1.getFile().getName());
+                    mesh1.createBorders(split1);
+//                }
+//            };
+//            Thread thread2 = new Thread() {
+//                {
+//                    setPriority(Thread.NORM_PRIORITY);
+//                }
+//
+//                @Override
+//                public void run() {
+                    IJ.log("Working on " + mesh2.getFile().getName());
+                    mesh2.createBorders(split2);
+//                }
+//            };
+//            thread1.start();
+//            thread2.start();
+//            thread1.join();
+//            thread2.join();
+
+            if (mesh1.getBorders().isEmpty()) {
+                IJ.showMessage(mesh1.getFile().getName()
+                        + " don't cross to the border");
+            } else {
+
+                if (mesh2.getBorders().isEmpty()) {
+                    IJ.showMessage(mesh2.getFile().getName()
+                            + " don't cross to the border");
                 } else {
-                    mesh1.importMesh();
-                    IJ.log(mesh1.getFile().getName() + " imported");
-                    mesh2.importMesh();
-                    IJ.log(mesh2.getFile().getName() + " imported");
-                    Thread thread1 = new Thread() {
-                        {
-                            setPriority(Thread.NORM_PRIORITY);
-                        }
-
-                        @Override
-                        public void run() {
-                            IJ.log("Working on " + mesh1.getFile().getName());
-                            mesh1.createBorders();
-                        }
-                    };
-                    Thread thread2 = new Thread() {
-                        {
-                            setPriority(Thread.NORM_PRIORITY);
-                        }
-
-                        @Override
-                        public void run() {
-                            IJ.log("Working on " + mesh2.getFile().getName());
-                            mesh2.createBorders();
-                        }
-                    };
-                    thread1.start();
-                    thread2.start();
-                    thread1.join();
-                    thread2.join();
-
-                    if (mesh1.getBorders().isEmpty()) {
-                        IJ.showMessage(mesh1.getFile().getName()
-                                + " don't cross to the border");
-                    } else {
-
-                        if (mesh2.getBorders().isEmpty()) {
-                            IJ.showMessage(mesh2.getFile().getName()
-                                    + " don't cross to the border");
-                        } else {
-                            final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
-                                    mesh2.getBorders());
-                            final List<Face> newFaces = new ArrayList();
-                            IJ.log("Computing the new faces");
-                            for (Border[] couple : couples) {
-                                newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
-                            }
-                            IJ.log("Saving the new object");
-                            exportFusion(mesh1, mesh2, newFaces);
-                            IJ.log("Done");
-                            mesh1.clear();
-                            mesh2.clear();
-                        }
+                    final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
+                            mesh2.getBorders());
+                    final List<Face> newFaces = new ArrayList();
+                    IJ.log("Computing the new faces");
+                    for (Border[] couple : couples) {
+                        newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
                     }
+                    IJ.log("Saving the new object");
+                    exportFusion(mesh1, mesh2, newFaces);
+                    IJ.log("Done");
+                    mesh1.clear();
+                    mesh2.clear();
                 }
             }
         }
@@ -170,7 +195,8 @@ public class MeshMerger {
         for (Face face : newFaces) {
             facesToWrite.add(face);
         }
-        ObjWriter.writeResult(verticesToWrite, facesToWrite, newName, new File(mesh1.getFile().getParent()));
+        ObjWriter.writeResult(verticesToWrite, facesToWrite, newName,
+                new File(mesh1.getFile().getParent()));
 
     }
 

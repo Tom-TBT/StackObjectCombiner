@@ -14,7 +14,7 @@
 
     <groupId>gin.mElec</groupId>
     <artifactId>Stack_Object_Combiner</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
 
     <name>Stack_Object_Combiner</name>
     <description>A plugin that merge object from different parts of a same stack</description>

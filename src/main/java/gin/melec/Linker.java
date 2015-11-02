@@ -119,9 +119,13 @@ public class Linker {
             prevDestSpot = nextDestSpot;
             // Select the next dest spot in a sublist starting from the last
             // spot, to the end of the list
-            nextDestSpot = nextOrigSpot.findCloserIn(destSequence.
-                    subList(destSequence.
-                            indexOf(prevDestSpot), destSequence.size()));
+            if (notFinished) {
+                nextDestSpot = nextOrigSpot.findCloserIn(destSequence.
+                        subList(destSequence.
+                                indexOf(prevDestSpot), destSequence.size()));
+            } else {
+                nextDestSpot = destSequence.get(destSequence.size() - 1);
+            }
 
             // add new next link
             links.add(new Link(nextOrigSpot, nextDestSpot));
@@ -136,8 +140,8 @@ public class Linker {
                 links.addAll(getLinksFromSubsets(subListOrig, subListDest));
             } else {
                 subListDest = new ArrayList(destSequence.
-                    subList(destSequence.indexOf(prevDestSpot) + 1,
-                            destSequence.indexOf(nextDestSpot)));
+                        subList(destSequence.indexOf(prevDestSpot) + 1,
+                                destSequence.indexOf(nextDestSpot)));
                 if (!subListDest.isEmpty()) {
                     links.addAll(getLinksFromSubsets(subListOrig, subListDest));
                 }
@@ -151,7 +155,6 @@ public class Linker {
         for (Link link : tmpLinks) {
             links.add(link);
         }
-
 
         final Set<Link> newLinks = new HashSet();
         Vertex origCurrent, origPrevious, destCurrent, destPrevious;
@@ -193,18 +196,17 @@ public class Linker {
         }
         List newFaces = exportLinks(links);
         if (origin.isCircular()) {
-            newFaces.add(new Face (origin.getFirstVertex()
-                    , origin.getLastVertex(), destination.getFirstVertex()));
-            newFaces.add(new Face (origin.getLastVertex()
-                    , destination.getLastVertex(), destination.getFirstVertex()));
+            newFaces.add(new Face(origin.getFirstVertex(), origin.getLastVertex(), destination.getFirstVertex()));
+            newFaces.add(new Face(origin.getLastVertex(), destination.getLastVertex(), destination.getFirstVertex()));
         }
         return newFaces;
     }
 
     /**
      * With the two list of vertex, create links switch the position of the
-     * vertex. The links are made in a way that the can't cross each other.
-     * At the end, each vertex is linked to at least one other vertex.
+     * vertex. The links are made in a way that the can't cross each other. At
+     * the end, each vertex is linked to at least one other vertex.
+     *
      * @param origin , the vertex from which the links originate.
      * @param destination , the vertex that are linked.
      * @return a set of the links created by this method.
@@ -241,6 +243,9 @@ public class Linker {
             }
             destination = destination.subList(j, destination.size());
             i++;
+        }
+        for (Vertex destVertex : destination) {
+            result.add(new Link(origin.get(origin.size() - 1), destVertex));
         }
 
         return result;

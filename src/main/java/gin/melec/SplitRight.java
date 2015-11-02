@@ -25,15 +25,6 @@ import static gin.melec.AbstractSplit.WINDOW;
  */
 public class SplitRight extends AbstractSplit {
 
-
-    /**
-     * Public constructor for a split with a position.
-     * @param position , the position of the border.
-     */
-    public SplitRight(final long position) {
-        super(position);
-    }
-
     @Override
     protected float distanceTo(final Vertex vertex) {
         return Math.abs(this.position - vertex.getX());

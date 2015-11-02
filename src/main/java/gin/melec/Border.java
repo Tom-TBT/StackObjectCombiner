@@ -60,21 +60,26 @@ public class Border implements Serializable {
      * given mesh to build the new border.
      *
      * @param mesh , the mesh from which a new border is created.
+     * @param split , the split used to initiate the border.
      */
-    public Border(final Mesh mesh) {
+    public Border(final Mesh mesh, final AbstractSplit split) {
         this.vertexSequence = new LinkedList();
 
-        Vertex currentVertex = null;
+        Vertex currentVertex;
         Vertex firstVertex = null, secondVertex = null;
-        for (AbstractSplit currentSplit : mesh.getSplits()) {
-            currentVertex = currentSplit.findCloserVertex(mesh.getPrimers());
+        while (mesh.getPrimers().size() > 0 && firstVertex == null) {
+            currentVertex = split.findCloserVertex(mesh.getPrimers());
+            mesh.setNeighbourhoodToVertex(currentVertex);
             if (currentVertex.belongToBorder()) {
                 firstVertex = currentVertex;
-                this.split = currentSplit;
+                this.split = split;
                 break;
             } else {
                 mesh.getPrimers().remove(currentVertex);
             }
+        }
+        if (firstVertex == null) {
+            return;
         }
         vertexSequence.add(firstVertex);
         mesh.setNeighbourhoodToVertex(firstVertex);
@@ -329,7 +334,6 @@ public class Border implements Serializable {
     public final void alignOn(Border border) {
         Vertex firstVertexThis = this.getFirstVertex();
         final Vertex firstVertexRef = border.getFirstVertex();
-        Vertex previousVertexThis, nextVertexThis, nextVertexRef;
 
         if (this.isCircular() && border.isCircular()) {
             for (Vertex candidate : this.vertexSequence) {
@@ -338,23 +342,21 @@ public class Border implements Serializable {
                     firstVertexThis = candidate;
                 }
             }
-            if (firstVertexThis != this.getFirstVertex()) {
-                previousVertexThis = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertexThis) - 1);
-            } else {
-                previousVertexThis = this.vertexSequence.getLast();
-            }
-            if (firstVertexThis != this.vertexSequence.getLast()) {
-                nextVertexThis = this.vertexSequence.get(this.vertexSequence.indexOf(firstVertexThis) + 1);
-            } else {
-                nextVertexThis = this.vertexSequence.getFirst();
-            }
-            nextVertexRef = border.getVertexSequence().get(1);
 
-            if (nextVertexThis.distanceTo(nextVertexRef)
-                    > previousVertexThis.distanceTo(nextVertexRef)) {
+            this.changeFirstVertex(firstVertexThis);
+
+            int lenghtThis = this.getVertexSequence().size() / 16;
+            int lenghtRef = border.getVertexSequence().size() / 16;
+            Vertex vertexRef, vertexThis;
+            vertexThis = this.getVertexSequence().get(lenghtThis);
+            vertexRef = border.getVertexSequence().get(lenghtRef);
+            double distanceMin = vertexThis.distanceTo(vertexRef)
+                    + firstVertexThis.distanceTo(firstVertexRef);
+            double distanceMax = vertexThis.distanceTo(firstVertexRef)
+                    + firstVertexThis.distanceTo(vertexRef);
+            if (distanceMin > distanceMax) {
                 this.revertSequence();
             }
-            this.changeFirstVertex(firstVertexThis);
         } else if (!this.isCircular() && !border.isCircular()) {
             if (this.getFirstVertex().distanceTo(border.getFirstVertex())
                     > this.getLastVertex().distanceTo(border.getFirstVertex())) {
