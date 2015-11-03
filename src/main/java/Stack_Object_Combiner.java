@@ -169,6 +169,7 @@ public class Stack_Object_Combiner implements PlugIn {
         final GenericDialog gDial = new GenericDialog("Stack Object Combiner");
         gDial.addMessage("Choose the action to perform");
         gDial.enableYesNoCancel("Move meshes", "Merge two meshes");
+        gDial.addHelp("http://imagej.net/StackObjectCombiner");
         gDial.showDialog();
         if (gDial.wasCanceled()) {
             result = false;
@@ -198,6 +199,7 @@ public class Stack_Object_Combiner implements PlugIn {
         boolean verticalExist = false, horizontalExist = false;
         final GenericDialog gDial = new GenericDialog("Indicate the positions "
                 + "of the splits.");
+        gDial.addHelp("http://imagej.net/StackObjectCombiner");
 
         // TODO think to a control
         File[] listing;
@@ -232,11 +234,17 @@ public class Stack_Object_Combiner implements PlugIn {
         }
 
         if (!horizontalExist && !verticalExist) {
-            gDial.addMessage("No meshes can be found.\n"
+            listing = workingDirectory.listFiles(objFilters[0]);
+            if (listing[0].isFile()) {
+                gDial.addMessage("Error 1 : The repository contain only A_files.\n"
                     + "Check the documentation for more informations.");
+            } else {
+                gDial.addMessage("Error 2 : No meshes can be found.\n"
+                    + "Check the documentation for more informations.");
+            }
             result = false;
         }
-        gDial.showDialog();
+            gDial.showDialog();
         if (gDial.wasCanceled()) {
             result = false;
         } else {
@@ -245,7 +253,7 @@ public class Stack_Object_Combiner implements PlugIn {
                 Prefs.set("SOC.verticalSplit", verticalSplit);
                 RIGHT_SPLIT.setPosition(verticalSplit);
                 LEFT_SPLIT.setPosition(verticalSplit);
-            }
+                }
             if (horizontalExist) {
                 horizontalSplit = (int) gDial.getNextNumber();
                 Prefs.set("SOC.horizontalSplit", horizontalSplit);

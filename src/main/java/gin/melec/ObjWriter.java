@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import ij.gui.GenericDialog;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -97,7 +98,22 @@ public class ObjWriter {
     static void writeResult(final List<Vertex> vertices, final List<Face> faces,
             final String newName, final File parentDirectory) throws IOException {
 
-        final File newMesh = new File(parentDirectory, newName);
+        File newMesh = new File(parentDirectory, newName);
+        if (newMesh.exists()) {
+            final GenericDialog gDial = new GenericDialog("");
+            gDial.addMessage("The file already exist, remplace it?");
+            gDial.enableYesNoCancel("Yes", "No");
+            gDial.hideCancelButton();
+            gDial.showDialog();
+            if (!gDial.wasOKed()) {
+                int i = 0;
+                while (newMesh.exists()) {
+                    i++;
+                    newMesh = new File(parentDirectory,
+                            newName.substring(0, newName.length()-4) + "-" + i + ".obj");
+                }
+            }
+        }
 
         final FileWriter fiW = new FileWriter(newMesh.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);

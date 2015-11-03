@@ -61,7 +61,7 @@ public class MeshMerger {
         choices = getChoices(allMeshes);
         if (choices.length < 2) {
             // It is impossible to merge less than two meshes.
-            IJ.showMessage("Their is not enough meshes to merge.\n"
+            IJ.showMessage("Error 5 : Their is not enough meshes to merge.\n"
                     + choices.length + " meshes found.\n"
                     + "See the documentation for more informations.");
         } else {
@@ -108,7 +108,7 @@ public class MeshMerger {
             split1 = allSplits.get(3);
             split2 = allSplits.get(2);
         } else {
-            IJ.error("Two meshes from a same part can't be merged\n"
+            IJ.error("Error 4 : Two meshes from a same part can't be merged\n"
                     + "See the documentation for more informations.");
             return;
         }
@@ -116,40 +116,40 @@ public class MeshMerger {
             IJ.log(mesh1.getFile().getName() + " imported");
             mesh2.importMesh();
             IJ.log(mesh2.getFile().getName() + " imported");
-//            Thread thread1 = new Thread() {
-//                {
-//                    setPriority(Thread.NORM_PRIORITY);
-//                }
-//
-//                @Override
-//                public void run() {
+            Thread thread1 = new Thread() {
+                {
+                    setPriority(Thread.NORM_PRIORITY);
+                }
+
+                @Override
+                public void run() {
                     IJ.log("Working on " + mesh1.getFile().getName());
                     mesh1.createBorders(split1);
-//                }
-//            };
-//            Thread thread2 = new Thread() {
-//                {
-//                    setPriority(Thread.NORM_PRIORITY);
-//                }
-//
-//                @Override
-//                public void run() {
+                }
+            };
+            Thread thread2 = new Thread() {
+                {
+                    setPriority(Thread.NORM_PRIORITY);
+                }
+
+                @Override
+                public void run() {
                     IJ.log("Working on " + mesh2.getFile().getName());
                     mesh2.createBorders(split2);
-//                }
-//            };
-//            thread1.start();
-//            thread2.start();
-//            thread1.join();
-//            thread2.join();
+                }
+            };
+            thread1.start();
+            thread2.start();
+            thread1.join();
+            thread2.join();
 
             if (mesh1.getBorders().isEmpty()) {
-                IJ.showMessage(mesh1.getFile().getName()
+                IJ.showMessage("Error 3 : " + mesh1.getFile().getName()
                         + " don't cross to the border");
             } else {
 
                 if (mesh2.getBorders().isEmpty()) {
-                    IJ.showMessage(mesh2.getFile().getName()
+                    IJ.showMessage("Error 3 : " + mesh2.getFile().getName()
                             + " don't cross to the border");
                 } else {
                     final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
