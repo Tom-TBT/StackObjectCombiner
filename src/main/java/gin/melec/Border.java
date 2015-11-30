@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.math3.geometry.Point;
+import org.apache.commons.math3.geometry.euclidean.twod.PolygonsSet;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /**
  *
@@ -64,6 +67,7 @@ public class Border implements Serializable {
      */
     public Border(final Mesh mesh, final AbstractSplit split) {
         this.vertexSequence = new LinkedList();
+        this.split = split;
 
         Vertex currentVertex;
         Vertex firstVertex = null, secondVertex = null;
@@ -72,7 +76,6 @@ public class Border implements Serializable {
             mesh.setNeighbourhoodToVertex(currentVertex);
             if (currentVertex.belongToBorder()) {
                 firstVertex = currentVertex;
-                this.split = split;
                 break;
             } else {
                 mesh.getPrimers().remove(currentVertex);
@@ -96,10 +99,7 @@ public class Border implements Serializable {
         mesh.getGarbage().add(getLastVertex());
     }
 
-    /**
-     * A simple constructor which is used when a border is only loaded.
-     */
-    public Border() {
+    private Border() {
         this.vertexSequence = new LinkedList();
     }
 
@@ -177,6 +177,10 @@ public class Border implements Serializable {
         return result;
     }
 
+    private void setSplit(AbstractSplit split) {
+        this.split = split;
+    }
+
     /**
      * Divide the border into sub-borders. A border can be decompose from 1 to
      * many subborders, in case of a multiple crossing of the split.
@@ -205,6 +209,7 @@ public class Border implements Serializable {
                     if (!isCircular) {
                         //this.split.removeTails(currentSubBorder);
                     }
+                    currentSubBorder.setSplit(this.split);
                     currentSubBorder.prepare();
                     result.add(currentSubBorder);
                     currentSubBorder = null;
@@ -215,6 +220,7 @@ public class Border implements Serializable {
             if (!isCircular) {
                 //this.split.removeTails(currentSubBorder);
             }
+            currentSubBorder.setSplit(this.split);
             currentSubBorder.prepare();
             result.add(currentSubBorder);
         }
@@ -246,6 +252,10 @@ public class Border implements Serializable {
 
         this.circular = this.getFirstVertex().getNeighbours()
                 .contains(this.getLastVertex());
+
+        if (this.isCircular() && this.isInverted()) {
+            this.revertSequence();
+        }
     }
 
     /**
@@ -342,21 +352,7 @@ public class Border implements Serializable {
                     firstVertexThis = candidate;
                 }
             }
-
             this.changeFirstVertex(firstVertexThis);
-
-            int lenghtThis = this.getVertexSequence().size() / 16;
-            int lenghtRef = border.getVertexSequence().size() / 16;
-            Vertex vertexRef, vertexThis;
-            vertexThis = this.getVertexSequence().get(lenghtThis);
-            vertexRef = border.getVertexSequence().get(lenghtRef);
-            double distanceMin = vertexThis.distanceTo(vertexRef)
-                    + firstVertexThis.distanceTo(firstVertexRef);
-            double distanceMax = vertexThis.distanceTo(firstVertexRef)
-                    + firstVertexThis.distanceTo(vertexRef);
-            if (distanceMin > distanceMax) {
-                this.revertSequence();
-            }
         } else if (!this.isCircular() && !border.isCircular()) {
             if (this.getFirstVertex().distanceTo(border.getFirstVertex())
                     > this.getLastVertex().distanceTo(border.getFirstVertex())) {
@@ -366,6 +362,38 @@ public class Border implements Serializable {
             // TODO Exception, not two borders are linear or circular.
         }
 
+    }
+
+    private boolean isInverted() {
+        List<Vector2D> twodPoints = new ArrayList<Vector2D>();
+
+        int i = 0, increment = 10;
+        boolean isHorizontalPlane = this.getSplit() instanceof SplitDown
+                || this.getSplit() instanceof SplitUp;
+
+        // *** Initialisation of the points *** //
+        while (i < this.getVertexSequence().size()) {
+            Vertex vertex = this.getVertexSequence().get(i);
+            if (isHorizontalPlane) {
+                twodPoints.add(new Vector2D(vertex.getX(), vertex.getZ()));
+            } else {
+                twodPoints.add(new Vector2D(vertex.getY(), vertex.getZ()));
+            }
+            i += increment;
+        }
+        if (isHorizontalPlane) {
+            twodPoints.add(new Vector2D(this.getFirstVertex().getX(),
+                    this.getFirstVertex().getZ()));
+        } else {
+            twodPoints.add(new Vector2D(this.getFirstVertex().getY(),
+                    this.getFirstVertex().getZ()));
+        }
+        // *** End of initialisation of the points *** //
+        Vector2D pointArray[] = new Vector2D[twodPoints.size()];
+        PolygonsSet polygon = new PolygonsSet(0.001, twodPoints.toArray(pointArray));
+        Point point = polygon.getBarycenter();
+        // The polygone is created switch the orientation of the border.
+        return point.isNaN();
     }
 
     /**
