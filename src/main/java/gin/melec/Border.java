@@ -16,14 +16,16 @@
  */
 package gin.melec;
 
+import java.awt.Polygon;
+import java.awt.Shape;
+import java.awt.geom.Area;
+import java.awt.geom.Path2D;
+import java.awt.geom.PathIterator;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.math3.geometry.Point;
-import org.apache.commons.math3.geometry.euclidean.twod.PolygonsSet;
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /**
  *
@@ -184,6 +186,7 @@ public class Border implements Serializable {
     /**
      * Divide the border into sub-borders. A border can be decompose from 1 to
      * many subborders, in case of a multiple crossing of the split.
+     *
      * @return a list of the separated borders.
      */
     public final List separateSubBorders() {
@@ -253,7 +256,7 @@ public class Border implements Serializable {
         this.circular = this.getFirstVertex().getNeighbours()
                 .contains(this.getLastVertex());
 
-        if (this.isCircular() && this.isInverted()) {
+        if (this.isCircular() && this.isClockwise()) {
             this.revertSequence();
         }
     }
@@ -353,6 +356,7 @@ public class Border implements Serializable {
                 }
             }
             this.changeFirstVertex(firstVertexThis);
+//            border.isClockwise();
         } else if (!this.isCircular() && !border.isCircular()) {
             if (this.getFirstVertex().distanceTo(border.getFirstVertex())
                     > this.getLastVertex().distanceTo(border.getFirstVertex())) {
@@ -364,40 +368,73 @@ public class Border implements Serializable {
 
     }
 
-    private boolean isInverted() {
-        List<Vector2D> twodPoints = new ArrayList<Vector2D>();
-
-        int i = 0, increment = 10;
+    private boolean isClockwise() {
+//        List<Vector2D> twodPoints = new ArrayList<Vector2D>();
+//
+//        int i = 0, increment = 10;
         boolean isHorizontalPlane = this.getSplit() instanceof SplitDown
                 || this.getSplit() instanceof SplitUp;
 
-        // *** Initialisation of the points *** //
-        while (i < this.getVertexSequence().size()) {
-            Vertex vertex = this.getVertexSequence().get(i);
-            if (isHorizontalPlane) {
-                twodPoints.add(new Vector2D(vertex.getX(), vertex.getZ()));
-            } else {
-                twodPoints.add(new Vector2D(vertex.getY(), vertex.getZ()));
-            }
-            i += increment;
-        }
+        // Creating the shape
+        Path2D shape = new Path2D.Double();
         if (isHorizontalPlane) {
-            twodPoints.add(new Vector2D(this.getFirstVertex().getX(),
-                    this.getFirstVertex().getZ()));
+            shape.moveTo(this.getFirstVertex().getX(),
+                    this.getFirstVertex().getZ());
         } else {
-            twodPoints.add(new Vector2D(this.getFirstVertex().getY(),
-                    this.getFirstVertex().getZ()));
+            shape.moveTo(this.getFirstVertex().getY(),
+                    this.getFirstVertex().getZ());
         }
-        // *** End of initialisation of the points *** //
-        Vector2D pointArray[] = new Vector2D[twodPoints.size()];
-        PolygonsSet polygon = new PolygonsSet(0.001, twodPoints.toArray(pointArray));
-        Point point = polygon.getBarycenter();
-        // The polygone is created switch the orientation of the border.
-        return point.isNaN();
+        int i = 1;
+        while (i < vertexSequence.size()) {
+            if (isHorizontalPlane) {
+                shape.lineTo(vertexSequence.get(i).getX(),
+                        vertexSequence.get(i).getZ());
+            } else {
+                shape.lineTo(vertexSequence.get(i).getY(),
+                        vertexSequence.get(i).getZ());
+            }
+            i++;
+        }
+        shape.closePath();
+        // Shape created
+
+        PathIterator shapePath = shape.getPathIterator(null);
+        Area area = new Area(shape);
+        PathIterator areaPath = area.getPathIterator(null);
+        // The pathIterator of a created area is always read reverse-clockwise
+
+        double shapeCoord[] = new double[6];
+        double areaCoord[] = new double[6];
+        shapePath.currentSegment(shapeCoord);
+        int index = 0;
+        boolean result = false;
+        while (!areaPath.isDone() && index < vertexSequence.size()) {
+            areaPath.currentSegment(areaCoord);
+            if (areaCoord[0] == shapeCoord[0] && areaCoord[1] == shapeCoord[1]) {
+                shapePath.next();
+                shapePath.currentSegment(shapeCoord);
+                if (index == vertexSequence.size() - 1) {
+                    // If it is the last point, we start over
+                    areaPath = area.getPathIterator(null);
+                    areaPath.currentSegment(areaCoord);
+                } else {
+                    areaPath.next();
+                    areaPath.currentSegment(areaCoord);
+                }
+                // test if the two iterator iterate in the same direction
+                result = areaCoord[0] == shapeCoord[0]
+                        && areaCoord[1] == shapeCoord[1];
+                break;
+            }
+            index++;
+            areaPath.next();
+        }
+        return !result;
     }
 
     /**
      * Method that indicate if the border is circular or not.
+     *
      * @return true if the border is circular, else false (and the border is
      * linear).
      */
