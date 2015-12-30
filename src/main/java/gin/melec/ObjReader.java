@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import ij.IJ;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -108,6 +109,7 @@ public class ObjReader {
             buR.close();
         }
         mesh.getVertices().addAll(tmpVertices);
+        IJ.log(mesh.getFile().getName() + " imported");
     }
 
     /**

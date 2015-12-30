@@ -146,7 +146,6 @@ public class Mesh {
                 if (border.getFirstVertex() == null) {
                     break;
                 }
-                IJ.log("New border for " + this.file.getName());
                 Vertex nextVertex = border.getLastVertex();
                 while (!nextVertex.equals(border.getFirstVertex())) {
                     nextVertex = this.findNextVertex(border);
@@ -159,13 +158,14 @@ public class Mesh {
                 this.garbage.clear();
                 this.borders.add(border);
             }
-            IJ.log(this.borders.size() + " borders detected for "
-                    + this.file.getName());
+
             final List<Border> tmpBorders = new ArrayList();
             for (Border border : this.borders) {
                 tmpBorders.addAll(border.separateSubBorders());
             }
             this.borders = tmpBorders;
+            IJ.log(this.borders.size() + " borders detected for "
+                    + this.file.getName());
         }
     }
 
@@ -201,6 +201,7 @@ public class Mesh {
             }
         }
         this.moved = true;
+        IJ.log("The mesh" + this.file.getName() + "has been moved");
     }
 
     /**
@@ -221,15 +222,6 @@ public class Mesh {
      */
     protected final void importMesh() throws ParseException, IOException {
         ObjReader.readMesh(this.file, this);
-    }
-
-    /**
-     * This method is used to export in a file the borders of this mesh.
-     *
-     * @throws java.io.IOException
-     */
-    protected final void exportBorders() throws IOException {
-        ObjWriter.serializeBorders(this.file, borders);
     }
 
     /**

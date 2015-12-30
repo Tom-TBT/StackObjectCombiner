@@ -93,6 +93,6 @@ public class MeshMover {
             }
             mesh.clear();
         }
-        IJ.showMessage(nbMoved + " meshes have been moved.");
+        IJ.log(nbMoved + " meshes have been moved.");
     }
 }

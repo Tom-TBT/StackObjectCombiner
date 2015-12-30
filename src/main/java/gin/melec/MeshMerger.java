@@ -113,9 +113,7 @@ public class MeshMerger {
             return;
         }
             mesh1.importMesh();
-            IJ.log(mesh1.getFile().getName() + " imported");
             mesh2.importMesh();
-            IJ.log(mesh2.getFile().getName() + " imported");
             Thread thread1 = new Thread() {
                 {
                     setPriority(Thread.NORM_PRIORITY);
@@ -159,7 +157,6 @@ public class MeshMerger {
                     for (Border[] couple : couples) {
                         newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
                     }
-                    IJ.log("Saving the new object");
                     exportFusion(mesh1, mesh2, newFaces);
                     IJ.log("Done");
                     mesh1.clear();

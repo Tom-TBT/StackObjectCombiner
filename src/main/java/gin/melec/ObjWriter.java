@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import ij.IJ;
 import ij.gui.GenericDialog;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -57,6 +58,7 @@ public class ObjWriter {
      */
     public static void writeMesh(final File file, final Mesh mesh)
             throws IOException {
+        IJ.log("Saving the mesh " + mesh.getFile().getName());
         final FileWriter fiW = new FileWriter(file.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
@@ -75,33 +77,12 @@ public class ObjWriter {
         }
     }
 
-    /**
-     * A method to write borders in a file.
-     *
-     * @param filePath , the path to the file to write.
-     * @param borders , the borders to write.
-     * @throws IOException if their is an error while writing.
-     */
-    static void serializeBorders(final File file, final List<Border> borders)
-            throws IOException {
-        final ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(file.toString()));
-        try {
-            oos.writeObject(borders);
-        } finally {
-            oos.close();
-        }
-
-    }
-
-
     static void writeResult(final List<Vertex> vertices, final List<Face> faces,
             final String newName, final File parentDirectory) throws IOException {
-
         File newMesh = new File(parentDirectory, newName);
         if (newMesh.exists()) {
             final GenericDialog gDial = new GenericDialog("");
-            gDial.addMessage("The file already exist, remplace it?");
+            gDial.addMessage("The file already exist, replace it?");
             gDial.enableYesNoCancel("Yes", "No");
             gDial.hideCancelButton();
             gDial.showDialog();
@@ -114,7 +95,7 @@ public class ObjWriter {
                 }
             }
         }
-
+        IJ.log("Saving the new object");
         final FileWriter fiW = new FileWriter(newMesh.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);

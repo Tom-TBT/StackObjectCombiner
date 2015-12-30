@@ -16,6 +16,7 @@
  */
 package gin.melec;
 
+import ij.IJ;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
@@ -82,6 +83,7 @@ public class Border {
         if (firstVertex == null) {
             return;
         }
+        IJ.log("Detecting new border for " + mesh.getFile().getName());
         vertexSequence.add(firstVertex);
         for (final Vertex vertex : firstVertex.getNeighbours()) {
             if (vertex.belongToBorder()) {
