@@ -201,7 +201,6 @@ public class Mesh {
             }
         }
         this.moved = true;
-        IJ.log("The mesh" + this.file.getName() + "has been moved");
     }
 
     /**

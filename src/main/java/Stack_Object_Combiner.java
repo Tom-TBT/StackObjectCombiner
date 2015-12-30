@@ -201,7 +201,6 @@ public class Stack_Object_Combiner implements PlugIn {
                 + "of the splits.");
         gDial.addHelp("http://imagej.net/StackObjectCombiner");
 
-        // TODO think to a control
         File[] listing;
         listing = workingDirectory.listFiles(objFilters[3]); // Filter D_
         for (File file : listing) {

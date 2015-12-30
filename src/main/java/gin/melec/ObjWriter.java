@@ -20,10 +20,8 @@ import ij.IJ;
 import ij.gui.GenericDialog;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -68,6 +66,7 @@ public class ObjWriter {
             }
             for (Vertex vertex : mesh.getVertices()) {
                 prW.write(vertex.toString() + "\n");
+
             }
             for (Face face : mesh.getFaces()) {
                 prW.write(face.toString() + "\n");

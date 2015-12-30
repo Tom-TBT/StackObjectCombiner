@@ -358,7 +358,7 @@ public class Border {
                 this.revertSequence();
             }
         } else {
-            // TODO Exception, not two borders are linear or circular.
+            // TODO Exception, if two borders are linear and circular.
         }
 
     }

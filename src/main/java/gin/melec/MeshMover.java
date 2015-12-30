@@ -57,6 +57,7 @@ public class MeshMover {
             mesh.importMesh();
             if (!mesh.isMoved()) {
                 mesh.shift(null);
+                IJ.log("The mesh " + mesh.getFile().getName() + " has been moved");
                 mesh.exportMesh();
                 nbMoved++;
             }
@@ -67,6 +68,7 @@ public class MeshMover {
             mesh.importMesh();
             if (!mesh.isMoved()) {
                 mesh.shift(allSplits.get(1));
+                IJ.log("The mesh " + mesh.getFile().getName() + " has been moved");
                 mesh.exportMesh();
                 nbMoved++;
             }
@@ -77,6 +79,7 @@ public class MeshMover {
             mesh.importMesh();
             if (!mesh.isMoved()) {
                 mesh.shift(allSplits.get(3));
+                IJ.log("The mesh " + mesh.getFile().getName() + " has been moved");
                 mesh.exportMesh();
                 nbMoved++;
             }
@@ -88,6 +91,7 @@ public class MeshMover {
             if (!mesh.isMoved()) {
                 mesh.shift(allSplits.get(1));
                 mesh.shift(allSplits.get(3));
+                IJ.log("The mesh " + mesh.getFile().getName() + " has been moved");
                 mesh.exportMesh();
                 nbMoved++;
             }
