@@ -16,7 +16,6 @@
  */
 package gin.melec;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +26,7 @@ import java.util.TreeSet;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public abstract class AbstractSplit implements Serializable {
+public abstract class AbstractSplit{
 
     /**
      * The maximal distance to the split from which a vertex does no longer

@@ -91,13 +91,17 @@ public class ObjReader {
                             format.parse(splitedLine[3]).floatValue()));
                     id++;
                 } else if (splitedLine[0].equals("f")) {
-                    mesh.getFaces().add(new Face(
-                            tmpVertices.get(
-                                    Integer.parseInt(splitedLine[1]) - 1),
-                            tmpVertices.get(
-                                    Integer.parseInt(splitedLine[2]) - 1),
-                            tmpVertices.get(
-                                    Integer.parseInt(splitedLine[3]) - 1)));
+                    Vertex v1 = tmpVertices.get(
+                                    Integer.parseInt(splitedLine[1]) - 1);
+                    Vertex v2 = tmpVertices.get(
+                                    Integer.parseInt(splitedLine[2]) - 1);
+                    Vertex v3 = tmpVertices.get(
+                                    Integer.parseInt(splitedLine[3]) - 1);
+                    Face face = new Face(v1, v2, v3);
+                    mesh.getFaces().add(face);
+                    v1.getFaces().add(face);
+                    v2.getFaces().add(face);
+                    v3.getFaces().add(face);
                 }
             }
         } finally {

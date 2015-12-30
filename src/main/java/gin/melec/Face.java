@@ -16,16 +16,12 @@
  */
 package gin.melec;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  *
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Face implements Comparable<Face>{
+public class Face {
 
     /**
      * The id of the first vertex of this face.
@@ -52,14 +48,9 @@ public class Face implements Comparable<Face>{
      */
     public Face(final Vertex v1, final Vertex v2,
             final Vertex v3) {
-        final List<Vertex> sortingList = new ArrayList();
-        sortingList.add(v1);
-        sortingList.add(v2);
-        sortingList.add(v3);
-        Collections.sort(sortingList);
-        this.vertex1 = sortingList.get(0);
-        this.vertex2 = sortingList.get(1);
-        this.vertex3 = sortingList.get(2);
+        this.vertex1 = v1;
+        this.vertex2 = v2;
+        this.vertex3 = v3;
     }
 
     @Override
@@ -128,48 +119,6 @@ public class Face implements Comparable<Face>{
     public final boolean include(final Vertex vertex) {
         return vertex.equals(this.vertex1) || vertex.equals(this.vertex2)
                 || vertex.equals(this.vertex3);
-    }
-
-    @Override
-    public final int compareTo(final Face face) {
-        int result;
-        if (this.vertex1.getId() == face.vertex1.getId()) {
-            if (this.vertex2.getId() == face.vertex2.getId()) {
-                result = this.vertex3.getId() - face.vertex3.getId();
-            } else {
-                result = this.vertex2.getId() - face.vertex2.getId();
-            }
-        } else {
-            result = this.vertex1.getId() - face.vertex1.getId();
-        }
-        return result;
-    }
-
-    @Override
-    public final int hashCode() {
-        int hash = 7;
-        hash = 17 * hash + this.vertex1.getId();
-        hash = 17 * hash + this.vertex2.getId();
-        hash = 17 * hash + this.vertex3.getId();
-        return hash;
-    }
-
-    @Override
-    public final boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Face other = (Face) obj;
-        if (!this.vertex1.equals(other.vertex1)) {
-            return false;
-        }
-        if (!this.vertex2.equals(other.vertex2)) {
-            return false;
-        }
-        return this.vertex3.equals(other.vertex3);
     }
 
     /**

@@ -16,12 +16,9 @@
  */
 package gin.melec;
 
-import java.awt.Polygon;
-import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,7 +29,7 @@ import java.util.List;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Border implements Serializable {
+public class Border {
 
     /**
      * The split that initiate this border.
@@ -75,7 +72,6 @@ public class Border implements Serializable {
         Vertex firstVertex = null, secondVertex = null;
         while (mesh.getPrimers().size() > 0 && firstVertex == null) {
             currentVertex = split.findCloserVertex(mesh.getPrimers());
-            mesh.setNeighbourhoodToVertex(currentVertex);
             if (currentVertex.belongToBorder()) {
                 firstVertex = currentVertex;
                 break;
@@ -87,16 +83,13 @@ public class Border implements Serializable {
             return;
         }
         vertexSequence.add(firstVertex);
-        mesh.setNeighbourhoodToVertex(firstVertex);
         for (final Vertex vertex : firstVertex.getNeighbours()) {
-            mesh.setNeighbourhoodToVertex(vertex);
             if (vertex.belongToBorder()) {
                 secondVertex = vertex;
                 break;
             }
         }
         vertexSequence.add(secondVertex);
-        mesh.setNeighbourhoodToVertex(secondVertex);
         mesh.getGarbage().add(getSecondLastVertex());
         mesh.getGarbage().add(getLastVertex());
     }

@@ -16,7 +16,6 @@
  */
 package gin.melec;
 
-import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ import java.util.Set;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Vertex implements Comparable<Vertex>, Serializable {
+public class Vertex implements Comparable<Vertex>{
 
     /**
      * A decimal format used to export vertex with only 3 fraction digits.
@@ -64,11 +63,6 @@ public class Vertex implements Comparable<Vertex>, Serializable {
     private float z;
 
     /**
-     * The list of the neighbours of this vertex.
-     */
-    private transient Set<Vertex> neighbours;
-
-    /**
      * The faces to who the vertex belong.
      */
     private transient Set<Face> faces;
@@ -87,7 +81,6 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         this.y = y;
         this.z = z;
         this.faces = new HashSet();
-        this.neighbours = new HashSet();
     }
 
     /**
@@ -107,11 +100,11 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      * @param garbage , the garbage where vertices are added.
      * @param primers, the set containing all the vertices that can be added.
      */
-    public final void addNeighborToGarbage(final Set garbage, final Set primers) {
+    public final void addNeighbourToGarbage(final Set garbage, final Set primers) {
         garbage.add(this);
-        for (Vertex neighbour : this.neighbours) {
+        for (Vertex neighbour : this.getNeighbours()) {
             if (!garbage.contains(neighbour) && primers.contains(neighbour)) {
-                neighbour.addNeighborToGarbage(garbage, primers);
+                neighbour.addNeighbourToGarbage(garbage, primers);
             }
         }
     }
@@ -123,7 +116,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      */
     public final Vertex getNeighbour(final int idNeighbour) {
         Vertex result = null;
-        for (Vertex candidat : this.neighbours) {
+        for (Vertex candidat : this.getNeighbours()) {
             if (candidat.id == idNeighbour) {
                 result = candidat;
                 break;
@@ -170,7 +163,7 @@ public class Vertex implements Comparable<Vertex>, Serializable {
         boolean result = true;
         final List<Vertex> tmpNeighbours = new ArrayList();
         final List<Face> facesRemaining = new ArrayList();
-        tmpNeighbours.addAll(this.neighbours);
+        tmpNeighbours.addAll(this.getNeighbours());
         facesRemaining.addAll(this.faces);
 
         final Vertex firstVertex = tmpNeighbours.get(0);
@@ -191,7 +184,6 @@ public class Vertex implements Comparable<Vertex>, Serializable {
 
     /**
      * Give the face containing the vertex. The face is only search in a subset.
-     * @param vertex , the vertex for which we search the face.
      * @param facesRemaining , the subset of faces.
      * @return the face containing the vertex.
      */
@@ -302,7 +294,12 @@ public class Vertex implements Comparable<Vertex>, Serializable {
      * @return the neighbours of the vertex.
      */
     public final Set<Vertex> getNeighbours() {
-        return neighbours;
+        Set<Vertex> neighbSet = new HashSet();
+        for (Face face : this.getFaces()) {
+            neighbSet.add(face.getFirstNeighbour(this));
+            neighbSet.add(face.getSecondNeighbour(this));
+        }
+        return neighbSet;
     }
     /**
      * Getter of the attribute faces.

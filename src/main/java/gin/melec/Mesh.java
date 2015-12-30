@@ -36,11 +36,11 @@ public class Mesh {
     /**
      * Contain the vertices composing this mesh.
      */
-    private TreeSet<Vertex> vertices;
+    private final TreeSet<Vertex> vertices;
     /**
      * Contain the faces composing this mesh.
      */
-    private Set<Face> faces;
+    private final Set<Face> faces;
     /**
      * List of borders of this mesh.
      */
@@ -51,19 +51,19 @@ public class Mesh {
      * when a border is formed, and the corresponding vertex are removed from
      * the mesh.
      */
-    private Set<Vertex> garbage;
+    private final Set<Vertex> garbage;
     /**
      * Contain the vertex that can initiate a border. Once this set is empty, it
      * means that all the borders have been detected. Else, we create a new one
      * by taking a vertex in the set (method in split). After a detection of a
      * border, the vertex detected are removed from this set.
      */
-    private TreeSet<Vertex> primers;
+    private final TreeSet<Vertex> primers;
 
     /**
      * The path to this mesh's file.
      */
-    private File file;
+    private final File file;
 
     /**
      * The boolean that indicate if the mesh has already been moved.
@@ -80,7 +80,7 @@ public class Mesh {
     public Mesh(final File file)
             throws IOException {
         this.file = file;
-        this.faces = new TreeSet();
+        this.faces = new HashSet();
         this.vertices = new TreeSet();
         this.garbage = new HashSet();
         this.borders = new ArrayList();
@@ -90,60 +90,13 @@ public class Mesh {
     }
 
     /**
-     * Set to a vertex the faces in which he is.
-     *
-     * @param vertex , the vertex to set the faces.
-     */
-    protected final void setNeighbourhoodToVertex(final Vertex vertex) {
-        for (Face face : this.faces) {
-            if (face.getVertex1().equals(vertex)) {
-                vertex.getFaces().add(face);
-                vertex.getNeighbours().add(face.getVertex2());
-                vertex.getNeighbours().add(face.getVertex3());
-            } else if (face.getVertex2().equals(vertex)) {
-                vertex.getFaces().add(face);
-                vertex.getNeighbours().add(face.getVertex1());
-                vertex.getNeighbours().add(face.getVertex3());
-            } else if (face.getVertex3().equals(vertex)) {
-                vertex.getFaces().add(face);
-                vertex.getNeighbours().add(face.getVertex1());
-                vertex.getNeighbours().add(face.getVertex2());
-            }
-        }
-    }
-
-    /**
-     * Set the neighbours to the primers. Every primers need to know its
-     * neighbours, so that they can add them in the garbage later.
-     */
-    private void doPrimersNeighbours() {
-        int minId, maxId;
-        minId = this.primers.first().getId();
-        maxId = this.primers.last().getId();
-        for (Face face : this.faces) {
-            if ((face.getVertex1().getId() >= minId
-                    && face.getVertex3().getId() <= maxId)) {
-                final Vertex vertex1 = face.getVertex1();
-                final Vertex vertex2 = face.getVertex2();
-                final Vertex vertex3 = face.getVertex3();
-                vertex1.getNeighbours().add(vertex2);
-                vertex1.getNeighbours().add(vertex3);
-                vertex2.getNeighbours().add(vertex1);
-                vertex2.getNeighbours().add(vertex3);
-                vertex3.getNeighbours().add(vertex1);
-                vertex3.getNeighbours().add(vertex2);
-            }
-        }
-    }
-
-    /**
      * Once a border is finish, this method is called to add all vertex related
      * to the border to the garbage.
      */
     private void completeGarbage() {
         final List<Vertex> vertexToCheck = new ArrayList(this.garbage);
         for (Vertex vertex : vertexToCheck) {
-            vertex.addNeighborToGarbage(this.garbage, this.primers);
+            vertex.addNeighbourToGarbage(this.garbage, this.primers);
         }
     }
 
@@ -171,7 +124,6 @@ public class Mesh {
             nextVertex = currentFace.getThirdVertex(border.getLastVertex(),
                     nextVertex);
         }
-        this.setNeighbourhoodToVertex(nextVertex);
         this.garbage.add(nextVertex);
         return nextVertex;
     }
@@ -189,7 +141,6 @@ public class Mesh {
     protected final void createBorders(final AbstractSplit split) {
         createPrimers(split);
         if (!this.primers.isEmpty()) {
-            doPrimersNeighbours();
             while (!primers.isEmpty()) {
                 final Border border = new Border(this, split);
                 if (border.getFirstVertex() == null) {
