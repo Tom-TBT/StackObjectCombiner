@@ -256,8 +256,8 @@ public class Vertex implements Comparable<Vertex>{
      * Setter of the attribute x.
      * @param x , the new value for the x of this vertex.
      */
-    public final void setX(float x) {
-        this.x = x;
+    public final void setX(double x) {
+        this.x = (float) x;
     }
     /**
      * Getter of the attribute y.
@@ -271,8 +271,8 @@ public class Vertex implements Comparable<Vertex>{
      * Setter of the attribute y.
      * @param y , the new value for the y of this vertex.
      */
-    public final void setY(float y) {
-        this.y = y;
+    public final void setY(double y) {
+        this.y = (float) y;
     }
     /**
      * Getter of the attribute z.

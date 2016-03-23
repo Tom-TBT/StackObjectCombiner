@@ -193,8 +193,8 @@ public class Stack_Object_Combiner implements PlugIn {
      */
     private boolean getSplits(final File workingDirectory,
             final FilenameFilter[] objFilters) {
-        long verticalSplit = Math.round(Prefs.get("SOC.verticalSplit", 0));
-        long horizontalSplit = Math.round(Prefs.get("SOC.horizontalSplit", 0));
+        double verticalSplit = Math.round(Prefs.get("SOC.verticalSplit", 0));
+        double horizontalSplit = Math.round(Prefs.get("SOC.horizontalSplit", 0));
         boolean result = true;
         boolean verticalExist = false, horizontalExist = false;
         final GenericDialog gDial = new GenericDialog("Indicate the positions "
@@ -248,13 +248,13 @@ public class Stack_Object_Combiner implements PlugIn {
             result = false;
         } else {
             if (verticalExist) {
-                verticalSplit = (int) gDial.getNextNumber();
+                verticalSplit = gDial.getNextNumber() - 0.5;
                 Prefs.set("SOC.verticalSplit", verticalSplit);
                 RIGHT_SPLIT.setPosition(verticalSplit);
                 LEFT_SPLIT.setPosition(verticalSplit);
                 }
             if (horizontalExist) {
-                horizontalSplit = (int) gDial.getNextNumber();
+                horizontalSplit = (int) gDial.getNextNumber() - 0.5;
                 Prefs.set("SOC.horizontalSplit", horizontalSplit);
                 UP_SPLIT.setPosition(horizontalSplit);
                 DOWN_SPLIT.setPosition(horizontalSplit);

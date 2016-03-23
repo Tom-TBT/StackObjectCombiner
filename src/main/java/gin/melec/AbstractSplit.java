@@ -32,14 +32,14 @@ public abstract class AbstractSplit{
      * The maximal distance to the split from which a vertex does no longer
      * belong to the border.
      */
-    protected static final double WINDOW = 4;
+    protected static double WINDOW = 4;
 
     private static final double TAIL_LIMIT = 2;
 
     /**
      * The position of the split.
      */
-    protected long position;
+    protected double position;
 
     /**
      * Find the vertices who belong to the border.
@@ -62,11 +62,11 @@ public abstract class AbstractSplit{
      *
      * @return the position of the border.
      */
-    public final long getPosition() {
+    public final double getPosition() {
         return position;
     }
 
-    public void setPosition(long position) {
+    public void setPosition(double position) {
         this.position = position;
     }
 
@@ -94,14 +94,14 @@ public abstract class AbstractSplit{
      *
      * @return the position of the split.
      */
-    protected abstract long xPosition();
+    protected abstract double xPosition();
 
     /**
      * Give the position of the split in his y Position.
      *
      * @return the position of the split.
      */
-    protected abstract long yPosition();
+    protected abstract double yPosition();
 
     /**
      * Give the distance between the split and the vertex depending the axe of
@@ -110,7 +110,7 @@ public abstract class AbstractSplit{
      * @param vertex , the vertex mesured.
      * @return the distance.
      */
-    protected abstract float distanceTo(final Vertex vertex);
+    protected abstract double distanceTo(final Vertex vertex);
 
     /**
      * A method that indicate if the given vertex is close to the split.

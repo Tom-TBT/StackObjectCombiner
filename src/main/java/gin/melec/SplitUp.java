@@ -24,17 +24,17 @@ package gin.melec;
 public class SplitUp extends AbstractSplit {
 
     @Override
-    protected float distanceTo(final Vertex vertex) {
+    protected double distanceTo(final Vertex vertex) {
         return Math.abs(this.position - vertex.getY());
     }
 
     @Override
-    protected final long xPosition() {
+    protected final double xPosition() {
         return 0;
     }
 
     @Override
-    protected final long yPosition() {
+    protected final double yPosition() {
         return position;
     }
 

@@ -24,17 +24,17 @@ package gin.melec;
 public class SplitLeft extends AbstractSplit {
 
     @Override
-    protected float distanceTo(final Vertex vertex) {
+    protected double distanceTo(final Vertex vertex) {
         return Math.abs(this.position - vertex.getX());
     }
 
     @Override
-    protected final long xPosition() {
+    protected final double xPosition() {
         return position;
     }
 
     @Override
-    protected final long yPosition() {
+    protected final double yPosition() {
         return 0;
     }
 

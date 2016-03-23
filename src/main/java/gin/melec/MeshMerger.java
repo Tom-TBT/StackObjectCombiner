@@ -63,11 +63,15 @@ public class MeshMerger {
             // It is impossible to merge less than two meshes.
             IJ.showMessage("Error 5 : Their is not enough meshes to merge.\n"
                     + choices.length + " meshes found.\n"
+                    + "Please check that you moved the meshes "
+                    + "with the plugin before merging.\n"
                     + "See the documentation for more informations.");
         } else {
         GenericDialog gDial = new GenericDialog("Choose_meshes");
         gDial.addChoice("Part 1", choices, choices[0]);
         gDial.addChoice("Part 2", choices, choices[1]);
+        gDial.addMessage("The following parameters are for experimented users");
+        gDial.addNumericField("Border distance", 4, 3);
         gDial.showDialog();
         if (gDial.wasCanceled()) {
             return;
@@ -75,6 +79,7 @@ public class MeshMerger {
         final Mesh mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
         final Mesh mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
         final AbstractSplit split1, split2;
+        AbstractSplit.WINDOW = gDial.getNextNumber();
         if (allMeshes.get(0).contains(mesh1) && allMeshes.get(1).
                 contains(mesh2)) {
             split1 = allSplits.get(0);

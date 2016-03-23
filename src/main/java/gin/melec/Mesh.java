@@ -183,7 +183,7 @@ public class Mesh {
      * @param split , the split that give the shift to apply.
      */
     protected final void shift(final AbstractSplit split) {
-        long deltaX = 0, deltaY = 0;
+        double deltaX = 0, deltaY = 0;
         if (SplitLeft.class.isInstance(split)) {
             deltaX = split.xPosition();
         }
