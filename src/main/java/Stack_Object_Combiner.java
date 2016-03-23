@@ -169,7 +169,7 @@ public class Stack_Object_Combiner implements PlugIn {
         final GenericDialog gDial = new GenericDialog("Stack Object Combiner");
         gDial.addMessage("Choose the action to perform");
         gDial.enableYesNoCancel("Move meshes", "Merge two meshes");
-        gDial.addHelp("http://imagej.net/StackObjectCombiner");
+        gDial.addHelp("http://imagej.net/StackObjectCombiner#Errors");
         gDial.showDialog();
         if (gDial.wasCanceled()) {
             result = false;
@@ -199,7 +199,7 @@ public class Stack_Object_Combiner implements PlugIn {
         boolean verticalExist = false, horizontalExist = false;
         final GenericDialog gDial = new GenericDialog("Indicate the positions "
                 + "of the splits.");
-        gDial.addHelp("http://imagej.net/StackObjectCombiner");
+        gDial.addHelp("http://imagej.net/StackObjectCombiner#Errors");
 
         File[] listing;
         listing = workingDirectory.listFiles(objFilters[3]); // Filter D_
@@ -234,7 +234,7 @@ public class Stack_Object_Combiner implements PlugIn {
 
         if (!horizontalExist && !verticalExist) {
             listing = workingDirectory.listFiles(objFilters[0]);
-            if (listing[0].isFile()) {
+            if (listing.length != 0 && listing[0].isFile()) {
                 gDial.addMessage("Error 1 : The repository contain only A_files.\n"
                     + "Check the documentation for more informations.");
             } else {
