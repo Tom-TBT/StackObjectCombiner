@@ -68,10 +68,12 @@ public class MeshMerger {
                     + "See the documentation for more informations.");
         } else {
         GenericDialog gDial = new GenericDialog("Choose_meshes");
+        gDial.addHelp("http://imagej.net/StackObjectCombiner#Errors");
         gDial.addChoice("Part 1", choices, choices[0]);
         gDial.addChoice("Part 2", choices, choices[1]);
         gDial.addMessage("The following parameters are for experimented users");
-        gDial.addNumericField("Border distance", 4, 3);
+        gDial.addNumericField("Split/Border distance", 4, 3);
+        gDial.addNumericField("Face creation increment", 10, 3);
         gDial.showDialog();
         if (gDial.wasCanceled()) {
             return;
@@ -79,7 +81,21 @@ public class MeshMerger {
         final Mesh mesh1 = getMesh(gDial.getNextChoice(), allMeshes);
         final Mesh mesh2 = getMesh(gDial.getNextChoice(), allMeshes);
         final AbstractSplit split1, split2;
-        AbstractSplit.WINDOW = gDial.getNextNumber();
+        double tmpWindow = gDial.getNextNumber();
+        if (tmpWindow < 0) {
+            IJ.showMessage("Error 6 : The distance parameter must be positive\n"
+                    + "See the documentation for more informations.");
+            return;
+        }
+        AbstractSplit.WINDOW = tmpWindow;
+        int tmpIncrem = (int) gDial.getNextNumber();
+        if (tmpIncrem < 1) {
+            IJ.showMessage("Error 7 : The increment parameter must be bigger"
+                    + "than 1.\n"
+                    + "See the documentation for more informations.");
+            return;
+        }
+        Linker.INCREM = tmpIncrem;
         if (allMeshes.get(0).contains(mesh1) && allMeshes.get(1).
                 contains(mesh2)) {
             split1 = allSplits.get(0);

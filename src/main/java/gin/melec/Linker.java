@@ -30,7 +30,7 @@ import java.util.TreeSet;
  */
 public class Linker {
 
-    private static final int INCREM = 10;
+    protected static int INCREM = 10;
 
     private Linker() {
     }
