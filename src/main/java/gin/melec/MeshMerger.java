@@ -74,6 +74,7 @@ public class MeshMerger {
         gDial.addMessage("The following parameters are for experimented users");
         gDial.addNumericField("Split/Border distance", 4, 3);
         gDial.addNumericField("Face creation increment", 10, 3);
+        gDial.addNumericField("Tail size", 4, 3);
         gDial.showDialog();
         if (gDial.wasCanceled()) {
             return;
@@ -88,14 +89,22 @@ public class MeshMerger {
             return;
         }
         AbstractSplit.WINDOW = tmpWindow;
-        int tmpIncrem = (int) gDial.getNextNumber();
-        if (tmpIncrem < 1) {
+        int tmpInt = (int) gDial.getNextNumber();
+        if (tmpInt < 1) {
             IJ.showMessage("Error 7 : The increment parameter must be bigger"
                     + "than 1.\n"
                     + "See the documentation for more informations.");
             return;
         }
-        Linker.INCREM = tmpIncrem;
+        Linker.INCREM = tmpInt;
+        tmpInt = (int) gDial.getNextNumber();
+        if (tmpInt < 1) {
+            IJ.showMessage("Error 8 : The tail size parameter must be "
+                    + "positive.\n"
+                    + "See the documentation for more informations.");
+            return;
+        }
+        Border.TAIL_SIZE = tmpInt;
         if (allMeshes.get(0).contains(mesh1) && allMeshes.get(1).
                 contains(mesh2)) {
             split1 = allSplits.get(0);

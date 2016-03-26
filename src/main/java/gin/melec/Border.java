@@ -21,9 +21,11 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -31,6 +33,8 @@ import java.util.List;
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
 public class Border {
+
+    protected static int TAIL_SIZE = 4;
 
     /**
      * The split that initiate this border.
@@ -205,7 +209,7 @@ public class Border {
                     currentSubBorder.addNextVertex(vertex);
                 } else {
                     if (!isCircular) {
-                        //this.split.removeTails(currentSubBorder);
+                        currentSubBorder.removeTails();
                     }
                     currentSubBorder.setSplit(this.split);
                     currentSubBorder.prepare();
@@ -216,7 +220,7 @@ public class Border {
         }
         if (currentSubBorder != null) {
             if (!isCircular) {
-                //this.split.removeTails(currentSubBorder);
+                currentSubBorder.removeTails();
             }
             currentSubBorder.setSplit(this.split);
             currentSubBorder.prepare();
@@ -425,6 +429,31 @@ public class Border {
             areaPath.next();
         }
         return !result;
+    }
+
+    /**
+     * A method that remove the tails of a border. Only used on linear border.
+     * @param currentSubBorder , the border for which the tails are removed.
+     */
+    protected final void removeTails() {
+        List<Vertex> sequence = getVertexSequence();
+        Set trash = new HashSet();
+        int i, j;
+        i = 0;
+        j = TAIL_SIZE;
+        while (j > 0) {
+            trash.add(sequence.get(i));
+            i++;
+            j--;
+        }
+        i = sequence.size() - 1;
+        j = TAIL_SIZE;
+        while (j > 0) {
+            trash.add(sequence.get(i));
+            i--;
+            j--;
+        }
+        sequence.removeAll(trash);
     }
 
     /**
