@@ -34,6 +34,7 @@ public class Stack_Object_Combiner implements PlugIn {
     public final void run(final String arg) {
         CustomFrame cW = new CustomFrame();
         cW.setVisible(true);
+        
 
         //TODO Clean on exit
     }

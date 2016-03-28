@@ -176,7 +176,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         initComponentsManually();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         chooseDirBtn.setText("Choose Dir");
         chooseDirBtn.setToolTipText("");
@@ -573,9 +573,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else if (button == helpAddBtn) {
             IJ.showMessage("To add a mesh for merging, select it from\n"
                     + "one of the lists. Then you can either\n "
-                    + "click on the \">>>\"button or press \'a\'.");
+                    + "click on the \">>>\"button or press \'a\' to add it.");
         } else if (button == helpDirBtn) {
-            IJ.showMessage("Select the directory where the meshes are.");
+            IJ.showMessage("Select the directory where the meshes are stocked.");
         } else if (button == helpShiftBtn) {
             IJ.showMessage("Here you can shift your meshes to their "
                     + "original position. \nThe X and Y shift correspond "
@@ -666,8 +666,6 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
     protected static void appendToLog(final String msg) {
         logText.append(msg + "\n");
-        logText.getParent().getParent().revalidate();
-        logText.getParent().getParent().repaint();
     }
 
     double ParseDouble(String strNumber) {
