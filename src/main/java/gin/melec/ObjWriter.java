@@ -16,13 +16,13 @@
  */
 package gin.melec;
 
-import ij.IJ;
 import ij.gui.GenericDialog;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +31,7 @@ import java.util.List;
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
 public class ObjWriter {
+    static boolean AUTOSAVE = false;
 
     /**
      * A private constructor because this is an utilitary class and it should
@@ -56,7 +57,7 @@ public class ObjWriter {
      */
     public static void writeMesh(final File file, final Mesh mesh)
             throws IOException {
-        IJ.log("Saving the mesh " + mesh.getFile().getName());
+        CustomFrame.appendToLog("Saving the mesh " + mesh.getFile().getName());
         final FileWriter fiW = new FileWriter(file.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
@@ -80,21 +81,26 @@ public class ObjWriter {
             final String newName, final File parentDirectory) throws IOException {
         File newMesh = new File(parentDirectory, newName);
         if (newMesh.exists()) {
-            final GenericDialog gDial = new GenericDialog("");
-            gDial.addMessage("The file already exist, replace it?");
-            gDial.enableYesNoCancel("Yes", "No");
-            gDial.hideCancelButton();
-            gDial.showDialog();
-            if (!gDial.wasOKed()) {
+            boolean replaceYN = false;
+            if (!AUTOSAVE) {
+                final GenericDialog gDial = new GenericDialog("");
+                gDial.addMessage("The file already exist, replace it?");
+                gDial.enableYesNoCancel("Yes", "No");
+                gDial.hideCancelButton();
+                gDial.showDialog();
+                replaceYN = gDial.wasOKed();
+            }
+            if (!replaceYN) {
                 int i = 0;
                 while (newMesh.exists()) {
                     i++;
                     newMesh = new File(parentDirectory,
-                            newName.substring(0, newName.length()-4) + "-" + i + ".obj");
+                            newName.substring(0, newName.length()-4)
+                                    + "-" + i + ".obj");
                 }
             }
         }
-        IJ.log("Saving the new object");
+        CustomFrame.appendToLog("Saving the new object");
         final FileWriter fiW = new FileWriter(newMesh.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
@@ -109,5 +115,44 @@ public class ObjWriter {
         } finally {
             prW.close();
         }
+    }
+
+    protected static void exportFusion(Mesh mesh1, Mesh mesh2,
+            List<Face> newFaces) throws IOException {
+        String newName;
+        if (!AUTOSAVE) {
+            final GenericDialog gDial = new GenericDialog("Enter the name of the "
+                + "new mesh");
+            gDial.addStringField("Name", mesh1.getFile().getName(), 30);
+            gDial.hideCancelButton();
+            gDial.showDialog();
+            newName = gDial.getNextString();
+        } else {
+            String mesh1Name = mesh1.getFile().getName();
+            newName = mesh1Name.substring(0, mesh1Name.length()-4) + "_"
+                    + mesh2.getFile().getName();
+        }
+        List<Vertex> verticesToWrite = new ArrayList();
+        List<Face> facesToWrite = new ArrayList();
+
+        for (Vertex vertex : mesh1.getVertices()) {
+            verticesToWrite.add(vertex);
+        }
+        for (Vertex vertex : mesh2.getVertices()) {
+            vertex.incrementId(mesh1.getVertices().size());
+            verticesToWrite.add(vertex);
+        }
+        for (Face face : mesh1.getFaces()) {
+            facesToWrite.add(face);
+        }
+        for (Face face : mesh2.getFaces()) {
+            facesToWrite.add(face);
+        }
+        for (Face face : newFaces) {
+            facesToWrite.add(face);
+        }
+        ObjWriter.writeResult(verticesToWrite, facesToWrite, newName,
+                new File(mesh1.getFile().getParent()));
+
     }
 }

@@ -16,10 +16,8 @@
  */
 package gin.melec;
 
-import ij.IJ;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.List;
 
 /**
  *
@@ -48,55 +46,73 @@ public class MeshMover {
      * @throws java.text.ParseException
      * @throws java.io.IOException
      */
-    public static void moveMeshes(final List<List> allMeshes,
-            final List<AbstractSplit> allSplits)
+    public static void moveMeshes()
             throws ParseException, IOException {
         int nbMoved = 0;
-        for (Object obj : allMeshes.get(0)) {
+        //final List<List> allMeshes = DialogContentManager.ALL_MESHES;
+        //final List<AbstractSplit> allSplits = DialogContentManager.ALL_SPLITS;
+        for (Object obj : DialogContentManager.A_MESHES) {
             Mesh mesh = (Mesh) obj;
-            mesh.importMesh();
             if (!mesh.isMoved()) {
+                mesh.importMesh();
                 mesh.shift(null);
-                IJ.log("The mesh " + mesh.getFile().getName() + " has been moved");
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been shifted");
                 mesh.exportMesh();
                 nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is already shifted");
             }
             mesh.clear();
         }
-        for (Object obj : allMeshes.get(1)) {
+        for (Object obj : DialogContentManager.B_MESHES) {
             Mesh mesh = (Mesh) obj;
-            mesh.importMesh();
             if (!mesh.isMoved()) {
-                mesh.shift(allSplits.get(1));
-                IJ.log("The mesh " + mesh.getFile().getName() + " has been moved");
+                mesh.importMesh();
+                mesh.shift(DialogContentManager.LEFT_SPLIT);
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been moved");
                 mesh.exportMesh();
                 nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is already shifted");
             }
             mesh.clear();
         }
-        for (Object obj : allMeshes.get(2)) {
+        for (Object obj : DialogContentManager.C_MESHES) {
             Mesh mesh = (Mesh) obj;
-            mesh.importMesh();
             if (!mesh.isMoved()) {
-                mesh.shift(allSplits.get(3));
-                IJ.log("The mesh " + mesh.getFile().getName() + " has been moved");
+                mesh.importMesh();
+                mesh.shift(DialogContentManager.UP_SPLIT);
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been moved");
                 mesh.exportMesh();
                 nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is already shifted");
             }
             mesh.clear();
         }
-        for (Object obj : allMeshes.get(3)) {
+        for (Object obj : DialogContentManager.D_MESHES) {
             Mesh mesh = (Mesh) obj;
-            mesh.importMesh();
             if (!mesh.isMoved()) {
-                mesh.shift(allSplits.get(1));
-                mesh.shift(allSplits.get(3));
-                IJ.log("The mesh " + mesh.getFile().getName() + " has been moved");
+                mesh.importMesh();
+                mesh.shift(DialogContentManager.LEFT_SPLIT);
+                mesh.shift(DialogContentManager.UP_SPLIT);
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been moved");
                 mesh.exportMesh();
                 nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is already shifted");
             }
             mesh.clear();
         }
-        IJ.log(nbMoved + " meshes have been moved.");
+        CustomFrame.appendToLog(nbMoved + " meshes have been moved.");
+        CustomFrame.appendToLog("-----------------------");
     }
 }

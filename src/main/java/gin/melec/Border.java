@@ -87,7 +87,7 @@ public class Border {
         if (firstVertex == null) {
             return;
         }
-        IJ.log("Detecting new border for " + mesh.getFile().getName());
+        CustomFrame.appendToLog("Detecting new border for " + mesh.getFile().getName());
         vertexSequence.add(firstVertex);
         for (final Vertex vertex : firstVertex.getNeighbours()) {
             if (vertex.belongToBorder()) {

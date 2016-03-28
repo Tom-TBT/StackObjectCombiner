@@ -164,7 +164,7 @@ public class Mesh {
                 tmpBorders.addAll(border.separateSubBorders());
             }
             this.borders = tmpBorders;
-            IJ.log(this.borders.size() + " borders detected for "
+            CustomFrame.appendToLog(this.borders.size() + " borders detected for "
                     + this.file.getName());
         }
     }
@@ -191,11 +191,13 @@ public class Mesh {
             deltaY = split.yPosition();
         }
         if (deltaX > 0) {
+            deltaX += 0.5;
             for (Vertex vertex : this.vertices) {
                 vertex.setX(vertex.getX() + deltaX);
             }
         }
         if (deltaY > 0) {
+            deltaY += 0.5;
             for (Vertex vertex : this.vertices) {
                 vertex.setY(vertex.getY() + deltaY);
             }
