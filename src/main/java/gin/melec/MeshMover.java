@@ -18,6 +18,8 @@ package gin.melec;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -46,19 +48,15 @@ public class MeshMover {
      * @throws java.text.ParseException
      * @throws java.io.IOException
      */
-    public static void moveMeshes()
+    static void moveMeshes()
             throws ParseException, IOException {
         int nbMoved = 0;
-        //final List<List> allMeshes = DialogContentManager.ALL_MESHES;
-        //final List<AbstractSplit> allSplits = DialogContentManager.ALL_SPLITS;
-        for (Object obj : DialogContentManager.A_MESHES) {
-            Mesh mesh = (Mesh) obj;
+        for (Mesh mesh : DialogContentManager.A_MESHES) {
             if (!mesh.isMoved()) {
                 mesh.importMesh();
-                mesh.shift(null);
+                mesh.shift(new ArrayList());
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " has been shifted");
-                mesh.exportMesh();
                 nbMoved++;
             } else {
                 CustomFrame.appendToLog(mesh.getFile().getName()
@@ -66,14 +64,14 @@ public class MeshMover {
             }
             mesh.clear();
         }
-        for (Object obj : DialogContentManager.B_MESHES) {
-            Mesh mesh = (Mesh) obj;
+        for (Mesh mesh : DialogContentManager.B_MESHES) {
             if (!mesh.isMoved()) {
                 mesh.importMesh();
-                mesh.shift(DialogContentManager.LEFT_SPLIT);
+                List splits = new ArrayList();
+                splits.add(DialogContentManager.LEFT_SPLIT);
+                mesh.shift(splits);
                 CustomFrame.appendToLog(mesh.getFile().getName()
-                        + " has been moved");
-                mesh.exportMesh();
+                        + " has been shifted");
                 nbMoved++;
             } else {
                 CustomFrame.appendToLog(mesh.getFile().getName()
@@ -81,14 +79,14 @@ public class MeshMover {
             }
             mesh.clear();
         }
-        for (Object obj : DialogContentManager.C_MESHES) {
-            Mesh mesh = (Mesh) obj;
+        for (Mesh mesh : DialogContentManager.C_MESHES) {
             if (!mesh.isMoved()) {
                 mesh.importMesh();
-                mesh.shift(DialogContentManager.UP_SPLIT);
+                List splits = new ArrayList();
+                splits.add(DialogContentManager.UP_SPLIT);
+                mesh.shift(splits);
                 CustomFrame.appendToLog(mesh.getFile().getName()
-                        + " has been moved");
-                mesh.exportMesh();
+                        + " has been shifted");
                 nbMoved++;
             } else {
                 CustomFrame.appendToLog(mesh.getFile().getName()
@@ -96,15 +94,15 @@ public class MeshMover {
             }
             mesh.clear();
         }
-        for (Object obj : DialogContentManager.D_MESHES) {
-            Mesh mesh = (Mesh) obj;
+        for (Mesh mesh : DialogContentManager.D_MESHES) {
             if (!mesh.isMoved()) {
                 mesh.importMesh();
-                mesh.shift(DialogContentManager.LEFT_SPLIT);
-                mesh.shift(DialogContentManager.UP_SPLIT);
+                List splits = new ArrayList();
+                splits.add(DialogContentManager.LEFT_SPLIT);
+                splits.add(DialogContentManager.UP_SPLIT);
+                mesh.shift(splits);
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " has been moved");
-                mesh.exportMesh();
                 nbMoved++;
             } else {
                 CustomFrame.appendToLog(mesh.getFile().getName()
@@ -112,7 +110,31 @@ public class MeshMover {
             }
             mesh.clear();
         }
-        CustomFrame.appendToLog(nbMoved + " meshes have been moved.");
+        CustomFrame.appendToLog(nbMoved + " meshes have been shifted.");
+        CustomFrame.appendToLog("-----------------------");
+    }
+    static void unshiftMeshes() throws ParseException, IOException {
+        int nbMoved = 0;
+        final List<Mesh> ALL_MESHES = new ArrayList();
+        ALL_MESHES.addAll(DialogContentManager.A_MESHES);
+        ALL_MESHES.addAll(DialogContentManager.B_MESHES);
+        ALL_MESHES.addAll(DialogContentManager.C_MESHES);
+        ALL_MESHES.addAll(DialogContentManager.D_MESHES);
+        for (Mesh mesh : ALL_MESHES) {
+            if (mesh.isMoved()) {
+                mesh.importMesh();
+                mesh.unshift();
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been unshifted");
+                mesh.exportMesh(0,0);
+                nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is not shifted");
+            }
+            mesh.clear();
+        }
+        CustomFrame.appendToLog(nbMoved + " meshes have been unshifted.");
         CustomFrame.appendToLog("-----------------------");
     }
 }

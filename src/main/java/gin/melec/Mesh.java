@@ -16,7 +16,6 @@
  */
 package gin.melec;
 
-import ij.IJ;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -180,29 +179,61 @@ public class Mesh {
 
     /**
      * This method shift the mesh, depending of its own splits.
-     * @param split , the split that give the shift to apply.
+     * @param splits , the splits to apply
      */
-    protected final void shift(final AbstractSplit split) {
+    protected final void shift(final List<AbstractSplit> splits) throws IOException {
         double deltaX = 0, deltaY = 0;
-        if (SplitLeft.class.isInstance(split)) {
-            deltaX = split.xPosition();
+        AbstractSplit split1, split2;
+        if (splits.size() >= 1) {
+            split1 = splits.get(0);
+            if (SplitLeft.class.isInstance(split1)) {
+                deltaX = split1.xPosition();
+            } else if (SplitUp.class.isInstance(split1)) {
+                deltaY = split1.yPosition();
+            }
+            if (splits.size() >= 2) {
+                split2 = splits.get(1);
+                if (SplitLeft.class.isInstance(split2)) {
+                    deltaX = split2.xPosition();
+                } else if (SplitUp.class.isInstance(split2)) {
+                    deltaY = split2.yPosition();
+                }
+            }
         }
-        if (SplitUp.class.isInstance(split)) {
-            deltaY = split.yPosition();
-        }
+
         if (deltaX > 0) {
-            deltaX += 0.5;
+            deltaX += 0.5; // To compensate the position of the split in the middle
             for (Vertex vertex : this.vertices) {
                 vertex.setX(vertex.getX() + deltaX);
             }
         }
         if (deltaY > 0) {
-            deltaY += 0.5;
+            deltaY += 0.5; // To compensate the position of the split in the middle
             for (Vertex vertex : this.vertices) {
                 vertex.setY(vertex.getY() + deltaY);
             }
         }
         this.moved = true;
+        this.exportMesh(deltaX, deltaY);
+    }
+
+    void unshift() throws IOException {
+        double deltaX , deltaY;
+        double shifts[];
+        shifts = ObjReader.getShift(file);
+        deltaX = -shifts[0];
+        deltaY = -shifts[1];
+        if (deltaX < 0) {
+            for (Vertex vertex : this.vertices) {
+                vertex.setX(vertex.getX() + deltaX);
+            }
+        }
+        if (deltaY < 0) {
+            for (Vertex vertex : this.vertices) {
+                vertex.setY(vertex.getY() + deltaY);
+            }
+        }
+        this.moved = false;
     }
 
     /**
@@ -211,8 +242,9 @@ public class Mesh {
      *
      * @throws java.io.IOException
      */
-    protected final void exportMesh() throws IOException {
-        ObjWriter.writeMesh(this.file, this);
+    protected final void exportMesh(final double shiftX, final double shiftY)
+            throws IOException {
+        ObjWriter.writeMesh(this, shiftX, shiftY);
     }
 
     /**

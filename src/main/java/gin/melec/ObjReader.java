@@ -46,7 +46,7 @@ public class ObjReader {
     private ObjReader() {
     }
 
-    public static ObjReader getInstance() {
+    static ObjReader getInstance() {
         return ObjReaderHolder.INSTANCE;
     }
 
@@ -64,7 +64,7 @@ public class ObjReader {
      * @throws java.text.ParseException if their is an error while parsing the
      * values of the vertices.
      */
-    public static void readMesh(final File file, final Mesh mesh)
+    static void readMesh(final File file, final Mesh mesh)
             throws IOException, ParseException {
         final List<Vertex> tmpVertices;
 
@@ -118,7 +118,7 @@ public class ObjReader {
      * @throws FileNotFoundException if the file does not exist.
      * @throws IOException if their is an error of lecture.
      */
-    public static boolean isMeshMoved(final File file)
+    static boolean isMeshMoved(final File file)
             throws FileNotFoundException, IOException {
         String currentLine;
         boolean result = false;
@@ -128,8 +128,40 @@ public class ObjReader {
         final BufferedReader buR = new BufferedReader(ipsr);
         try {
             while ((currentLine = buR.readLine()) != null) {
-                if (currentLine.contains("#movedBySOC")) {
+                if (currentLine.contains("#movedBySOC") && !currentLine.contains("Merged")) {
                     result = true;
+                    break;
+                }
+            }
+        } finally {
+            buR.close();
+        }
+        return result;
+    }
+    /**
+     * Check if the mesh has already been moved by the plugin.
+     * @param file , the file of the mesh.
+     * @return true if the mesh has already been moved by the plugin.
+     * @throws FileNotFoundException if the file does not exist.
+     * @throws IOException if their is an error of lecture.
+     */
+    static double[] getShift(final File file)
+            throws FileNotFoundException, IOException {
+        String currentLine;
+        double result[] = new double[2];
+
+        final InputStream ips = new FileInputStream(file.toString());
+        final InputStreamReader ipsr = new InputStreamReader(ips);
+        final BufferedReader buR = new BufferedReader(ipsr);
+        try {
+            while ((currentLine = buR.readLine()) != null) {
+                if (currentLine.contains("#movedBySOC")) {
+                    int xIndex = currentLine.indexOf("X:");
+                    int yIndex = currentLine.indexOf("Y:");
+                    String tmpString = currentLine.substring(xIndex+2, yIndex - 1);
+                    result[0] = Double.parseDouble(tmpString);
+                    tmpString = currentLine.substring(yIndex+2, currentLine.length());
+                    result[1] = Double.parseDouble(tmpString);
                     break;
                 }
             }
@@ -146,7 +178,7 @@ public class ObjReader {
      * @return a list of vertices making the border.
      * @throws IOException if their is an error while reading the file.
      */
-    public static List deserializeBorders(final File file) throws IOException {
+    static List deserializeBorders(final File file) throws IOException {
         List<Border> borders = null;
         final ObjectInputStream ois = new ObjectInputStream(
                 new FileInputStream(file.toString()));

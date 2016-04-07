@@ -52,18 +52,21 @@ public class ObjWriter {
      * Replace the given mesh by the new mesh contained in the array.
      *
      * @param file , the file of the mesh.
+     * @param shiftX
+     * @param shiftY
      * @param mesh , the mesh to write.
      * @throws IOException , thrown by the writer.
      */
-    public static void writeMesh(final File file, final Mesh mesh)
+    public static void writeMesh(final Mesh mesh, final double shiftX,
+            final double shiftY)
             throws IOException {
         CustomFrame.appendToLog("Saving the mesh " + mesh.getFile().getName());
-        final FileWriter fiW = new FileWriter(file.toString());
+        final FileWriter fiW = new FileWriter(mesh.getFile().toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
         try {
             if (mesh.isMoved()) {
-                prW.write("#movedBySOC\n");
+                prW.write("#movedBySOC X:"+shiftX+" Y:"+shiftY+"\n");
             }
             for (Vertex vertex : mesh.getVertices()) {
                 prW.write(vertex.toString() + "\n");
@@ -105,7 +108,7 @@ public class ObjWriter {
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
         try {
-            prW.write("#movedBySOC\n");
+            prW.write("#movedBySOC Merged\n");// A mesh merged cannot be moved anymore
             for (Vertex vertex : vertices) {
                 prW.write(vertex.toString() + "\n");
             }

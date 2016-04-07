@@ -21,6 +21,8 @@ import java.text.Collator;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.text.DefaultCaret;
 
@@ -97,6 +99,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         chooseDirBtn.addActionListener(this);
         actualiseBtn.addActionListener(this);
         shiftBtn.addActionListener(this);
+        unshiftBtn.addActionListener(this);
         clearLogBtn.addActionListener(this);
         addObjBtn.addActionListener(this);
         clearMergeBtn.addActionListener(this);
@@ -591,7 +594,16 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
-        } else if (button == clearLogBtn) {
+        }   else if (button == unshiftBtn) {
+           try {
+               MeshMover.unshiftMeshes();
+           } catch (ParseException ex) {
+               IJ.handleException(ex);
+           } catch (IOException ex) {
+               IJ.handleException(ex);
+           }
+        }
+            else if (button == clearLogBtn) {
             logText.setText("");
         } else if (button == addObjBtn) {
             addObj();
@@ -613,7 +625,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else if (button == helpShiftBtn) {
             IJ.showMessage("Here you can shift your meshes to their "
                     + "original position. \nThe X and Y shift correspond "
-                    + "respectively to the X and Y size of the A sub-stack.");
+                    + "respectively to the X and Y size of the A sub-stack.\n"
+                    + "You can also unshift a mesh that has been treated by \nthe"
+                    + "SOC with the Unshift button.");
         } else if (button == helpMergeBtn) {
             IJ.showMessage("Here you can merge meshes two by two.\n"
                     + "Select first two meshes. Then click on the \"Merge\"\n"
