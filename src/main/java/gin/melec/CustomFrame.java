@@ -34,6 +34,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JLabel aLabel;
     private List aList;
     private javax.swing.JButton addObjBtn;
+    private javax.swing.JButton actualiseBtn;
     private javax.swing.JLabel bLabel;
     private List bList;
     private javax.swing.JLabel cLabel;
@@ -77,6 +78,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JTextField xValueField;
     private javax.swing.JLabel yLabel;
     private javax.swing.JTextField yValueField;
+    private javax.swing.JButton unshiftBtn;
 
 
     public CustomFrame() {
@@ -93,6 +95,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         chooseDirBtn.addActionListener(this);
+        actualiseBtn.addActionListener(this);
         shiftBtn.addActionListener(this);
         clearLogBtn.addActionListener(this);
         addObjBtn.addActionListener(this);
@@ -135,8 +138,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         yLabel = new javax.swing.JLabel();
         yValueField = new javax.swing.JTextField();
         shiftBtn = new javax.swing.JButton();
-        helpShiftBtn = new javax.swing.JButton();
         helpDirBtn = new javax.swing.JButton();
+        actualiseBtn = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         obj1Label = new javax.swing.JLabel();
@@ -157,15 +160,15 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         jPanel5 = new javax.swing.JPanel();
         aLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        aList = new List();
+        aList = new java.awt.List();
         jScrollPane2 = new javax.swing.JScrollPane();
-        bList = new List();
+        bList = new java.awt.List();
         bLabel = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        cList = new List();
+        cList = new java.awt.List();
         cLabel = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        dList = new List();
+        dList = new java.awt.List();
         dLabel = new javax.swing.JLabel();
         addObjBtn = new javax.swing.JButton();
         helpAddBtn = new javax.swing.JButton();
@@ -173,10 +176,17 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         jScrollPane5 = new javax.swing.JScrollPane();
         logText = new javax.swing.JTextArea();
         clearLogBtn = new javax.swing.JButton();
+        helpShiftBtn = new javax.swing.JButton();
+        unshiftBtn = new javax.swing.JButton();
 
         initComponentsManually();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setLocation(new java.awt.Point(200, 100));
+        setName("Stack Object Combiner"); // NOI18N
+
+        jPanel1.setToolTipText("");
+        jPanel1.setName(""); // NOI18N
 
         chooseDirBtn.setText("Choose Dir");
         chooseDirBtn.setToolTipText("");
@@ -191,49 +201,51 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         shiftBtn.setText("Shift");
 
-        helpShiftBtn.setText("?");
-
         helpDirBtn.setText("?");
+
+        actualiseBtn.setText("Actualise");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(chooseDirBtn)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(actualiseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(chooseDirBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(dirField, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(helpDirBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(60, 60, 60)
+                .addGap(66, 66, 66)
                 .addComponent(xLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(yLabel)
+                .addGap(6, 6, 6)
+                .addComponent(yValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(yValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(shiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(helpShiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(shiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createSequentialGroup()
                     .addComponent(chooseDirBtn)
-                    .addComponent(dirField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(xLabel)
-                    .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(yLabel)
-                    .addComponent(yValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(shiftBtn)
-                    .addComponent(helpShiftBtn)
-                    .addComponent(helpDirBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 22, Short.MAX_VALUE))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(actualiseBtn))
+                .addComponent(dirField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(xLabel)
+                .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(yLabel)
+                .addComponent(yValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(shiftBtn)
+                .addComponent(helpDirBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jPanel4.setName(""); // NOI18N
 
         obj1Label.setText("Obj 1");
 
@@ -339,15 +351,19 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         aLabel.setText("A_Meshes");
 
+
         jScrollPane1.setViewportView(aList);
+
 
         jScrollPane2.setViewportView(bList);
 
         bLabel.setText("B_Meshes");
 
+
         jScrollPane3.setViewportView(cList);
 
         cLabel.setText("C_Meshes");
+
 
         jScrollPane4.setViewportView(dList);
 
@@ -451,18 +467,22 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(clearLogBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(clearLogBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(clearLogBtn))
         );
+
+        helpShiftBtn.setText("?");
+
+        unshiftBtn.setText("Unshift");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -471,7 +491,12 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(unshiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(helpShiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -482,7 +507,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(helpShiftBtn)
+                    .addComponent(unshiftBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -533,11 +561,17 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         if (button==chooseDirBtn) {
             DirectoryChooser dc = new DirectoryChooser("Select the folder"
             + " containing the .obj files");
-            String dir = dc.getDirectory();
-            dirField.setText(dir);
-            DialogContentManager.setWorkingDir(dir);
+            String directory = dc.getDirectory();
+            dirField.setText(directory);
+            DialogContentManager.setWorkingDir(directory);
             listMeshes();
-        }  else if (button == shiftBtn) {
+        }   else if (button == actualiseBtn) {
+            String directory = dirField.getText();
+            if (directory.length() != 0) {
+                DialogContentManager.setWorkingDir(directory);
+                listMeshes();
+            }
+        }   else if (button == shiftBtn) {
             try {
                 double x = ParseDouble(xValueField.getText());
                 double y = ParseDouble(yValueField.getText());
