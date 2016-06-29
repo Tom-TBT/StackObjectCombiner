@@ -147,4 +147,10 @@ public class Face {
     public final Vertex getVertex3() {
         return vertex3;
     }
+
+    public boolean vertexFollows(final Vertex v1, final Vertex v2) {
+        return (this.vertex1 == v1 && this.vertex2 == v2) ||
+                (this.vertex2 == v1 && this.vertex3 == v2) ||
+                (this.vertex3 == v1 && this.vertex1 == v2);
+    }
 }

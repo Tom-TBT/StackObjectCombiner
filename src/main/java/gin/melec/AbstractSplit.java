@@ -16,6 +16,8 @@
  */
 package gin.melec;
 
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +41,25 @@ public abstract class AbstractSplit{
      */
     protected double position;
 
+    protected Set<Vertex> primers;
+
+    private Edge upEdge, rightEdge, downEdge, leftEdge;
+
+    public AbstractSplit() {
+        this.position = 0;
+        this.primers = new TreeSet();
+    }
+
+    public AbstractSplit(double position) {
+        this.position = position;
+         this.primers = new TreeSet();
+    }
+
+    public AbstractSplit(AbstractSplit original) {
+        this.position = original.position;
+        this.primers = new TreeSet();
+    }
+
     /**
      * Find the vertices who belong to the border.
      *
@@ -52,6 +73,7 @@ public abstract class AbstractSplit{
                 closeVertices.add(vertex);
             }
         }
+        this.primers.addAll(closeVertices);
         return closeVertices;
     }
 
@@ -76,13 +98,98 @@ public abstract class AbstractSplit{
      * @param collection , the collection containing the vertices.
      * @return the distance of the closest vertex to the split.
      */
-    protected final Vertex findCloserVertex(final Set<Vertex> collection) {
+    protected final Vertex findCloserVertex() {
         Vertex result = null;
-        for (Vertex candidat : collection) {
-            if (result == null
-                    || this.distanceTo(candidat) < this.distanceTo(result)) {
-                result = candidat;
+        while (result == null && primers.size() > 0) {
+            for (Vertex candidat : primers) {
+                if (result == null
+                        || this.distanceTo(candidat) < this.distanceTo(result)) {
+                    result = candidat;
+                }
             }
+            if (!result.belongToBorder()) {
+                primers.remove(result);
+                result = null;
+            }
+        }
+
+        return result;
+    }
+
+    protected void removeAlreadyLookedPrimers(final Set primersLeft) {
+        Set tmpSet = new HashSet();
+        for (Vertex v:this.primers) {
+            if (!primersLeft.contains(v)) {
+                tmpSet.add(v);
+            }
+        }
+        this.primers.removeAll(tmpSet);
+    }
+
+    protected final void clearPrimers(final Set garbage) {
+        this.primers.removeAll(garbage);
+    }
+
+    protected final List<FlatBorder> getFlatBorders(){
+        List<FlatBorder> result = new ArrayList();
+        boolean connectorFound = true;
+        Connector firstConn;
+        do {
+            Edge currentEdge;
+            firstConn = this.downEdge.getFirst();
+            currentEdge = this.downEdge;
+            if (firstConn == null) {
+                firstConn = this.leftEdge.getFirst();
+                currentEdge = this.leftEdge;
+                if (firstConn == null) {
+                    firstConn = this.upEdge.getFirst();
+                    currentEdge = this.upEdge;
+                    if (firstConn == null) {
+                        firstConn = this.rightEdge.getFirst();
+                        currentEdge = this.rightEdge;
+                        if (firstConn == null) {
+                            break;
+                        }
+                    }
+                }
+            }
+            FlatBorder currentFlat = new FlatBorder();
+            currentFlat.addElement(firstConn.getSequence());
+            Vertex currVertex = firstConn.getLastVertex();
+            currentEdge = firstConn.getNextEdge();
+            do {
+                currVertex = currentEdge.getNext(currVertex);
+                if (currVertex == firstConn) {
+                    result.add(currentFlat);
+                    break;
+                }
+                if (currVertex instanceof Connector) {
+                    Connector connector = (Connector) currVertex;
+                    currentEdge.removeConnector(connector);
+                    currentEdge = connector.getNextEdge();
+                    currentFlat.addElement(connector.getSequence());
+                    currVertex = connector.getLastVertex();
+                } else {
+                    currentEdge = getNextEdge(currentEdge);
+                    currentFlat.addElement(currVertex);
+                }
+
+            } while(true);
+            currentEdge.removeConnector(firstConn);
+        } while(connectorFound);
+        return result;
+    }
+
+    private Edge getNextEdge(Edge edge) {
+        Edge result;
+        if (edge == upEdge) {
+            result = leftEdge;
+        } else if (edge == leftEdge) {
+            result = downEdge;
+        } else if (edge == downEdge) {
+            result = rightEdge;
+        } else {
+            result = upEdge;
         }
         return result;
     }
@@ -102,6 +209,13 @@ public abstract class AbstractSplit{
     protected abstract double yPosition();
 
     /**
+     * Give the position of the split in his y Position.
+     *
+     * @return the position of the split.
+     */
+    protected abstract double zPosition();
+
+    /**
      * Give the distance between the split and the vertex depending the axe of
      * the split.
      *
@@ -117,5 +231,40 @@ public abstract class AbstractSplit{
      * @return true if the vertex is close, else false.
      */
     protected abstract boolean isClose(final Vertex vertex);
+
+    protected abstract Line2D.Float getSegment(final Vertex vertex1,
+            final Vertex vertex2);
+
+    public Edge getUpEdge() {
+        return upEdge;
+    }
+
+    public void setUpEdge(Edge upEdge) {
+        this.upEdge = upEdge;
+    }
+
+    public Edge getRightEdge() {
+        return rightEdge;
+    }
+
+    public void setRightEdge(Edge rightEdge) {
+        this.rightEdge = rightEdge;
+    }
+
+    public Edge getDownEdge() {
+        return downEdge;
+    }
+
+    public void setDownEdge(Edge downEdge) {
+        this.downEdge = downEdge;
+    }
+
+    public Edge getLeftEdge() {
+        return leftEdge;
+    }
+
+    public void setLeftEdge(Edge leftEdge) {
+        this.leftEdge = leftEdge;
+    }
 
 }

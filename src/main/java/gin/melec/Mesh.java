@@ -70,6 +70,11 @@ public class Mesh {
     private boolean moved;
 
     /**
+     * The boolean that indicate if the mesh has already been moved.
+     */
+    private final boolean merged;
+
+    /**
      * Public constructor for a mesh.
      *
      * @param file , the file containing the mesh.
@@ -86,6 +91,7 @@ public class Mesh {
         this.primers = new TreeSet();
 
         this.moved = ObjReader.isMeshMoved(this.file);
+        this.merged = ObjReader.isMeshMerged(this.file);
     }
 
     /**
@@ -138,8 +144,8 @@ public class Mesh {
      * @param split , the split for which we create the borders.
      */
     protected final void createBorders(final AbstractSplit split) {
-        createPrimers(split);
         if (!this.primers.isEmpty()) {
+            split.removeAlreadyLookedPrimers(primers);
             while (!primers.isEmpty()) {
                 final Border border = new Border(this, split);
                 if (border.getFirstVertex() == null) {
@@ -152,19 +158,14 @@ public class Mesh {
                         border.addNextVertex(nextVertex);
                     }
                 }
-                completeGarbage();
                 primers.removeAll(this.garbage);
+                split.clearPrimers(this.garbage);
                 this.garbage.clear();
                 this.borders.add(border);
             }
-
-            final List<Border> tmpBorders = new ArrayList();
-            for (Border border : this.borders) {
-                tmpBorders.addAll(border.separateSubBorders());
-            }
-            this.borders = tmpBorders;
-            CustomFrame.appendToLog(this.borders.size() + " borders detected for "
-                    + this.file.getName());
+            completeGarbage();
+            primers.removeAll(this.garbage);
+            split.clearPrimers(this.garbage);
         }
     }
 
@@ -173,7 +174,7 @@ public class Mesh {
      *
      * @param split , the split used for the primers.
      */
-    private void createPrimers(final AbstractSplit split) {
+    protected void createPrimers(final AbstractSplit split) {
         primers.addAll(split.findLimitVertices(vertices));
     }
 
@@ -186,16 +187,16 @@ public class Mesh {
         AbstractSplit split1, split2;
         if (splits.size() >= 1) {
             split1 = splits.get(0);
-            if (SplitLeft.class.isInstance(split1)) {
+            if (WidthSplit.class.isInstance(split1)) {
                 deltaX = split1.xPosition();
-            } else if (SplitUp.class.isInstance(split1)) {
+            } else if (HeightSplit.class.isInstance(split1)) {
                 deltaY = split1.yPosition();
             }
             if (splits.size() >= 2) {
                 split2 = splits.get(1);
-                if (SplitLeft.class.isInstance(split2)) {
+                if (WidthSplit.class.isInstance(split2)) {
                     deltaX = split2.xPosition();
-                } else if (SplitUp.class.isInstance(split2)) {
+                } else if (HeightSplit.class.isInstance(split2)) {
                     deltaY = split2.yPosition();
                 }
             }
@@ -240,6 +241,8 @@ public class Mesh {
      * Use the ObjWriter to write the vertices and the faces in the file of the
      * mesh.
      *
+     * @param shiftX
+     * @param shiftY
      * @throws java.io.IOException
      */
     protected final void exportMesh(final double shiftX, final double shiftY)
@@ -333,6 +336,14 @@ public class Mesh {
     public final boolean isMoved() {
         return moved;
     }
+    /**
+     * Getter of the attribute merged.
+     *
+     * @return true if the mesh has already been merged.
+     */
+    public final boolean isMerged() {
+        return merged;
+    }
 
     /**
      * Clear the faces and the vertices of the mesh. It is used to release
@@ -342,5 +353,9 @@ public class Mesh {
         this.borders.clear();
         this.faces.clear();
         this.vertices.clear();
+    }
+
+    void setBorders(List<Border> borders) {
+        this.borders = borders;
     }
 }

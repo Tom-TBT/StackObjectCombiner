@@ -42,26 +42,10 @@ public class DialogContentManager {
      */
     protected static final List<Mesh> D_MESHES = new ArrayList();
 
-    /**
-     * List of splits in the A_ part.
-     */
-    protected static final AbstractSplit RIGHT_SPLIT = new SplitRight();
-    /**
-     * List of splits in the B_ part.
-     */
-    protected static final AbstractSplit LEFT_SPLIT = new SplitLeft();
-    /**
-     * List of splits in the C_ part.
-     */
-    protected static final AbstractSplit UP_SPLIT = new SplitUp();
-    /**
-     * List of splits in the D_ part.
-     */
-    protected static final AbstractSplit DOWN_SPLIT = new SplitDown();
+    protected static final AbstractSplit WIDTH_SPLIT = new WidthSplit();
+    protected static final AbstractSplit HEIGHT_SPLIT = new HeightSplit();
 
-    protected static AbstractSplit ACTIVE_SPLIT_1;
-
-    protected static AbstractSplit ACTIVE_SPLIT_2;
+    protected static AbstractSplit ACTIVE_SPLIT;
 
     protected static Mesh ACTIVE_MESH_1;
 
@@ -173,12 +157,10 @@ public class DialogContentManager {
     protected static void setSplits(double x, double y) {
         //ALL_SPLITS.clear();
         if (x != 0) {
-            RIGHT_SPLIT.setPosition(x - 0.5);
-            LEFT_SPLIT.setPosition(x - 0.5);
+            WIDTH_SPLIT.setPosition(x - 0.5);
         }
         if (y != 0) {
-            UP_SPLIT.setPosition(y - 0.5);
-            DOWN_SPLIT.setPosition(y - 0.5);
+            HEIGHT_SPLIT.setPosition(y - 0.5);
         }
 
     }
@@ -186,46 +168,22 @@ public class DialogContentManager {
     protected static boolean setActiveSplits(final String obj1, final String obj2) {
         ACTIVE_MESH_1 = getMesh(obj1);
         ACTIVE_MESH_2 = getMesh(obj2);
-        String errMessage = "";
+
         if (!ACTIVE_MESH_1.isMoved() || !ACTIVE_MESH_2.isMoved()) {
             IJ.error("At least one of the mesh haven't been shifted.\n"
                     + "Please use the Shift function of the plugin");
             CustomFrame.appendToLog("Merging aborted");
             return false;
         }
-        if (A_MESHES.contains(ACTIVE_MESH_1) && B_MESHES.
-                contains(ACTIVE_MESH_2)) {
-            ACTIVE_SPLIT_1 = RIGHT_SPLIT;
-            ACTIVE_SPLIT_2 = LEFT_SPLIT;
-        } else if (B_MESHES.contains(ACTIVE_MESH_1) && A_MESHES.
-                contains(ACTIVE_MESH_2)) {
-            ACTIVE_SPLIT_1 = LEFT_SPLIT;
-            ACTIVE_SPLIT_2 = RIGHT_SPLIT;
-        } else if (C_MESHES.contains(ACTIVE_MESH_1) && D_MESHES.
-                contains(ACTIVE_MESH_2)) {
-            ACTIVE_SPLIT_1 = RIGHT_SPLIT;
-            ACTIVE_SPLIT_2 = LEFT_SPLIT;
-        } else if (D_MESHES.contains(ACTIVE_MESH_1) && C_MESHES.
-                contains(ACTIVE_MESH_2)) {
-            ACTIVE_SPLIT_1 = LEFT_SPLIT;
-            ACTIVE_SPLIT_2 = RIGHT_SPLIT;
-        } else if (A_MESHES.contains(ACTIVE_MESH_1) && C_MESHES.
-                contains(ACTIVE_MESH_2)) {
-            ACTIVE_SPLIT_1 = DOWN_SPLIT;
-            ACTIVE_SPLIT_2 = UP_SPLIT;
-        } else if (B_MESHES.contains(ACTIVE_MESH_1) && D_MESHES.
-                contains(ACTIVE_MESH_2)) {
-            ACTIVE_SPLIT_1 = DOWN_SPLIT;
-            ACTIVE_SPLIT_2 = UP_SPLIT;
-        } else if (C_MESHES.contains(ACTIVE_MESH_1) && A_MESHES.
-                contains(ACTIVE_MESH_2)) {
-            ACTIVE_SPLIT_1 = UP_SPLIT;
-            ACTIVE_SPLIT_2 = DOWN_SPLIT;
-        } else if (D_MESHES.contains(ACTIVE_MESH_1) && B_MESHES.
-                contains(ACTIVE_MESH_2)) {
-            ACTIVE_SPLIT_1 = UP_SPLIT;
-            ACTIVE_SPLIT_2 = DOWN_SPLIT;
-        }
+        if ((A_MESHES.contains(ACTIVE_MESH_1) && B_MESHES.contains(ACTIVE_MESH_2))
+                || (B_MESHES.contains(ACTIVE_MESH_1) && A_MESHES.contains(ACTIVE_MESH_2))
+                || (C_MESHES.contains(ACTIVE_MESH_1) && D_MESHES.contains(ACTIVE_MESH_2))
+                || (D_MESHES.contains(ACTIVE_MESH_1) && C_MESHES.contains(ACTIVE_MESH_2))) {
+            ACTIVE_SPLIT = WIDTH_SPLIT;
+        } else {
+            ACTIVE_SPLIT = HEIGHT_SPLIT;
+        } // No other control needed since the meshes added to the merge must
+            // already correspond.
         return true;
     }
 

@@ -46,26 +46,26 @@ public class Vertex implements Comparable<Vertex>{
     /**
      * The id number of the vertex.
      */
-    private int id;
+    protected int id;
     /**
      * The x coordonate of the vertex.
      */
-    private float x;
+    protected float x;
 
     /**
      * The y coordonate of the vertex.
      */
-    private float y;
+    protected float y;
 
     /**
      * The z coordonate of the vertex.
      */
-    private float z;
+    protected float z;
 
     /**
      * The faces to who the vertex belong.
      */
-    private transient Set<Face> faces;
+    private final transient Set<Face> faces;
 
     /**
      * Public constructor of a vertex.
@@ -192,6 +192,17 @@ public class Vertex implements Comparable<Vertex>{
         for (Face face : facesRemaining) {
             if (face.include(this)) {
                 result = face;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public final boolean isLogicalNext(final Vertex vertex) {
+        boolean result = false;
+        for (Face face: this.faces) {
+            if (face.include(vertex)) {
+                result = face.vertexFollows(this, vertex);
                 break;
             }
         }

@@ -128,7 +128,35 @@ public class ObjReader {
         final BufferedReader buR = new BufferedReader(ipsr);
         try {
             while ((currentLine = buR.readLine()) != null) {
-                if (currentLine.contains("#movedBySOC") && !currentLine.contains("Merged")) {
+                if (currentLine.contains("#movedBySOC")) {
+                    result = true;
+                    break;
+                }
+            }
+        } finally {
+            buR.close();
+        }
+        return result;
+    }
+
+    /**
+     * Check if the mesh has already been moved by the plugin.
+     * @param file , the file of the mesh.
+     * @return true if the mesh has already been moved by the plugin.
+     * @throws FileNotFoundException if the file does not exist.
+     * @throws IOException if their is an error of lecture.
+     */
+    static boolean isMeshMerged(final File file)
+            throws FileNotFoundException, IOException {
+        String currentLine;
+        boolean result = false;
+
+        final InputStream ips = new FileInputStream(file.toString());
+        final InputStreamReader ipsr = new InputStreamReader(ips);
+        final BufferedReader buR = new BufferedReader(ipsr);
+        try {
+            while ((currentLine = buR.readLine()) != null) {
+                if (currentLine.contains("Merged")) {
                     result = true;
                     break;
                 }

@@ -17,8 +17,6 @@
 package gin.melec;
 
 import ij.IJ;
-import ij.gui.GenericDialog;
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -64,7 +62,15 @@ public class MeshMerger {
             @Override
             public void run() {
                 CustomFrame.appendToLog("Working on " + mesh1.getFile().getName());
-                mesh1.createBorders(DialogContentManager.ACTIVE_SPLIT_1);
+                mesh1.createPrimers(DialogContentManager.ACTIVE_SPLIT);
+                mesh1.createBorders(DialogContentManager.ACTIVE_SPLIT);
+                final List<Border> tmpBorders = new ArrayList();
+                for (Border border : mesh1.getBorders()) {
+                    tmpBorders.addAll(border.separateSubBorders());
+                }
+                mesh1.setBorders(tmpBorders);
+                CustomFrame.appendToLog(mesh1.getBorders().size() + " borders detected for "
+                    + mesh1.getFile().getName());
             }
         };
         Thread thread2 = new Thread() {
@@ -74,8 +80,24 @@ public class MeshMerger {
 
             @Override
             public void run() {
+                AbstractSplit tmpSplit;
+                if (WidthSplit.class.isInstance(DialogContentManager.ACTIVE_SPLIT)) {
+                    tmpSplit = new WidthSplit(DialogContentManager.ACTIVE_SPLIT);
+                } else if (HeightSplit.class.isInstance(DialogContentManager.ACTIVE_SPLIT)) {
+                    tmpSplit = new HeightSplit(DialogContentManager.ACTIVE_SPLIT);
+                } else {
+                    tmpSplit = new DepthSplit(DialogContentManager.ACTIVE_SPLIT);
+                }
                 CustomFrame.appendToLog("Working on " + mesh2.getFile().getName());
-                mesh2.createBorders(DialogContentManager.ACTIVE_SPLIT_2);
+                mesh2.createPrimers(tmpSplit);
+                mesh2.createBorders(tmpSplit);
+                final List<Border> tmpBorders = new ArrayList();
+                for (Border border : mesh2.getBorders()) {
+                    tmpBorders.addAll(border.separateSubBorders());
+                }
+                mesh2.setBorders(tmpBorders);
+                CustomFrame.appendToLog(mesh2.getBorders().size() + " borders detected for "
+                    + mesh2.getFile().getName());
             }
         };
         thread1.start();
@@ -101,6 +123,8 @@ public class MeshMerger {
                 final List<Face> newFaces = new ArrayList();
                 CustomFrame.appendToLog("Computing the new faces");
                 for (Border[] couple : couples) {
+                    if (couple[0].distanceTo(couple[1]) < 100)
+//                    double dis = couple[0].distanceTo(couple[1]);
                     newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
                 }
                 try {
@@ -184,46 +208,6 @@ public class MeshMerger {
                 }
             }
             result.add(distances);
-        }
-        return result;
-    }
-
-    /**
-     * Return a list of string containing the name of the meshes that can be
-     * merged. Only the meshes that have been moved by the plugin can appear in
-     * the list.
-     *
-     * @param allMeshes , the list containing all the meshes of the file.
-     * @return the array of string of the name of the meshes.
-     */
-    private static String[] getChoices(List<List> allMeshes) {
-        final List<String> choices = new ArrayList();
-        for (List<Mesh> listMesh : allMeshes) {
-            for (Mesh mesh : listMesh) {
-                if (mesh.isMoved()) {
-                    choices.add(mesh.toString());
-                }
-            }
-        }
-        return choices.toArray(new String[0]);
-    }
-
-    /**
-     * Return the mesh given by it's name.
-     *
-     * @param meshName , the name of the mesh we search.
-     * @param allMeshes , the list containing the meshes.
-     * @return the meshes with the given name.
-     */
-    private static Mesh getMesh(String meshName, List<List> allMeshes) {
-        Mesh result = null;
-        for (List<Mesh> listMesh : allMeshes) {
-            for (Mesh mesh : listMesh) {
-                if (mesh.toString().equals(meshName)) {
-                    result = mesh;
-                    break;
-                }
-            }
         }
         return result;
     }

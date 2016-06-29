@@ -21,8 +21,6 @@ import java.text.Collator;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.text.DefaultCaret;
 
@@ -37,6 +35,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private List aList;
     private javax.swing.JButton addObjBtn;
     private javax.swing.JButton actualiseBtn;
+    private javax.swing.JToggleButton autoMerge;
     private javax.swing.JLabel bLabel;
     private List bList;
     private javax.swing.JLabel cLabel;
@@ -81,6 +80,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JLabel yLabel;
     private javax.swing.JTextField yValueField;
     private javax.swing.JButton unshiftBtn;
+    private javax.swing.JTextField width;
+    private javax.swing.JTextField height;
+    private javax.swing.JTextField depth;
 
 
     public CustomFrame() {
@@ -104,6 +106,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         addObjBtn.addActionListener(this);
         clearMergeBtn.addActionListener(this);
         mergeBtn.addActionListener(this);
+        autoMerge.addActionListener(this);
 
         helpAddBtn.addActionListener(this);
         helpMergeBtn.addActionListener(this);
@@ -181,6 +184,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         clearLogBtn = new javax.swing.JButton();
         helpShiftBtn = new javax.swing.JButton();
         unshiftBtn = new javax.swing.JButton();
+        autoMerge = new javax.swing.JToggleButton();
+        width = new javax.swing.JTextField();
+        height = new javax.swing.JTextField();
+        depth = new javax.swing.JTextField();
 
         initComponentsManually();
 
@@ -208,6 +215,14 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         actualiseBtn.setText("Actualise");
 
+        autoMerge.setText("jToggleButton1");
+
+        width.setText("jTextField1");
+
+        height.setText("jTextField2");
+
+        depth.setText("jTextField1");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -216,29 +231,45 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(actualiseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(chooseDirBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(dirField, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(helpDirBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66)
-                .addComponent(xLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(yLabel)
-                .addGap(6, 6, 6)
-                .addComponent(yValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(shiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dirField, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(helpDirBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(66, 66, 66)
+                        .addComponent(xLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(yLabel)
+                        .addGap(6, 6, 6)
+                        .addComponent(yValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(shiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(156, 156, 156)
+                        .addComponent(autoMerge)
+                        .addGap(18, 18, 18)
+                        .addComponent(width, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(height, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(depth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(chooseDirBtn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(actualiseBtn)
+                    .addComponent(autoMerge)
+                    .addComponent(width, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(height, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(depth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addComponent(chooseDirBtn)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(actualiseBtn))
                 .addComponent(dirField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(xLabel)
                 .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -354,19 +385,15 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         aLabel.setText("A_Meshes");
 
-
         jScrollPane1.setViewportView(aList);
-
 
         jScrollPane2.setViewportView(bList);
 
         bLabel.setText("B_Meshes");
 
-
         jScrollPane3.setViewportView(cList);
 
         cLabel.setText("C_Meshes");
-
 
         jScrollPane4.setViewportView(dList);
 
@@ -616,6 +643,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             dList.setEnabled(true);
         } else if (button == mergeBtn) {
             merge();
+        } else if (button == autoMerge) {
+            autoMerge();
         } else if (button == helpAddBtn) {
             IJ.showMessage("To add a mesh for merging, select it from\n"
                     + "one of the lists. Then you can either\n "
@@ -627,7 +656,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                     + "original position. \nThe X and Y shift correspond "
                     + "respectively to the X and Y size of the A sub-stack.\n"
                     + "You can also unshift a mesh that has been treated by \nthe"
-                    + "SOC with the Unshift button.");
+                    + " SOC with the Unshift button. Note that merged mesh can't be\n"
+                    + " unshifted");
         } else if (button == helpMergeBtn) {
             IJ.showMessage("Here you can merge meshes two by two.\n"
                     + "Select first two meshes. Then click on the \"Merge\"\n"
@@ -680,6 +710,29 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             DialogContentManager.setWorkingDir(dirField.getText());
             listMeshes();
         }
+    }
+
+    protected void autoMerge() {
+        Cube cube_A = new Cube(0,0,0,191.5,213.5,280.5);
+        Cube cube_B = new Cube(191.5,0,0,400,213.5,280.5);
+        Cube cube_C = new Cube(0,213.5,0,191.5,600,280.5);
+        Cube cube_D = new Cube(191.5,213.5,0,400,600,280.5);
+        cube_A.addAllMesh(DialogContentManager.A_MESHES);
+        cube_B.addAllMesh(DialogContentManager.B_MESHES);
+        cube_C.addAllMesh(DialogContentManager.C_MESHES);
+        cube_D.addAllMesh(DialogContentManager.D_MESHES);
+
+        cube_A.detectMeshBorders();
+        cube_B.detectMeshBorders();
+        cube_C.detectMeshBorders();
+        cube_D.detectMeshBorders();
+
+        cube_A.prepareMeshBorders();
+        cube_B.prepareMeshBorders();
+        cube_C.prepareMeshBorders();
+        cube_D.prepareMeshBorders();
+
+        int g = 0;
     }
 
     protected void addObjToMerge(final String name, final char source) {

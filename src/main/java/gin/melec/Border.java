@@ -16,8 +16,8 @@
  */
 package gin.melec;
 
-import ij.IJ;
 import java.awt.geom.Area;
+import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
@@ -61,6 +61,11 @@ public class Border {
      */
     private boolean circular;
 
+    private double area;
+
+    private Connector connector;
+
+
     /**
      * Public constructor for the border. This constructor is used when the
      * border need to be detected. The constructor look at the primers of the
@@ -73,24 +78,15 @@ public class Border {
         this.vertexSequence = new LinkedList();
         this.split = split;
 
-        Vertex currentVertex;
         Vertex firstVertex = null, secondVertex = null;
-        while (mesh.getPrimers().size() > 0 && firstVertex == null) {
-            currentVertex = split.findCloserVertex(mesh.getPrimers());
-            if (currentVertex.belongToBorder()) {
-                firstVertex = currentVertex;
-                break;
-            } else {
-                mesh.getPrimers().remove(currentVertex);
-            }
-        }
+        firstVertex = split.findCloserVertex();
         if (firstVertex == null) {
             return;
         }
         CustomFrame.appendToLog("Detecting new border for " + mesh.getFile().getName());
         vertexSequence.add(firstVertex);
         for (final Vertex vertex : firstVertex.getNeighbours()) {
-            if (vertex.belongToBorder()) {
+            if (vertex.belongToBorder() && firstVertex.isLogicalNext(vertex)) {
                 secondVertex = vertex;
                 break;
             }
@@ -102,6 +98,16 @@ public class Border {
 
     private Border() {
         this.vertexSequence = new LinkedList();
+    }
+
+    protected Border(List<Vertex> vertexList, int startSequence, int endSequence, Edge stopEdge) {
+        this.vertexSequence = new LinkedList();
+        this.connector = new Connector(vertexList.get(startSequence), this, stopEdge);
+        int i = startSequence;
+        while ( i < endSequence) {
+            this.vertexSequence.add(vertexList.get(i));
+            i++;
+        }
     }
 
     /**
@@ -178,7 +184,7 @@ public class Border {
         return result;
     }
 
-    private void setSplit(AbstractSplit split) {
+    void setSplit(AbstractSplit split) {
         this.split = split;
     }
 
@@ -196,36 +202,44 @@ public class Border {
             if (!this.split.isClose(vertex)) {
                 this.changeFirstVertex(vertex);
                 isCircular = false;
+                //break;
             }
         }
-        Border currentSubBorder = null;
-
-        for (Vertex vertex : this.vertexSequence) {
-            if (currentSubBorder == null && this.split.isClose(vertex)) {
-                currentSubBorder = new Border();
-                currentSubBorder.addNextVertex(vertex);
-            } else if (currentSubBorder != null) {
-                if (this.split.isClose(vertex)) {
+        if (isCircular) { // the border is circular so no need to split it
+            this.prepare();
+            result.add(this);
+        }
+        else {
+            Border currentSubBorder = null;
+            for (Vertex vertex : this.vertexSequence) {
+                if (currentSubBorder == null && this.split.isClose(vertex)) {
+                    currentSubBorder = new Border();
                     currentSubBorder.addNextVertex(vertex);
-                } else {
-                    if (!isCircular) {
+                } else if (currentSubBorder != null) {
+                    if (this.split.isClose(vertex)) {
+                        currentSubBorder.addNextVertex(vertex);
+                    } else {
                         currentSubBorder.removeTails();
+                        if (currentSubBorder.vertexSequence.size() > 0) {
+                            // if the tails removing remove everything, we don't keep it
+                            currentSubBorder.setSplit(this.split);
+                            currentSubBorder.prepare();
+                            result.add(currentSubBorder);
+                        }
+                        currentSubBorder = null;
                     }
-                    currentSubBorder.setSplit(this.split);
-                    currentSubBorder.prepare();
-                    result.add(currentSubBorder);
-                    currentSubBorder = null;
                 }
             }
-        }
-        if (currentSubBorder != null) {
-            if (!isCircular) {
-                currentSubBorder.removeTails();
+            if (currentSubBorder != null) {
+                if (!isCircular) {
+                    currentSubBorder.removeTails();
+                }
+                currentSubBorder.setSplit(this.split);
+                currentSubBorder.prepare();
+                result.add(currentSubBorder);
             }
-            currentSubBorder.setSplit(this.split);
-            currentSubBorder.prepare();
-            result.add(currentSubBorder);
         }
+
         return result;
     }
 
@@ -255,9 +269,34 @@ public class Border {
         this.circular = this.getFirstVertex().getNeighbours()
                 .contains(this.getLastVertex());
 
+//        if (this.computeArea()) {
+//
+//        }
         if (this.isCircular() && this.isClockwise()) {
             this.revertSequence();
         }
+    }
+
+    private boolean computeArea() {
+        this.area = 0;
+        Vertex v1 = this.getVertexSequence().get(0);
+        Vertex v2;
+        for (int i = 1; i < this.getVertexSequence().size() - 1; i++) {
+            v2 = this.getVertexSequence().get(i);
+            Line2D.Float segment = this.split.getSegment(v1,v2);
+            this.area += (segment.getX1() + segment.getX2()) *
+                    (segment.getY1() - segment.getY2());
+            v1 = v2;
+        }
+        v2 = this.getVertexSequence().get(0);
+        Line2D.Float segment = this.split.getSegment(v1,v2);
+        this.area += (segment.getX1() + segment.getX2()) *
+                (segment.getY1() - segment.getY2());
+        if (area < 0) {
+            area = (-area);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -333,6 +372,12 @@ public class Border {
         }
     }
 
+    public final void addStartingSequence(final List<Vertex> firstFragment) {
+        for (int i = 0; i < firstFragment.size(); i++) {
+            this.vertexSequence.add(i, firstFragment.get(i));
+        }
+    }
+
     /**
      * This method take a border as reference, and align the border on. Can then
      * change the first vertex of the border, and the order of the sequence. If
@@ -371,8 +416,7 @@ public class Border {
 //        List<Vector2D> twodPoints = new ArrayList<Vector2D>();
 //
 //        int i = 0, increment = 10;
-        boolean isHorizontalPlane = this.getSplit() instanceof SplitDown
-                || this.getSplit() instanceof SplitUp;
+        boolean isHorizontalPlane = this.getSplit() instanceof HeightSplit;
 
         // Creating the shape
         Path2D shape = new Path2D.Double();
@@ -464,5 +508,21 @@ public class Border {
      */
     public final boolean isCircular() {
         return circular;
+    }
+
+    protected final double getCumulLenght() {
+        return this.cumulLenght;
+    }
+
+    public Vertex getCenter() {
+        return center;
+    }
+
+    public Connector getConnector() {
+        return connector;
+    }
+
+    public void setConnector(Connector connector) {
+        this.connector = connector;
     }
 }
