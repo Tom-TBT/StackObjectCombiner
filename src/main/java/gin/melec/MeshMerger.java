@@ -68,7 +68,7 @@ public class MeshMerger {
                 for (Border border : mesh1.getBorders()) {
                     tmpBorders.addAll(border.separateSubBorders());
                 }
-                mesh1.setBorders(tmpBorders);
+                mesh1.addBorders(tmpBorders);
                 CustomFrame.appendToLog(mesh1.getBorders().size() + " borders detected for "
                     + mesh1.getFile().getName());
             }
@@ -95,7 +95,7 @@ public class MeshMerger {
                 for (Border border : mesh2.getBorders()) {
                     tmpBorders.addAll(border.separateSubBorders());
                 }
-                mesh2.setBorders(tmpBorders);
+                mesh2.addBorders(tmpBorders);
                 CustomFrame.appendToLog(mesh2.getBorders().size() + " borders detected for "
                     + mesh2.getFile().getName());
             }

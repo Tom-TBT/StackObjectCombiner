@@ -17,19 +17,25 @@
  */
 package gin.melec;
 
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /**
  *
  * @author tom
  */
-public class FlatBorder {
+public class FlatBorder{
 
     private final List elements;
 
+    private CustomArea customArea;
+
     public FlatBorder() {
         this.elements = new ArrayList();
+        this.customArea = null;
     }
 
     public void addElement(Object element) {
@@ -44,6 +50,7 @@ public class FlatBorder {
     }
 
     public void printBorder() {
+        System.out.println();
         for (Object obj: this.elements) {
             if (obj instanceof List) {
                 List<Vertex> list = (List) obj;
@@ -54,5 +61,73 @@ public class FlatBorder {
                 System.out.println(obj);
             }
         }
+    }
+
+    private List<Vertex> getSingleSequence() {
+        List<Vertex> result = new ArrayList();
+        for (Object o : this.elements) {
+            if (o instanceof Vertex) {
+                result.add((Vertex)o);
+            } else {
+                List<Vertex> tmpList = (List)o;
+                if (tmpList.size() < 20) {
+                    //if the set is too small, no need to reduce it
+                    result.addAll(tmpList);
+                } else {
+                    int i;
+                    result.add(tmpList.get(0));
+                    for(i=1; i < tmpList.size()-10; i=i+1){ // TODO Parametrize precision
+                        result.add(tmpList.get(i));
+                    }
+//                    if (i != tmpList.size() + 4) { //
+//                        result.add(tmpList.get(tmpList.size()-1));
+//                    }
+                }
+
+            }
+        }
+        return result;
+    }
+
+    private List<Vector2D> getVectors(List<Vertex> seq, AbstractSplit split) {
+        List<Vector2D> result = new ArrayList();
+        for (Vertex v: seq) {
+            result.add(split.getVector(v));
+        }
+        return result;
+    }
+
+    private List<Vector2D> revertVectors(List<Vector2D> vectors) {
+        List<Vector2D> result = new ArrayList();
+        for(int i = vectors.size()-1; i >=0; i--) {
+            result.add(vectors.get(i));
+        }
+        return result;
+    }
+
+    public void computeProperties(final AbstractSplit split) {
+        List<Vertex> singleSequence = getSingleSequence();
+        List<Vector2D> vectors = getVectors(singleSequence, split);
+        this.customArea = new CustomArea(vectors);
+    }
+
+    public Point2D getBarycenter() {
+        return this.customArea.barycentre;
+    }
+
+    public double getSize() {
+        return this.customArea.getSize();
+    }
+
+    public double getPerimeter() {
+        return this.customArea.perimeter;
+    }
+
+    public Rectangle2D getRectangle() {
+        return this.customArea.getBounds();
+    }
+
+    public CustomArea getCustomArea() {
+        return this.customArea;
     }
 }

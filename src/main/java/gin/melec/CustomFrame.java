@@ -19,6 +19,7 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.text.Collator;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 import javax.swing.JFrame;
@@ -713,10 +714,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     }
 
     protected void autoMerge() {
-        Cube cube_A = new Cube(0,0,0,191.5,213.5,280.5);
-        Cube cube_B = new Cube(191.5,0,0,400,213.5,280.5);
-        Cube cube_C = new Cube(0,213.5,0,191.5,600,280.5);
-        Cube cube_D = new Cube(191.5,213.5,0,400,600,280.5);
+        Cube cube_A = new Cube(-0.5,-0.5,-0.5,191.5,213.5,282.5);
+        Cube cube_B = new Cube(191.5,-0.5,-0.5,400,213.5,282.5);
+        Cube cube_C = new Cube(-0.5,213.5,-0.5,191.5,600,282.5);
+        Cube cube_D = new Cube(191.5,213.5,-0.5,400,600,282.5);
         cube_A.addAllMesh(DialogContentManager.A_MESHES);
         cube_B.addAllMesh(DialogContentManager.B_MESHES);
         cube_C.addAllMesh(DialogContentManager.C_MESHES);
@@ -732,7 +733,73 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         cube_C.prepareMeshBorders();
         cube_D.prepareMeshBorders();
 
+        java.util.List<Couple> couples = new ArrayList();
+        //R: Right, L: Left, U: Up, D: Down, F: Front, B:, Back
+        couples.addAll(getCouples(cube_A, cube_B, 'R', 'L'));
+
         int g = 0;
+    }
+
+    private java.util.List<Couple> getCouples(Cube cube1, Cube cube2, char split1, char split2) {
+        java.util.List<Couple> result = new ArrayList();
+        java.util.List<FlatBorder> flats1 = null;
+        java.util.List<FlatBorder> flats2 = null;
+        for (Mesh mesh1 : cube1.getMeshes()) {
+            switch (split1) {
+                case 'R':
+                    flats1 = mesh1.getRightFlats();
+                    break;
+                case 'L':
+                    flats1 = mesh1.getLeftFlats();
+                    break;
+                case 'U':
+                    flats1 = mesh1.getUpFlats();
+                    break;
+                case 'D':
+                    flats1 = mesh1.getDownFlats();
+                    break;
+                case 'F':
+                    flats1 = mesh1.getFrontFlats();
+                    break;
+                case 'B':
+                    flats1 = mesh1.getBackFlats();
+                    break;
+            }
+            for (Mesh mesh2 : cube2.getMeshes()) {
+                switch (split2) {
+                    case 'R':
+                        flats2 = mesh2.getRightFlats();
+                        break;
+                    case 'L':
+                        flats2 = mesh2.getLeftFlats();
+                        break;
+                    case 'U':
+                        flats2 = mesh2.getUpFlats();
+                        break;
+                    case 'D':
+                        flats2 = mesh2.getDownFlats();
+                        break;
+                    case 'F':
+                        flats2 = mesh2.getFrontFlats();
+                        break;
+                    case 'B':
+                        flats2 = mesh2.getBackFlats();
+                        break;
+                }
+                result.addAll(createCouples(flats1, flats2));
+            }
+        }
+        return result;
+    }
+
+    private java.util.List<Couple> createCouples(java.util.List<FlatBorder> flats1, java.util.List<FlatBorder> flats2) {
+        java.util.List<Couple> result = new ArrayList();
+        for (FlatBorder flat1: flats1) {
+            for (FlatBorder flat2: flats2) {
+                result.add(new Couple(flat1, flat2));
+            }
+        }
+        return result;
     }
 
     protected void addObjToMerge(final String name, final char source) {
@@ -767,6 +834,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
     protected static void appendToLog(final String msg) {
         logText.append(msg + "\n");
+        //TODO The action need to be in a thread so the log can repaint aside
     }
 
     double ParseDouble(String strNumber) {

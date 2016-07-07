@@ -17,42 +17,97 @@
  */
 package gin.melec;
 
+import java.awt.geom.Area;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public class Couple implements Comparable<Couple>{
-    private Border border1;
+public class Couple{
+    private final FlatBorder flat1;
 
-    private Border border2;
+    private final FlatBorder flat2;
 
-    private double distance;
+    private double similarity;
 
-    protected Couple(final Border b1, final Border b2) {
-        border1 = b1;
-        border2 = b2;
+    private boolean compatible;
 
-        this.computeDistance();
+    private final static double COMPATIBLE_TOLERANCE = 0.1;
+
+    protected Couple(final FlatBorder b1, final FlatBorder b2) {
+        flat1 = b1;
+        flat2 = b2;
+        this.checkCompatible();
+        if (compatible) {
+            computeSimilarity();
+        } else {
+            similarity = 0;
+        }
     }
 
-    private void computeDistance() {
-        double result = 0;
-
-        double cumulLenghtDistance = Math.abs((2*(border1.getCumulLenght()
-                - border2.getCumulLenght()))/(border1.getCumulLenght()
-                + border2.getCumulLenght()))*100;
-
-        
-        this.distance = result;
+    private void checkCompatible() {
+        this.compatible = false;
+        if (valueDistance(flat1.getPerimeter(), flat2.getPerimeter()) < COMPATIBLE_TOLERANCE) {
+            if (valueDistance(flat1.getSize(), flat2.getSize()) < COMPATIBLE_TOLERANCE) {
+                Rectangle2D rect1 = flat1.getRectangle();
+                Rectangle2D rect2 = flat2.getRectangle();
+                if (valueDistance(rect1.getWidth(), rect2.getWidth()) < COMPATIBLE_TOLERANCE &&
+                        valueDistance(rect1.getHeight(), rect2.getHeight()) < COMPATIBLE_TOLERANCE) {
+                    Point2D point1 = flat1.getBarycenter();
+                    Point2D point2 = flat2.getBarycenter();
+                    double factor = (rect1.getWidth()+rect2.getWidth())/(rect1.getHeight()+rect2.getHeight());
+                    double distanceX = Math.abs(point1.getX() - point2.getX());
+                    double distanceY = Math.abs(point1.getY() - point2.getY());
+                    double distance = Math.sqrt(Math.pow(distanceX/factor, 2)+Math.pow(distanceY*factor, 2));
+                    this.compatible = distance < 0.05*Math.sqrt(Math.pow((rect1.getWidth()+rect2.getWidth())/2, 2)+Math.pow((rect1.getHeight()+rect2.getHeight()), 2));
+                }
+            }
+        }
     }
 
-    protected double getDistance() {
-        return distance;
+    /**
+     * Return the distance of the two value in a %.
+     * @param val1
+     * @param val2
+     * @return
+     */
+    private double valueDistance(double val1, double val2) {
+        return (Math.abs(val1-val2)*2)/(val1+val2);
     }
 
-    @Override
-    public int compareTo(Couple c) {
-        return (int)Math.floor(this.distance - c.distance);
+    private void computeSimilarity() {
+        Area intersection = (Area)flat1.getCustomArea().clone();
+        intersection.intersect((CustomArea)flat2.getCustomArea());
+        PathIterator pI = intersection.getPathIterator(null);
+        double size = 0;
+        List<Point2D> points = new ArrayList();
+        while(!pI.isDone()) {
+            double[] coords = new double[6];
+            pI.currentSegment(coords);
+            points.add(new Point2D.Double(coords[0], coords[1]));
+            pI.next();
+        }
+        int i, j, n = points.size();
+        for(i = 0; i < n; i++) {
+            j = (i + 1) % n;
+                size += points.get(i).getX() * points.get(j).getY();
+                size -= points.get(j).getX() * points.get(i).getY();
+        }
+        size /= 2.0;
+        size = Math.abs(size);
+        double sim1 = size/flat1.getSize();
+        double sim2 = size/flat2.getSize();
+        similarity = sim1<sim2 ? sim1:sim2;
+
+    }
+
+    protected boolean compatible() {
+        return this.compatible;
     }
 }

@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import org.apache.commons.math3.geometry.euclidean.twod.SubLine;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /**
  *
@@ -44,6 +46,8 @@ public abstract class AbstractSplit{
     protected Set<Vertex> primers;
 
     private Edge upEdge, rightEdge, downEdge, leftEdge;
+
+    private List<FlatBorder> flatBorders;
 
     public AbstractSplit() {
         this.position = 0;
@@ -130,23 +134,19 @@ public abstract class AbstractSplit{
         this.primers.removeAll(garbage);
     }
 
-    protected final List<FlatBorder> getFlatBorders(){
+    protected final void storeFlatBorders(){
         List<FlatBorder> result = new ArrayList();
         boolean connectorFound = true;
         Connector firstConn;
         do {
             Edge currentEdge;
             firstConn = this.downEdge.getFirst();
-            currentEdge = this.downEdge;
             if (firstConn == null) {
                 firstConn = this.leftEdge.getFirst();
-                currentEdge = this.leftEdge;
                 if (firstConn == null) {
                     firstConn = this.upEdge.getFirst();
-                    currentEdge = this.upEdge;
                     if (firstConn == null) {
                         firstConn = this.rightEdge.getFirst();
-                        currentEdge = this.rightEdge;
                         if (firstConn == null) {
                             break;
                         }
@@ -177,7 +177,22 @@ public abstract class AbstractSplit{
             } while(true);
             currentEdge.removeConnector(firstConn);
         } while(connectorFound);
-        return result;
+        this.flatBorders = result;
+    }
+
+    public List<FlatBorder> getFlatBorders() {
+        return this.flatBorders;
+    }
+
+    public void addFlatBorder(FlatBorder flat) {
+        if (this.flatBorders == null) {
+            this.flatBorders = new ArrayList();
+        }
+        this.flatBorders.add(flat);
+    }
+
+    public void clearFlatBorders() {
+        this.flatBorders = null;
     }
 
     private Edge getNextEdge(Edge edge) {
@@ -232,8 +247,7 @@ public abstract class AbstractSplit{
      */
     protected abstract boolean isClose(final Vertex vertex);
 
-    protected abstract Line2D.Float getSegment(final Vertex vertex1,
-            final Vertex vertex2);
+    protected abstract Vector2D getVector(final Vertex vertex);
 
     public Edge getUpEdge() {
         return upEdge;

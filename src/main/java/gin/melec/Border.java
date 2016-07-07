@@ -278,24 +278,24 @@ public class Border {
     }
 
     private boolean computeArea() {
-        this.area = 0;
-        Vertex v1 = this.getVertexSequence().get(0);
-        Vertex v2;
-        for (int i = 1; i < this.getVertexSequence().size() - 1; i++) {
-            v2 = this.getVertexSequence().get(i);
-            Line2D.Float segment = this.split.getSegment(v1,v2);
-            this.area += (segment.getX1() + segment.getX2()) *
-                    (segment.getY1() - segment.getY2());
-            v1 = v2;
-        }
-        v2 = this.getVertexSequence().get(0);
-        Line2D.Float segment = this.split.getSegment(v1,v2);
-        this.area += (segment.getX1() + segment.getX2()) *
-                (segment.getY1() - segment.getY2());
-        if (area < 0) {
-            area = (-area);
-            return false;
-        }
+//        this.area = 0;
+//        Vertex v1 = this.getVertexSequence().get(0);
+//        Vertex v2;
+//        for (int i = 1; i < this.getVertexSequence().size() - 1; i++) {
+//            v2 = this.getVertexSequence().get(i);
+//            Line2D.Float segment = this.split.getSegment(v1,v2);
+//            this.area += (segment.getX1() + segment.getX2()) *
+//                    (segment.getY1() - segment.getY2());
+//            v1 = v2;
+//        }
+//        v2 = this.getVertexSequence().get(0);
+//        Line2D.Float segment = this.split.getSegment(v1,v2);
+//        this.area += (segment.getX1() + segment.getX2()) *
+//                (segment.getY1() - segment.getY2());
+//        if (area < 0) {
+//            area = (-area);
+//            return false;
+//        }
         return true;
     }
 

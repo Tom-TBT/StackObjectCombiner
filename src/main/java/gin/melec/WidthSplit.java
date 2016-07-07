@@ -5,7 +5,8 @@
  */
 package gin.melec;
 
-import java.awt.geom.Line2D;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+import org.apache.commons.math3.geometry.euclidean.twod.SubLine;
 import java.util.TreeSet;
 
 /**
@@ -54,8 +55,7 @@ public class WidthSplit extends AbstractSplit{
     }
 
     @Override
-    protected Line2D.Float getSegment(Vertex vertex1, Vertex vertex2) {
-        return new Line2D.Float(vertex1.getY(), vertex1.getZ(), vertex2.getY(),
-                vertex2.getZ());
+    protected Vector2D getVector(Vertex vertex) {
+        return new Vector2D(vertex.getY(), vertex.getZ());
     }
 }

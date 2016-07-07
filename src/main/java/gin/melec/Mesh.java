@@ -46,6 +46,13 @@ public class Mesh {
     private List<Border> borders;
 
     /**
+     * The flat borders of a mesh are stored in 6 lists corresponding to the
+     * different side of a cube. These are the borders that will be merged (automatic
+     * merging for now).
+     */
+    private List<FlatBorder> leftFlats, rightFlats, upFlats, downFlats, frontFlats, backFlats;
+
+    /**
      * Contain the vertex already used to make a border. This garbage is emptied
      * when a border is formed, and the corresponding vertex are removed from
      * the mesh.
@@ -92,6 +99,13 @@ public class Mesh {
 
         this.moved = ObjReader.isMeshMoved(this.file);
         this.merged = ObjReader.isMeshMerged(this.file);
+
+        leftFlats = new ArrayList<FlatBorder>();
+        rightFlats = new ArrayList<FlatBorder>();
+        upFlats = new ArrayList<FlatBorder>();
+        downFlats = new ArrayList<FlatBorder>();
+        frontFlats = new ArrayList<FlatBorder>();
+        backFlats = new ArrayList<FlatBorder>();
     }
 
     /**
@@ -355,7 +369,117 @@ public class Mesh {
         this.vertices.clear();
     }
 
-    void setBorders(List<Border> borders) {
+    void addBorders(List<Border> borders) {
         this.borders = borders;
+    }
+
+    void addLeftFlat(List<FlatBorder> flats) {
+        if (flats != null) {
+            this.leftFlats.addAll(flats);
+        }
+    }
+    void addRightFlat(List<FlatBorder> flats) {
+        if (flats != null) {
+            this.rightFlats.addAll(flats);
+        }
+    }
+    void addUpFlat(List<FlatBorder> flats) {
+        if (flats != null) {
+            this.upFlats.addAll(flats);
+        }
+    }
+    void addDownFlat(List<FlatBorder> flats) {
+        if (flats != null) {
+            this.downFlats.addAll(flats);
+        }
+    }
+    void addFrontFlat(List<FlatBorder> flats) {
+        if (flats != null) {
+            this.frontFlats.addAll(flats);
+        }
+    }
+    void addBackFlat(List<FlatBorder> flats) {
+        if (flats != null) {
+            this.backFlats.addAll(flats);
+        }
+    }
+
+    void computeRightFlatProperties(AbstractSplit split) {
+        for (FlatBorder flat : this.rightFlats) {
+            flat.computeProperties(split);
+        }
+
+    }
+    void computeLeftFlatProperties(AbstractSplit split) {
+        for (FlatBorder flat : this.leftFlats) {
+            flat.computeProperties(split);
+        }
+    }
+    void computeUpFlatProperties(AbstractSplit split) {
+        for (FlatBorder flat : this.upFlats) {
+            flat.computeProperties(split);
+        }
+    }
+    void computeDownFlatProperties(AbstractSplit split) {
+        for (FlatBorder flat : this.downFlats) {
+            flat.computeProperties(split);
+        }
+    }
+    void computeFrontFlatProperties(AbstractSplit split) {
+        for (FlatBorder flat : this.frontFlats) {
+            flat.computeProperties(split);
+        }
+    }
+    void computeBackFlatProperties(AbstractSplit split) {
+        for (FlatBorder flat : this.backFlats) {
+            flat.computeProperties(split);
+        }
+    }
+
+    public List<FlatBorder> getLeftFlats() {
+        return leftFlats;
+    }
+
+    public List<FlatBorder> getRightFlats() {
+        return rightFlats;
+    }
+
+    public List<FlatBorder> getUpFlats() {
+        return upFlats;
+    }
+
+    public List<FlatBorder> getDownFlats() {
+        return downFlats;
+    }
+
+    public List<FlatBorder> getFrontFlats() {
+        return frontFlats;
+    }
+
+    public List<FlatBorder> getBackFlats() {
+        return backFlats;
+    }
+
+    
+
+    void printFlats() {
+        for (FlatBorder flat: this.frontFlats) {
+            flat.printBorder();
+        }
+        for (FlatBorder flat: this.backFlats) {
+            flat.printBorder();
+        }
+        for (FlatBorder flat: this.upFlats) {
+            flat.printBorder();
+        }
+        for (FlatBorder flat: this.downFlats) {
+            flat.printBorder();
+        }
+        for (FlatBorder flat: this.leftFlats) {
+            flat.printBorder();
+        }
+        for (FlatBorder flat: this.rightFlats) {
+            flat.printBorder();
+        }
     }
 }
