@@ -29,13 +29,18 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
  */
 public class FlatBorder{
 
-    private final List elements;
+    private List elements;
 
     private CustomArea customArea;
 
-    public FlatBorder() {
+    private AbstractSplit split;
+
+    private final Mesh parentMesh;
+
+    public FlatBorder(Mesh mesh) {
         this.elements = new ArrayList();
         this.customArea = null;
+        this.parentMesh = mesh;
     }
 
     public void addElement(Object element) {
@@ -70,26 +75,16 @@ public class FlatBorder{
                 result.add((Vertex)o);
             } else {
                 List<Vertex> tmpList = (List)o;
-                if (tmpList.size() < 20) {
-                    //if the set is too small, no need to reduce it
-                    result.addAll(tmpList);
-                } else {
-                    int i;
-                    result.add(tmpList.get(0));
-                    for(i=1; i < tmpList.size()-10; i=i+1){ // TODO Parametrize precision
-                        result.add(tmpList.get(i));
-                    }
-//                    if (i != tmpList.size() + 4) { //
-//                        result.add(tmpList.get(tmpList.size()-1));
-//                    }
+                int i;
+                for(i=0; i < tmpList.size(); i++){
+                    result.add(tmpList.get(i));
                 }
-
             }
         }
         return result;
     }
 
-    private List<Vector2D> getVectors(List<Vertex> seq, AbstractSplit split) {
+    private List<Vector2D> getVectors(List<Vertex> seq) {
         List<Vector2D> result = new ArrayList();
         for (Vertex v: seq) {
             result.add(split.getVector(v));
@@ -97,18 +92,41 @@ public class FlatBorder{
         return result;
     }
 
-    private List<Vector2D> revertVectors(List<Vector2D> vectors) {
-        List<Vector2D> result = new ArrayList();
-        for(int i = vectors.size()-1; i >=0; i--) {
-            result.add(vectors.get(i));
+    public void computeProperties(final AbstractSplit split) {
+        this.split = split;
+        List<Vertex> singleSequence = getSingleSequence();
+        List<Vector2D> vectors = getVectors(singleSequence);
+        this.customArea = new CustomArea(vectors);
+        if (this.customArea.getSize() < 0) { // The sequence need to be reverted
+            this.revertElements();
+            singleSequence = getSingleSequence();
+            vectors = getVectors(singleSequence);
+            this.customArea = new CustomArea(vectors);
         }
-        return result;
+        this.customArea.computeProperties(vectors);
     }
 
-    public void computeProperties(final AbstractSplit split) {
-        List<Vertex> singleSequence = getSingleSequence();
-        List<Vector2D> vectors = getVectors(singleSequence, split);
-        this.customArea = new CustomArea(vectors);
+    private void revertElements() {
+        List newElements = new ArrayList();
+        for (Object o:this.elements) {
+            if (o instanceof Vertex) {
+                newElements.add(0, o);
+            } else {
+                List revertedList = new ArrayList();
+                List oldList = (List) o;
+                for (int i = oldList.size()-1; i >=0; i--) {
+                    revertedList.add(oldList.get(i));
+                }
+                newElements.add(0,revertedList);
+            }
+        }
+        this.elements = newElements;
+        while(this.elements.get(0) instanceof Vertex) {
+            this.elements.add(this.elements.get(0));
+            this.elements.remove(0);
+            // We want to push to the end of the sequence the corners. The
+            // sequence must start with a real vertex
+        }
     }
 
     public Point2D getBarycenter() {
@@ -129,5 +147,39 @@ public class FlatBorder{
 
     public CustomArea getCustomArea() {
         return this.customArea;
+    }
+
+    public List getElements() {
+        return this.elements;
+    }
+
+    public void alignOn(FlatBorder referenceFlat) {
+        List<Vertex> refList = (List)referenceFlat.elements.get(0);
+        Vertex refVertex = refList.get(0);
+
+        double minDistance = -1;
+        List firstElement = null;
+        for (Object o: this.elements) {
+            if (o instanceof List) {
+                List<Vertex> candidateList = (List)o;
+                Vertex candidate = candidateList.get(0);
+                if (minDistance == -1 || candidate.distanceTo(refVertex) < minDistance) {
+                    minDistance = candidate.distanceTo(refVertex);
+                    firstElement = candidateList;
+                }
+            }
+        }
+        this.setStartingList(firstElement);
+    }
+
+    private void setStartingList(List startingList) {
+        while (!this.elements.get(0).equals(startingList)) {
+            this.elements.add(this.elements.get(0));
+            this.elements.remove(0);
+        }
+    }
+
+    public Mesh getParentMesh() {
+        return parentMesh;
     }
 }

@@ -123,9 +123,11 @@ public class MeshMerger {
                 final List<Face> newFaces = new ArrayList();
                 CustomFrame.appendToLog("Computing the new faces");
                 for (Border[] couple : couples) {
-                    if (couple[0].distanceTo(couple[1]) < 100)
+                    if (couple[0].distanceTo(couple[1]) < 100) {
 //                    double dis = couple[0].distanceTo(couple[1]);
-                    newFaces.addAll(Linker.createFacesBetween(couple[0], couple[1]));
+                        couple[0].alignOn(couple[1]);
+                        newFaces.addAll(Linker.createFacesBetween(couple[0].getVertexSequence(), couple[1].getVertexSequence(), couple[0].isCircular()));
+                    }
                 }
                 try {
                     ObjWriter.exportFusion(mesh1, mesh2, newFaces);

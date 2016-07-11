@@ -5,9 +5,7 @@ package gin.melec;
 
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
-import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
@@ -30,6 +28,9 @@ public class CustomArea extends Area{
         this.perimeter = 0;
         this.addArea(vectors);
         this.computeArea(vectors);
+    }
+
+    public void computeProperties(List<Vector2D> vectors) {
         this.computeBarycentre(vectors);
         this.computePerimeter(vectors);
     }
@@ -61,7 +62,7 @@ public class CustomArea extends Area{
 
     private void computeBarycentre(List<Vector2D> vectors) {
         double cx = 0, cy = 0;
-        double size = this.size;
+        double tmpSize = this.size;
         // could change this to Point2D.Float if you want to use less memory
         Point2D res = new Point2D.Double();
         int i, j, n = vectors.size();
@@ -74,8 +75,8 @@ public class CustomArea extends Area{
             cx += (vectors.get(i).getX() + vectors.get(j).getX()) * factor;
             cy += (vectors.get(i).getY() + vectors.get(j).getY()) * factor;
         }
-        size *= 6.0f;
-        factor = 1 / size;
+        tmpSize *= 6.0f;
+        factor = 1 / tmpSize;
         cx *= factor;
         cy *= factor;
         res.setLocation(cx, cy);
@@ -92,6 +93,6 @@ public class CustomArea extends Area{
     }
 
     public double getSize() {
-        return Math.abs(this.size);
+        return this.size;
     }
 }

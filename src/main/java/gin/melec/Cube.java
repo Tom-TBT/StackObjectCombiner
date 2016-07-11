@@ -196,9 +196,9 @@ public class Cube {
         for (Mesh mesh : meshes) {
             List<FlatBorder> tmpBorders = new ArrayList();
             for (Border currentBorder : mesh.getBorders()) {
-                separateBorder(currentBorder);
+                separateBorder(currentBorder, mesh);
             }
-            this.storeFlatBorders();
+            this.storeFlatBorders(mesh);
             setFlatsToMesh(mesh);
             mesh.printFlats();
             computeFlatProperties(mesh);
@@ -229,7 +229,7 @@ public class Cube {
         this.downSplit.clearFlatBorders();
     }
 
-    private void separateBorder(Border currentBorder) {
+    private void separateBorder(Border currentBorder, Mesh mesh) {
         List<FlatBorder> result = new ArrayList();
         List<Border> bordersList = new ArrayList();
         AbstractSplit currSplit = currentBorder.getSplit();
@@ -276,20 +276,20 @@ public class Cube {
                 edge.addConnector(border.getConnector());
             } else {
                 // Its only on one split so we transform it directly onto a flat border
-                FlatBorder flat = new FlatBorder();
+                FlatBorder flat = new FlatBorder(mesh);
                 flat.addElement(vertexList);
                 currSplit.addFlatBorder(flat);
             }
         }
     }
 
-    private void storeFlatBorders() {
-        frontSplit.storeFlatBorders();
-        backSplit.storeFlatBorders();
-        upSplit.storeFlatBorders();
-        downSplit.storeFlatBorders();
-        leftSplit.storeFlatBorders();
-        rightSplit.storeFlatBorders();
+    private void storeFlatBorders(Mesh mesh) {
+        frontSplit.storeFlatBorders(mesh);
+        backSplit.storeFlatBorders(mesh);
+        upSplit.storeFlatBorders(mesh);
+        downSplit.storeFlatBorders(mesh);
+        leftSplit.storeFlatBorders(mesh);
+        rightSplit.storeFlatBorders(mesh);
     }
 
     private int getIndexEndBorder(List<Vertex> vertexList, int startingPosition) {

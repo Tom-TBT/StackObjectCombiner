@@ -16,13 +16,11 @@
  */
 package gin.melec;
 
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import org.apache.commons.math3.geometry.euclidean.twod.SubLine;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /**
@@ -134,7 +132,7 @@ public abstract class AbstractSplit{
         this.primers.removeAll(garbage);
     }
 
-    protected final void storeFlatBorders(){
+    protected final void storeFlatBorders(Mesh mesh){
         List<FlatBorder> result = new ArrayList();
         boolean connectorFound = true;
         Connector firstConn;
@@ -153,7 +151,7 @@ public abstract class AbstractSplit{
                     }
                 }
             }
-            FlatBorder currentFlat = new FlatBorder();
+            FlatBorder currentFlat = new FlatBorder(mesh);
             currentFlat.addElement(firstConn.getSequence());
             Vertex currVertex = firstConn.getLastVertex();
             currentEdge = firstConn.getNextEdge();
@@ -177,7 +175,10 @@ public abstract class AbstractSplit{
             } while(true);
             currentEdge.removeConnector(firstConn);
         } while(connectorFound);
-        this.flatBorders = result;
+        if (this.flatBorders == null) {
+            this.flatBorders = new ArrayList();
+        }
+        this.flatBorders.addAll(result);
     }
 
     public List<FlatBorder> getFlatBorders() {

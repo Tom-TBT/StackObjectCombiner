@@ -283,6 +283,12 @@ public class Mesh {
         this.borders = ObjReader.deserializeBorders(this.file);
     }
 
+    protected final void incremVertices(int increm) {
+        for(Vertex vertex: this.vertices) {
+            vertex.incrementId(increm);
+        }
+    }
+
     @Override
     public String toString() {
         return this.file.getName();
@@ -460,7 +466,7 @@ public class Mesh {
         return backFlats;
     }
 
-    
+
 
     void printFlats() {
         for (FlatBorder flat: this.frontFlats) {

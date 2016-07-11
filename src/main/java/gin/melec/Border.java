@@ -17,7 +17,6 @@
 package gin.melec;
 
 import java.awt.geom.Area;
-import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.util.ArrayList;
@@ -60,8 +59,6 @@ public class Border {
      * The center of the border.
      */
     private boolean circular;
-
-    private double area;
 
     private Connector connector;
 
@@ -269,34 +266,9 @@ public class Border {
         this.circular = this.getFirstVertex().getNeighbours()
                 .contains(this.getLastVertex());
 
-//        if (this.computeArea()) {
-//
-//        }
         if (this.isCircular() && this.isClockwise()) {
             this.revertSequence();
         }
-    }
-
-    private boolean computeArea() {
-//        this.area = 0;
-//        Vertex v1 = this.getVertexSequence().get(0);
-//        Vertex v2;
-//        for (int i = 1; i < this.getVertexSequence().size() - 1; i++) {
-//            v2 = this.getVertexSequence().get(i);
-//            Line2D.Float segment = this.split.getSegment(v1,v2);
-//            this.area += (segment.getX1() + segment.getX2()) *
-//                    (segment.getY1() - segment.getY2());
-//            v1 = v2;
-//        }
-//        v2 = this.getVertexSequence().get(0);
-//        Line2D.Float segment = this.split.getSegment(v1,v2);
-//        this.area += (segment.getX1() + segment.getX2()) *
-//                (segment.getY1() - segment.getY2());
-//        if (area < 0) {
-//            area = (-area);
-//            return false;
-//        }
-        return true;
     }
 
     /**
@@ -406,8 +378,6 @@ public class Border {
                     > this.getLastVertex().distanceTo(border.getFirstVertex())) {
                 this.revertSequence();
             }
-        } else {
-            // TODO Exception, if two borders are linear and circular.
         }
 
     }

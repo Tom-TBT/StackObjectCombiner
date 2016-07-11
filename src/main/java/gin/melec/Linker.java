@@ -81,29 +81,27 @@ public class Linker {
      * @param destination , the destination border.
      * @return a set of links between the two borders.
      */
-    public static final List createFacesBetween(Border origin,
-            Border destination) {
+    public static final List createFacesBetween(List<Vertex> origin,
+            List<Vertex> destination, boolean isCircular) {
 
         // We always want to link first the border that has the fewer vertices,
         // to the border that had the more vertices.
         boolean inverted = false;
-        if (origin.getVertexSequence().size()
-                > destination.getVertexSequence().size()) {
+        if (origin.size()
+                > destination.size()) {
             inverted = true;
-            final Border tmp = origin;
+            final List<Vertex> tmp = origin;
             origin = destination;
             destination = tmp;
         }
-        // The borders are aligned.
-        destination.alignOn(origin);
 
         TreeSet<Link> links = new TreeSet();
-        List<Vertex> origSequence = origin.getVertexSequence();
-        List<Vertex> destSequence = destination.getVertexSequence();
+        List<Vertex> origSequence = origin;
+        List<Vertex> destSequence = destination;
         Vertex prevOrigSpot;
-        Vertex nextOrigSpot = origin.getFirstVertex();
+        Vertex nextOrigSpot = origin.get(0);
         Vertex prevDestSpot;
-        Vertex nextDestSpot = destination.getFirstVertex();
+        Vertex nextDestSpot = destination.get(0);
         // add new next link
         links.add(new Link(nextOrigSpot, nextDestSpot));
         int j = INCREM;
@@ -160,8 +158,8 @@ public class Linker {
         Vertex origCurrent, origPrevious, destCurrent, destPrevious;
         Link linkCurrent;
         final Iterator<Link> linkIterator = links.iterator();
-        origPrevious = origin.getFirstVertex();
-        destPrevious = destination.getFirstVertex();
+        origPrevious = origin.get(0);
+        destPrevious = destination.get(0);
         while (linkIterator.hasNext()) {
             linkCurrent = linkIterator.next();
             origCurrent = linkCurrent.getOrigin();
@@ -195,9 +193,9 @@ public class Linker {
             }
         }
         List newFaces = exportLinks(links);
-        if (origin.isCircular()) {
-            newFaces.add(new Face(origin.getFirstVertex(), origin.getLastVertex(), destination.getFirstVertex()));
-            newFaces.add(new Face(origin.getLastVertex(), destination.getLastVertex(), destination.getFirstVertex()));
+        if (isCircular) {
+            newFaces.add(new Face(origin.get(0), origin.get(origin.size()-1), destination.get(0)));
+            newFaces.add(new Face(origin.get(origin.size()-1), destination.get(destination.size()-1), destination.get(0)));
         }
         return newFaces;
     }

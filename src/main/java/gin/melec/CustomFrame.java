@@ -16,12 +16,17 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.io.IOException;
 import java.text.Collator;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.text.DefaultCaret;
 
@@ -736,6 +741,66 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         java.util.List<Couple> couples = new ArrayList();
         //R: Right, L: Left, U: Up, D: Down, F: Front, B:, Back
         couples.addAll(getCouples(cube_A, cube_B, 'R', 'L'));
+        couples.addAll(getCouples(cube_C, cube_D, 'R', 'L'));
+        couples.addAll(getCouples(cube_A, cube_C, 'F', 'B'));
+        couples.addAll(getCouples(cube_B, cube_D, 'F', 'B'));
+
+        for (Couple couple:couples) {
+            if (couple.compatible()) {
+                couple.alignFlats();
+                couple.merge();
+            }
+        }
+
+        java.util.List<Mesh> meshToCheck = new ArrayList();
+        meshToCheck.addAll(DialogContentManager.A_MESHES);
+        meshToCheck.addAll(DialogContentManager.B_MESHES);
+        meshToCheck.addAll(DialogContentManager.C_MESHES);
+        meshToCheck.addAll(DialogContentManager.D_MESHES);
+
+        Set<Mesh> meshChecked = new HashSet();
+        Set<Mesh> currentFamily = new HashSet();
+        int i = 1;
+        for (Mesh mesh: meshToCheck) {
+            Set<Couple> currentCouples = new HashSet();
+            if (!meshChecked.contains(mesh)) {
+                currentFamily.add(mesh);
+                meshChecked.add(mesh);
+                java.util.List<Mesh> tmpFamily = new ArrayList();
+                java.util.List<Vertex> vertices = new ArrayList();
+                java.util.List<Face> faces = new ArrayList();
+                do {
+                    for (Couple couple: couples) {
+                        if (couple.compatible() && couple.contain(mesh)) {
+                            currentCouples.add(couple);
+                            Mesh tmpMesh = couple.getOther(mesh);
+                            if (!meshChecked.contains(tmpMesh)) {
+                                tmpFamily.add(tmpMesh);
+                                meshChecked.add(tmpMesh);
+                            }
+                            currentFamily.add(tmpMesh);
+
+                        }
+                    }
+                    vertices.addAll(mesh.getVertices());
+                    faces.addAll(mesh.getFaces());
+                    tmpFamily.remove(mesh);
+                    if (tmpFamily.size() > 0) {
+                        mesh = tmpFamily.get(0);
+                        mesh.incremVertices(vertices.size());
+                    }
+                } while(!tmpFamily.isEmpty());
+                for (Couple couple: currentCouples) {
+                    faces.addAll(couple.getNewFaces());
+                }
+                try {
+                    ObjWriter.writeResult(vertices, faces, "Mesh-"+i, new File(dirField.getText()));
+                } catch (IOException ex) {
+                    Logger.getLogger(CustomFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                i++;
+            }
+        }
 
         int g = 0;
     }
