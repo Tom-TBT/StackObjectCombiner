@@ -73,7 +73,7 @@ public class ObjReader {
         final BufferedReader buR = new BufferedReader(ipsr);
         try{
             NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
-            tmpVertices = new ArrayList();
+            tmpVertices = mesh.getVertices();
             String currentLine;
             String[] splitedLine;
             int id = 1;
@@ -99,15 +99,14 @@ public class ObjReader {
                                     Integer.parseInt(splitedLine[3]) - 1);
                     Face face = new Face(v1, v2, v3);
                     mesh.getFaces().add(face);
-                    v1.getFaces().add(face);
-                    v2.getFaces().add(face);
-                    v3.getFaces().add(face);
+                    v1.addFace(face, v2, v3);
+                    v2.addFace(face, v1, v3);
+                    v3.addFace(face, v1, v2);
                 }
             }
         } finally {
             buR.close();
         }
-        mesh.getVertices().addAll(tmpVertices);
         CustomFrame.appendToLog(mesh.getFile().getName() + " loaded");
     }
 
@@ -176,7 +175,7 @@ public class ObjReader {
     static double[] getShift(final File file)
             throws FileNotFoundException, IOException {
         String currentLine;
-        double result[] = new double[2];
+        double result[] = new double[3];
 
         final InputStream ips = new FileInputStream(file.toString());
         final InputStreamReader ipsr = new InputStreamReader(ips);
@@ -186,10 +185,13 @@ public class ObjReader {
                 if (currentLine.contains("#movedBySOC")) {
                     int xIndex = currentLine.indexOf("X:");
                     int yIndex = currentLine.indexOf("Y:");
+                    int zIndex = currentLine.indexOf("Z:");
                     String tmpString = currentLine.substring(xIndex+2, yIndex - 1);
                     result[0] = Double.parseDouble(tmpString);
-                    tmpString = currentLine.substring(yIndex+2, currentLine.length());
+                    tmpString = currentLine.substring(yIndex+2, zIndex - 1);
                     result[1] = Double.parseDouble(tmpString);
+                    tmpString = currentLine.substring(zIndex+2, currentLine.length());
+                    result[2] = Double.parseDouble(tmpString);
                     break;
                 }
             }

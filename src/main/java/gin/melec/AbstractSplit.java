@@ -17,6 +17,7 @@
 package gin.melec;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,7 +69,7 @@ public abstract class AbstractSplit{
      * @param vertices , the list of the vertex to filter.
      * @return the list of the vertex belonging to the border.
      */
-    public final Set findLimitVertices(final Set<Vertex> vertices) {
+    public final Set findLimitVertices(final Collection<Vertex> vertices) {
         final TreeSet<Vertex> closeVertices = new TreeSet();
         for (Vertex vertex : vertices) {
             if (this.isClose(vertex)) {
@@ -118,14 +119,8 @@ public abstract class AbstractSplit{
         return result;
     }
 
-    protected void removeAlreadyLookedPrimers(final Set primersLeft) {
-        Set tmpSet = new HashSet();
-        for (Vertex v:this.primers) {
-            if (!primersLeft.contains(v)) {
-                tmpSet.add(v);
-            }
-        }
-        this.primers.removeAll(tmpSet);
+    protected void removeAlreadyLookedPrimers(final List primersLooked) {
+        this.primers.removeAll(primersLooked);
     }
 
     protected final void clearPrimers(final Set garbage) {
@@ -282,4 +277,7 @@ public abstract class AbstractSplit{
         this.leftEdge = leftEdge;
     }
 
+    public Set<Vertex> getPrimers() {
+        return primers;
+    }
 }

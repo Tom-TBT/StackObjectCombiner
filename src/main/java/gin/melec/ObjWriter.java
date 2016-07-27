@@ -58,7 +58,7 @@ public class ObjWriter {
      * @throws IOException , thrown by the writer.
      */
     public static void writeMesh(final Mesh mesh, final double shiftX,
-            final double shiftY)
+            final double shiftY, final double shiftZ)
             throws IOException {
         CustomFrame.appendToLog("Saving the mesh " + mesh.getFile().getName());
         final FileWriter fiW = new FileWriter(mesh.getFile().toString());
@@ -66,7 +66,7 @@ public class ObjWriter {
         final PrintWriter prW = new PrintWriter(bfW);
         try {
             if (mesh.isMoved()) {
-                prW.write("#movedBySOC X:"+shiftX+" Y:"+shiftY+"\n");
+                prW.write("#movedBySOC X:"+shiftX+" Y:"+shiftY+" Z:"+shiftZ+"\n");
             }
             for (Vertex vertex : mesh.getVertices()) {
                 prW.write(vertex.toString() + "\n");

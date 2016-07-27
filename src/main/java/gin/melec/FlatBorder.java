@@ -54,20 +54,6 @@ public class FlatBorder{
         }
     }
 
-    public void printBorder() {
-        System.out.println();
-        for (Object obj: this.elements) {
-            if (obj instanceof List) {
-                List<Vertex> list = (List) obj;
-                for (Vertex vertex: list) {
-                    System.out.println(vertex);
-                }
-            } else {
-                System.out.println(obj);
-            }
-        }
-    }
-
     private List<Vertex> getSingleSequence() {
         List<Vertex> result = new ArrayList();
         for (Object o : this.elements) {

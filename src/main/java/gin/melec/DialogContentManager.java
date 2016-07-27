@@ -21,7 +21,7 @@ public class DialogContentManager {
     /**
      * The filters for the obj files.
      */
-    private static final FilenameFilter[] OBJ_FILTERS = new FilenameFilter[4];
+    private static final FilenameFilter[] OBJ_FILTERS = new FilenameFilter[8];
 
     private static File WORKING_DIR;
 
@@ -41,9 +41,26 @@ public class DialogContentManager {
      * List of meshes in the D_ part.
      */
     protected static final List<Mesh> D_MESHES = new ArrayList();
+    /**
+     * List of meshes in the E_ part.
+     */
+    protected static final List<Mesh> E_MESHES = new ArrayList();
+    /**
+     * List of meshes in the F_ part.
+     */
+    protected static final List<Mesh> F_MESHES = new ArrayList();
+    /**
+     * List of meshes in the F_ part.
+     */
+    protected static final List<Mesh> G_MESHES = new ArrayList();
+    /**
+     * List of meshes in the H_ part.
+     */
+    protected static final List<Mesh> H_MESHES = new ArrayList();
 
     protected static final AbstractSplit WIDTH_SPLIT = new WidthSplit();
     protected static final AbstractSplit HEIGHT_SPLIT = new HeightSplit();
+    protected static final AbstractSplit DEPTH_SPLIT = new DepthSplit();
 
     protected static AbstractSplit ACTIVE_SPLIT;
 
@@ -66,6 +83,10 @@ public class DialogContentManager {
         B_MESHES.clear();
         C_MESHES.clear();
         D_MESHES.clear();
+        E_MESHES.clear();
+        F_MESHES.clear();
+        G_MESHES.clear();
+        H_MESHES.clear();
 
         listing = WORKING_DIR.listFiles(objFilters[0]);
         for (File file : listing) {
@@ -106,6 +127,50 @@ public class DialogContentManager {
                 try {
                     final Mesh mesh = new Mesh(file);
                     D_MESHES.add(mesh);
+                } catch (IOException ex) {
+                    IJ.handleException(ex);
+                }
+            }
+        }
+        listing = WORKING_DIR.listFiles(objFilters[4]);
+        for (File file : listing) {
+            if (file.isFile()) {
+                try {
+                    final Mesh mesh = new Mesh(file);
+                    E_MESHES.add(mesh);
+                } catch (IOException ex) {
+                    IJ.handleException(ex);
+                }
+            }
+        }
+        listing = WORKING_DIR.listFiles(objFilters[5]);
+        for (File file : listing) {
+            if (file.isFile()) {
+                try {
+                    final Mesh mesh = new Mesh(file);
+                    F_MESHES.add(mesh);
+                } catch (IOException ex) {
+                    IJ.handleException(ex);
+                }
+            }
+        }
+        listing = WORKING_DIR.listFiles(objFilters[6]);
+        for (File file : listing) {
+            if (file.isFile()) {
+                try {
+                    final Mesh mesh = new Mesh(file);
+                    G_MESHES.add(mesh);
+                } catch (IOException ex) {
+                    IJ.handleException(ex);
+                }
+            }
+        }
+        listing = WORKING_DIR.listFiles(objFilters[7]);
+        for (File file : listing) {
+            if (file.isFile()) {
+                try {
+                    final Mesh mesh = new Mesh(file);
+                    H_MESHES.add(mesh);
                 } catch (IOException ex) {
                     IJ.handleException(ex);
                 }
@@ -152,15 +217,50 @@ public class DialogContentManager {
                         && name.matches("D_.*");
             }
         };
+        OBJ_FILTERS[4] = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                return lowercaseName.endsWith(".obj")
+                        && name.matches("E_.*");
+            }
+        };
+        OBJ_FILTERS[5] = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                return lowercaseName.endsWith(".obj")
+                        && name.matches("F_.*");
+            }
+        };
+        OBJ_FILTERS[6] = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                return lowercaseName.endsWith(".obj")
+                        && name.matches("G_.*");
+            }
+        };
+        OBJ_FILTERS[7] = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String lowercaseName = name.toLowerCase();
+                return lowercaseName.endsWith(".obj")
+                        && name.matches("H_.*");
+            }
+        };
     }
 
-    protected static void setSplits(double x, double y) {
+    protected static void setSplits(double x, double y, double z) {
         //ALL_SPLITS.clear();
         if (x != 0) {
             WIDTH_SPLIT.setPosition(x - 0.5);
         }
         if (y != 0) {
             HEIGHT_SPLIT.setPosition(y - 0.5);
+        }
+        if (z != 0) {
+            DEPTH_SPLIT.setPosition(z - 0.5);
         }
 
     }
@@ -178,11 +278,25 @@ public class DialogContentManager {
         if ((A_MESHES.contains(ACTIVE_MESH_1) && B_MESHES.contains(ACTIVE_MESH_2))
                 || (B_MESHES.contains(ACTIVE_MESH_1) && A_MESHES.contains(ACTIVE_MESH_2))
                 || (C_MESHES.contains(ACTIVE_MESH_1) && D_MESHES.contains(ACTIVE_MESH_2))
-                || (D_MESHES.contains(ACTIVE_MESH_1) && C_MESHES.contains(ACTIVE_MESH_2))) {
+                || (D_MESHES.contains(ACTIVE_MESH_1) && C_MESHES.contains(ACTIVE_MESH_2))
+                || (E_MESHES.contains(ACTIVE_MESH_1) && F_MESHES.contains(ACTIVE_MESH_2))
+                || (F_MESHES.contains(ACTIVE_MESH_1) && E_MESHES.contains(ACTIVE_MESH_2))
+                || (G_MESHES.contains(ACTIVE_MESH_1) && H_MESHES.contains(ACTIVE_MESH_2))
+                || (H_MESHES.contains(ACTIVE_MESH_1) && G_MESHES.contains(ACTIVE_MESH_2))) {
             ACTIVE_SPLIT = WIDTH_SPLIT;
-        } else {
+        } else if ((A_MESHES.contains(ACTIVE_MESH_1) && C_MESHES.contains(ACTIVE_MESH_2))
+                || (B_MESHES.contains(ACTIVE_MESH_1) && D_MESHES.contains(ACTIVE_MESH_2))
+                || (C_MESHES.contains(ACTIVE_MESH_1) && A_MESHES.contains(ACTIVE_MESH_2))
+                || (D_MESHES.contains(ACTIVE_MESH_1) && B_MESHES.contains(ACTIVE_MESH_2))
+                || (E_MESHES.contains(ACTIVE_MESH_1) && G_MESHES.contains(ACTIVE_MESH_2))
+                || (G_MESHES.contains(ACTIVE_MESH_1) && E_MESHES.contains(ACTIVE_MESH_2))
+                || (F_MESHES.contains(ACTIVE_MESH_1) && H_MESHES.contains(ACTIVE_MESH_2))
+                || (H_MESHES.contains(ACTIVE_MESH_1) && F_MESHES.contains(ACTIVE_MESH_2))){
             ACTIVE_SPLIT = HEIGHT_SPLIT;
-        } // No other control needed since the meshes added to the merge must
+        } else {
+            ACTIVE_SPLIT = DEPTH_SPLIT;
+        }
+            // No other control needed since the meshes added to the merge must
             // already correspond.
         return true;
     }
@@ -200,6 +314,10 @@ public class DialogContentManager {
         allMesh.add(B_MESHES);
         allMesh.add(C_MESHES);
         allMesh.add(D_MESHES);
+        allMesh.add(E_MESHES);
+        allMesh.add(F_MESHES);
+        allMesh.add(G_MESHES);
+        allMesh.add(H_MESHES);
 
         Mesh result = null;
         for (List<Mesh> listMesh : allMesh) {

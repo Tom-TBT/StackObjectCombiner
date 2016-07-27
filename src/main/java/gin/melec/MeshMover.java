@@ -110,6 +110,70 @@ public class MeshMover {
             }
             mesh.clear();
         }
+        for (Mesh mesh : DialogContentManager.E_MESHES) {
+            if (!mesh.isMoved()) {
+                mesh.importMesh();
+                List splits = new ArrayList();
+                splits.add(DialogContentManager.DEPTH_SPLIT);
+                mesh.shift(splits);
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been shifted");
+                nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is already shifted");
+            }
+            mesh.clear();
+        }
+        for (Mesh mesh : DialogContentManager.F_MESHES) {
+            if (!mesh.isMoved()) {
+                mesh.importMesh();
+                List splits = new ArrayList();
+                splits.add(DialogContentManager.DEPTH_SPLIT);
+                splits.add(DialogContentManager.WIDTH_SPLIT);
+                mesh.shift(splits);
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been moved");
+                nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is already shifted");
+            }
+            mesh.clear();
+        }
+        for (Mesh mesh : DialogContentManager.G_MESHES) {
+            if (!mesh.isMoved()) {
+                mesh.importMesh();
+                List splits = new ArrayList();
+                splits.add(DialogContentManager.DEPTH_SPLIT);
+                splits.add(DialogContentManager.HEIGHT_SPLIT);
+                mesh.shift(splits);
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been moved");
+                nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is already shifted");
+            }
+            mesh.clear();
+        }
+        for (Mesh mesh : DialogContentManager.H_MESHES) {
+            if (!mesh.isMoved()) {
+                mesh.importMesh();
+                List splits = new ArrayList();
+                splits.add(DialogContentManager.WIDTH_SPLIT);
+                splits.add(DialogContentManager.HEIGHT_SPLIT);
+                splits.add(DialogContentManager.DEPTH_SPLIT);
+                mesh.shift(splits);
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " has been moved");
+                nbMoved++;
+            } else {
+                CustomFrame.appendToLog(mesh.getFile().getName()
+                        + " is already shifted");
+            }
+            mesh.clear();
+        }
         CustomFrame.appendToLog(nbMoved + " meshes have been shifted.");
         CustomFrame.appendToLog("-----------------------");
     }
@@ -126,7 +190,7 @@ public class MeshMover {
                 mesh.unshift();
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " has been unshifted");
-                mesh.exportMesh(0,0);
+                mesh.exportMesh(0,0,0);
                 nbMoved++;
             } else {
                 CustomFrame.appendToLog(mesh.getFile().getName()

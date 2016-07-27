@@ -67,6 +67,8 @@ public class Vertex implements Comparable<Vertex>{
      */
     private final transient Set<Face> faces;
 
+    private final Set<Vertex> uniqueNeighbours;
+
     /**
      * Public constructor of a vertex.
      *
@@ -81,6 +83,7 @@ public class Vertex implements Comparable<Vertex>{
         this.y = y;
         this.z = z;
         this.faces = new HashSet();
+        this.uniqueNeighbours = new HashSet();
     }
 
     /**
@@ -292,13 +295,12 @@ public class Vertex implements Comparable<Vertex>{
     public final float getZ() {
         return z;
     }
-
     /**
      * Setter of the attribute z.
      * @param z , the new value for the z of this vertex.
      */
-    public final void setZ(float z) {
-        this.z = z;
+    public final void setZ(double z) {
+        this.z = (float)z;
     }
     /**
      * Getter of the attribute neighbours.
@@ -312,6 +314,21 @@ public class Vertex implements Comparable<Vertex>{
         }
         return neighbSet;
     }
+
+    public final void addFace(Face face, Vertex neighb1, Vertex neighb2) {
+        this.faces.add(face);
+        if (!this.uniqueNeighbours.add(neighb1)) {
+            this.uniqueNeighbours.remove(neighb1);
+        }
+        if (!this.uniqueNeighbours.add(neighb2)) {
+            this.uniqueNeighbours.remove(neighb2);
+        }
+    }
+
+    public final boolean isBorderVertex() {
+        return !this.uniqueNeighbours.isEmpty();
+    }
+
     /**
      * Getter of the attribute faces.
      * @return the faces of the vertex.

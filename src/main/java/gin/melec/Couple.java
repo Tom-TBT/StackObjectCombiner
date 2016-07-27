@@ -42,7 +42,7 @@ public class Couple{
 
     private List<Face> newFaces;
 
-    private final static double COMPATIBLE_TOLERANCE = 0.4;
+    private final static double COMPATIBLE_TOLERANCE = 0.5;
 
     protected Couple(final FlatBorder b1, final FlatBorder b2) {
         flat1 = b1;
@@ -70,7 +70,7 @@ public class Couple{
                     double distanceX = Math.abs(point1.getX() - point2.getX());
                     double distanceY = Math.abs(point1.getY() - point2.getY());
                     double distance = Math.sqrt(Math.pow(distanceX/factor, 2)+Math.pow(distanceY*factor, 2));
-                    this.compatible = distance < 0.2*Math.sqrt(Math.pow((rect1.getWidth()+rect2.getWidth())/2, 2)+Math.pow((rect1.getHeight()+rect2.getHeight()), 2));
+                    this.compatible = distance < COMPATIBLE_TOLERANCE*Math.sqrt(Math.pow((rect1.getWidth()+rect2.getWidth())/2, 2)+Math.pow((rect1.getHeight()+rect2.getHeight()), 2));
                 }
             }
         }

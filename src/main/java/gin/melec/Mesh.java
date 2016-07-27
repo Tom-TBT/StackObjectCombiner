@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  *
@@ -35,7 +34,7 @@ public class Mesh {
     /**
      * Contain the vertices composing this mesh.
      */
-    private final TreeSet<Vertex> vertices;
+    private final List<Vertex> vertices;
     /**
      * Contain the faces composing this mesh.
      */
@@ -50,7 +49,7 @@ public class Mesh {
      * different side of a cube. These are the borders that will be merged (automatic
      * merging for now).
      */
-    private List<FlatBorder> leftFlats, rightFlats, upFlats, downFlats, frontFlats, backFlats;
+    private final List<FlatBorder> leftFlats, rightFlats, upFlats, downFlats, frontFlats, backFlats;
 
     /**
      * Contain the vertex already used to make a border. This garbage is emptied
@@ -58,13 +57,6 @@ public class Mesh {
      * the mesh.
      */
     private final Set<Vertex> garbage;
-    /**
-     * Contain the vertex that can initiate a border. Once this set is empty, it
-     * means that all the borders have been detected. Else, we create a new one
-     * by taking a vertex in the set (method in split). After a detection of a
-     * border, the vertex detected are removed from this set.
-     */
-    private final TreeSet<Vertex> primers;
 
     /**
      * The path to this mesh's file.
@@ -92,10 +84,9 @@ public class Mesh {
             throws IOException {
         this.file = file;
         this.faces = new HashSet();
-        this.vertices = new TreeSet();
+        this.vertices = new ArrayList();
         this.garbage = new HashSet();
         this.borders = new ArrayList();
-        this.primers = new TreeSet();
 
         this.moved = ObjReader.isMeshMoved(this.file);
         this.merged = ObjReader.isMeshMerged(this.file);
@@ -112,12 +103,12 @@ public class Mesh {
      * Once a border is finish, this method is called to add all vertex related
      * to the border to the garbage.
      */
-    private void completeGarbage() {
+    /**private void completeGarbage() {
         final List<Vertex> vertexToCheck = new ArrayList(this.garbage);
         for (Vertex vertex : vertexToCheck) {
-            vertex.addNeighbourToGarbage(this.garbage, this.primers);
+            vertex.addNeighbourToGarbage(this.garbage, this.primers, 10);
         }
-    }
+    }**/
 
     /**
      * Find the next vertex to add to the border. It is find according to the
@@ -140,10 +131,11 @@ public class Mesh {
                 }
             }
             facesRemaining.remove(currentFace);
+            garbage.addAll(nextVertex.getNeighbours());
             nextVertex = currentFace.getThirdVertex(border.getLastVertex(),
                     nextVertex);
         }
-        this.garbage.add(nextVertex);
+        //this.garbage.add(nextVertex);
         return nextVertex;
     }
 
@@ -158,9 +150,11 @@ public class Mesh {
      * @param split , the split for which we create the borders.
      */
     protected final void createBorders(final AbstractSplit split) {
-        if (!this.primers.isEmpty()) {
-            split.removeAlreadyLookedPrimers(primers);
-            while (!primers.isEmpty()) {
+        if (!split.primers.isEmpty()) {
+            for (Border border: this.borders) {
+                split.removeAlreadyLookedPrimers(border.getVertexSequence());
+            }
+            while (!split.primers.isEmpty()) {
                 final Border border = new Border(this, split);
                 if (border.getFirstVertex() == null) {
                     break;
@@ -172,14 +166,11 @@ public class Mesh {
                         border.addNextVertex(nextVertex);
                     }
                 }
-                primers.removeAll(this.garbage);
                 split.clearPrimers(this.garbage);
                 this.garbage.clear();
                 this.borders.add(border);
             }
-            completeGarbage();
-            primers.removeAll(this.garbage);
-            split.clearPrimers(this.garbage);
+            split.getPrimers().clear();
         }
     }
 
@@ -189,7 +180,7 @@ public class Mesh {
      * @param split , the split used for the primers.
      */
     protected void createPrimers(final AbstractSplit split) {
-        primers.addAll(split.findLimitVertices(vertices));
+        split.findLimitVertices(vertices);
     }
 
     /**
@@ -197,14 +188,16 @@ public class Mesh {
      * @param splits , the splits to apply
      */
     protected final void shift(final List<AbstractSplit> splits) throws IOException {
-        double deltaX = 0, deltaY = 0;
-        AbstractSplit split1, split2;
+        double deltaX = 0, deltaY = 0, deltaZ = 0;
+        AbstractSplit split1, split2, split3;
         if (splits.size() >= 1) {
             split1 = splits.get(0);
             if (WidthSplit.class.isInstance(split1)) {
                 deltaX = split1.xPosition();
             } else if (HeightSplit.class.isInstance(split1)) {
                 deltaY = split1.yPosition();
+            } else if (DepthSplit.class.isInstance(split1)) {
+                deltaZ = split1.zPosition();
             }
             if (splits.size() >= 2) {
                 split2 = splits.get(1);
@@ -212,6 +205,18 @@ public class Mesh {
                     deltaX = split2.xPosition();
                 } else if (HeightSplit.class.isInstance(split2)) {
                     deltaY = split2.yPosition();
+                } else if (DepthSplit.class.isInstance(split2)) {
+                    deltaZ = split2.zPosition();
+                }
+                if (splits.size() >= 3) {
+                    split3 = splits.get(2);
+                    if (WidthSplit.class.isInstance(split3)) {
+                        deltaX = split3.xPosition();
+                    } else if (HeightSplit.class.isInstance(split3)) {
+                        deltaY = split3.yPosition();
+                    } else if (DepthSplit.class.isInstance(split3)) {
+                        deltaZ = split3.zPosition();
+                    }
                 }
             }
         }
@@ -228,16 +233,23 @@ public class Mesh {
                 vertex.setY(vertex.getY() + deltaY);
             }
         }
+        if (deltaZ > 0) {
+            deltaZ += 0.5; // To compensate the position of the split in the middle
+            for (Vertex vertex : this.vertices) {
+                vertex.setZ(vertex.getZ() + deltaZ);
+            }
+        }
         this.moved = true;
-        this.exportMesh(deltaX, deltaY);
+        this.exportMesh(deltaX, deltaY, deltaZ);
     }
 
     void unshift() throws IOException {
-        double deltaX , deltaY;
+        double deltaX , deltaY, deltaZ;
         double shifts[];
         shifts = ObjReader.getShift(file);
         deltaX = -shifts[0];
         deltaY = -shifts[1];
+        deltaZ = -shifts[2];
         if (deltaX < 0) {
             for (Vertex vertex : this.vertices) {
                 vertex.setX(vertex.getX() + deltaX);
@@ -246,6 +258,11 @@ public class Mesh {
         if (deltaY < 0) {
             for (Vertex vertex : this.vertices) {
                 vertex.setY(vertex.getY() + deltaY);
+            }
+        }
+        if (deltaZ < 0) {
+            for (Vertex vertex : this.vertices) {
+                vertex.setZ(vertex.getZ() + deltaZ);
             }
         }
         this.moved = false;
@@ -259,9 +276,9 @@ public class Mesh {
      * @param shiftY
      * @throws java.io.IOException
      */
-    protected final void exportMesh(final double shiftX, final double shiftY)
+    protected final void exportMesh(final double shiftX, final double shiftY, final double shiftZ)
             throws IOException {
-        ObjWriter.writeMesh(this, shiftX, shiftY);
+        ObjWriter.writeMesh(this, shiftX, shiftY, shiftZ);
     }
 
     /**
@@ -299,7 +316,7 @@ public class Mesh {
      *
      * @return the vertices of the mesh.
      */
-    public final TreeSet<Vertex> getVertices() {
+    public final List<Vertex> getVertices() {
         return vertices;
     }
 
@@ -328,15 +345,6 @@ public class Mesh {
      */
     public final Set<Vertex> getGarbage() {
         return garbage;
-    }
-
-    /**
-     * Getter of the attribute primers.
-     *
-     * @return the primers of the mesh.
-     */
-    public final TreeSet<Vertex> getPrimers() {
-        return primers;
     }
 
     /**
@@ -464,28 +472,5 @@ public class Mesh {
 
     public List<FlatBorder> getBackFlats() {
         return backFlats;
-    }
-
-
-
-    void printFlats() {
-        for (FlatBorder flat: this.frontFlats) {
-            flat.printBorder();
-        }
-        for (FlatBorder flat: this.backFlats) {
-            flat.printBorder();
-        }
-        for (FlatBorder flat: this.upFlats) {
-            flat.printBorder();
-        }
-        for (FlatBorder flat: this.downFlats) {
-            flat.printBorder();
-        }
-        for (FlatBorder flat: this.leftFlats) {
-            flat.printBorder();
-        }
-        for (FlatBorder flat: this.rightFlats) {
-            flat.printBorder();
-        }
     }
 }

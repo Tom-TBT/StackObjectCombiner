@@ -85,6 +85,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JTextField xValueField;
     private javax.swing.JLabel yLabel;
     private javax.swing.JTextField yValueField;
+    private javax.swing.JTextField zValueField;
+    private javax.swing.JLabel zLabel;
     private javax.swing.JButton unshiftBtn;
     private javax.swing.JTextField width;
     private javax.swing.JTextField height;
@@ -133,8 +135,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         double x = Prefs.get("SOC.verticalSplit", 0);
         double y = Prefs.get("SOC.horizontalSplit", 0);
+        double z = Prefs.get("SOC.depthSplit", 0);
         xValueField.setText(Double.toString(x));
         yValueField.setText(Double.toString(y));
+        zValueField.setText(Double.toString(z));
 
 
         logText.setText("=== Welcome to the Stack Object Combiner ===\n");
@@ -149,6 +153,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         xValueField = new javax.swing.JTextField();
         yLabel = new javax.swing.JLabel();
         yValueField = new javax.swing.JTextField();
+        zLabel = new javax.swing.JLabel();
+        zValueField = new javax.swing.JTextField();
         shiftBtn = new javax.swing.JButton();
         helpDirBtn = new javax.swing.JButton();
         actualiseBtn = new javax.swing.JButton();
@@ -609,12 +615,14 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             }
         }   else if (button == shiftBtn) {
             try {
-                double x = ParseDouble(xValueField.getText());
-                double y = ParseDouble(yValueField.getText());
+                double x = 807;//ParseDouble(xValueField.getText());
+                double y = 596;//ParseDouble(yValueField.getText());
+                double z = 317;//ParseDouble(zValueField.getText());
                 Prefs.set("SOC.verticalSplit", x);
                 Prefs.set("SOC.horizontalSplit", y);
-                DialogContentManager.setSplits(x, y);
-                if (x != -1 && y != -1) {
+                Prefs.set("SOC.depthSplit", z);
+                DialogContentManager.setSplits(x, y, z);
+                if (x != -1 && y != -1 && z != -1) {
                     Prefs.savePreferences();
                     MeshMover.moveMeshes();
                 } else {
@@ -701,9 +709,11 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private void merge() {
         double x = ParseDouble(xValueField.getText());
         double y = ParseDouble(yValueField.getText());
+        double z = ParseDouble(zValueField.getText());
         Prefs.set("SOC.verticalSplit", x);
         Prefs.set("SOC.horizontalSplit", y);
-        DialogContentManager.setSplits(x, y);
+        Prefs.set("SOC.depthSplit", z);
+        DialogContentManager.setSplits(x, y, z);
         if (DialogContentManager.setActiveSplits(obj1Field.getText(),
                 obj2Field.getText()) && setParameters()) {
             MeshMerger.merge();
@@ -719,24 +729,40 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     }
 
     protected void autoMerge() {
-        Cube cube_A = new Cube(-0.5,-0.5,-0.5,191.5,213.5,282.5);
-        Cube cube_B = new Cube(191.5,-0.5,-0.5,400,213.5,282.5);
-        Cube cube_C = new Cube(-0.5,213.5,-0.5,191.5,600,282.5);
-        Cube cube_D = new Cube(191.5,213.5,-0.5,400,600,282.5);
+        Cube cube_A = new Cube(-0.5,-0.5,-0.5,807.5,596.5,317.5); //-0.5,-0.5,-0.5,191.5,213.5,282.5
+        Cube cube_B = new Cube(807.5,-0.5,-0.5,1617,596.5,317.5);
+        Cube cube_C = new Cube(-0.5,596.5,-0.5,807.5,1191,317.5);
+        Cube cube_D = new Cube(807.5,596.5,-0.5,1617,1191,317.5); //191.5,213.5,-0.5,400,600,282.5
+        Cube cube_E = new Cube(-0.5,-0.5,317.5,807.5,596.5,634);
+        Cube cube_F = new Cube(807.5,-0.5,317.5,1617,596.5,634);
+        Cube cube_G = new Cube(-0.5,596.5,317.5,807.5,1191,634);
+        Cube cube_H = new Cube(807.5,596.5,317.5,1617,1191,634);
         cube_A.addAllMesh(DialogContentManager.A_MESHES);
         cube_B.addAllMesh(DialogContentManager.B_MESHES);
         cube_C.addAllMesh(DialogContentManager.C_MESHES);
         cube_D.addAllMesh(DialogContentManager.D_MESHES);
+        cube_E.addAllMesh(DialogContentManager.E_MESHES);
+        cube_F.addAllMesh(DialogContentManager.F_MESHES);
+        cube_G.addAllMesh(DialogContentManager.G_MESHES);
+        cube_H.addAllMesh(DialogContentManager.H_MESHES);
 
         cube_A.detectMeshBorders();
         cube_B.detectMeshBorders();
         cube_C.detectMeshBorders();
         cube_D.detectMeshBorders();
+        cube_E.detectMeshBorders();
+        cube_F.detectMeshBorders();
+        cube_G.detectMeshBorders();
+        cube_H.detectMeshBorders();
 
         cube_A.prepareMeshBorders();
         cube_B.prepareMeshBorders();
         cube_C.prepareMeshBorders();
         cube_D.prepareMeshBorders();
+        cube_E.prepareMeshBorders();
+        cube_F.prepareMeshBorders();
+        cube_G.prepareMeshBorders();
+        cube_H.prepareMeshBorders();
 
         java.util.List<Couple> couples = new ArrayList();
         //R: Right, L: Left, U: Up, D: Down, F: Front, B:, Back
@@ -744,6 +770,16 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         couples.addAll(getCouples(cube_C, cube_D, 'R', 'L'));
         couples.addAll(getCouples(cube_A, cube_C, 'F', 'B'));
         couples.addAll(getCouples(cube_B, cube_D, 'F', 'B'));
+
+        couples.addAll(getCouples(cube_E, cube_F, 'R', 'L'));
+        couples.addAll(getCouples(cube_G, cube_H, 'R', 'L'));
+        couples.addAll(getCouples(cube_E, cube_G, 'F', 'B'));
+        couples.addAll(getCouples(cube_F, cube_H, 'F', 'B'));
+
+        couples.addAll(getCouples(cube_A, cube_E, 'D', 'U'));
+        couples.addAll(getCouples(cube_B, cube_F, 'D', 'U'));
+        couples.addAll(getCouples(cube_C, cube_G, 'D', 'U'));
+        couples.addAll(getCouples(cube_D, cube_H, 'D', 'U'));
 
         for (Couple couple:couples) {
             if (couple.compatible()) {
@@ -757,6 +793,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         meshToCheck.addAll(DialogContentManager.B_MESHES);
         meshToCheck.addAll(DialogContentManager.C_MESHES);
         meshToCheck.addAll(DialogContentManager.D_MESHES);
+        meshToCheck.addAll(DialogContentManager.E_MESHES);
+        meshToCheck.addAll(DialogContentManager.F_MESHES);
+        meshToCheck.addAll(DialogContentManager.G_MESHES);
+        meshToCheck.addAll(DialogContentManager.H_MESHES);
 
         Set<Mesh> meshChecked = new HashSet();
         Set<Mesh> currentFamily = new HashSet();

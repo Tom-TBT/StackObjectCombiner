@@ -200,7 +200,6 @@ public class Cube {
             }
             this.storeFlatBorders(mesh);
             setFlatsToMesh(mesh);
-            mesh.printFlats();
             computeFlatProperties(mesh);
         }
 
