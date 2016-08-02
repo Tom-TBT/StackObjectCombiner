@@ -176,13 +176,7 @@ public class Cube {
             IJ.handleException(ex);
         }
         for (Mesh mesh : meshes) {
-            mesh.createPrimers(leftSplit);
-            mesh.createPrimers(rightSplit);
-            mesh.createPrimers(backSplit);
-            mesh.createPrimers(frontSplit);
-            mesh.createPrimers(downSplit);
-            mesh.createPrimers(upSplit);
-
+            mesh.findPrimers();
             mesh.createBorders(leftSplit);
             mesh.createBorders(rightSplit);
             mesh.createBorders(backSplit);
@@ -228,6 +222,39 @@ public class Cube {
         this.downSplit.clearFlatBorders();
     }
 
+    private boolean vertexCloseToSeveralSplit(Vertex v) {
+        int result = 0;
+        if (this.frontSplit.isClose(v)) {
+            result++;
+        }
+        if (this.backSplit.isClose(v)) {
+            result++;
+        }
+        if (this.upSplit.isClose(v)) {
+            result++;
+        }
+        if (this.downSplit.isClose(v)) {
+            result++;
+        }
+        if (this.leftSplit.isClose(v)) {
+            result++;
+        }
+        if (this.rightSplit.isClose(v)) {
+            result++;
+        }
+        return result > 1;
+    }
+
+    private Vertex getVertexAtIndex(int index, List<Vertex> vertexList) {
+        Vertex result;
+        if (index < vertexList.size()) {
+            result = vertexList.get(index);
+        } else {
+            result = vertexList.get(index - vertexList.size());
+        }
+        return result;
+    }
+
     private void separateBorder(Border currentBorder, Mesh mesh) {
         List<FlatBorder> result = new ArrayList();
         List<Border> bordersList = new ArrayList();
@@ -235,6 +262,10 @@ public class Cube {
         List<Vertex> vertexList = new ArrayList(currentBorder.getVertexSequence());
         int startSequence = 0;
         int endSequence;
+
+        while (vertexCloseToSeveralSplit(vertexList.get(0))) {
+            vertexList.add(vertexList.size()-1, vertexList.remove(0));
+        }
 
         Edge edge = null;
 
@@ -303,7 +334,7 @@ public class Cube {
             limitSup = vertexList.size()-1;
         }
         int j = startingPosition;
-        while (j >= limitInf) {
+        while (j > limitInf) {
             if (isCrossedEdge(vertexList.get(j), vertexList.get(j-1))) {
                 crossBefore = j;
                 break;

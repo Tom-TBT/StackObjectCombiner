@@ -39,7 +39,6 @@ public class HeightSplit extends AbstractSplit{
 
     public HeightSplit(AbstractSplit original) {
         this.position = original.position;
-        this.primers = new TreeSet();
     }
 
     @Override

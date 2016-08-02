@@ -21,6 +21,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -67,7 +68,7 @@ public class Vertex implements Comparable<Vertex>{
      */
     private final transient Set<Face> faces;
 
-    private final Set<Vertex> uniqueNeighbours;
+    private Set<Vertex> uniqueNeighbours;
 
     /**
      * Public constructor of a vertex.
@@ -212,6 +213,15 @@ public class Vertex implements Comparable<Vertex>{
         return result;
     }
 
+    public final Vertex getOtherUnique(Vertex previous) {
+        Iterator<Vertex> it = this.uniqueNeighbours.iterator();
+        Vertex result = it.next();
+        if (previous == result) {
+            result = it.next();
+        }
+        return result;
+    }
+
     /**
      * Increment the Id of the vertex by the given shift. This is used when two
      * meshed are merged.
@@ -316,7 +326,7 @@ public class Vertex implements Comparable<Vertex>{
     }
 
     public final void addFace(Face face, Vertex neighb1, Vertex neighb2) {
-        this.faces.add(face);
+        //this.faces.add(face);
         if (!this.uniqueNeighbours.add(neighb1)) {
             this.uniqueNeighbours.remove(neighb1);
         }
@@ -326,7 +336,11 @@ public class Vertex implements Comparable<Vertex>{
     }
 
     public final boolean isBorderVertex() {
-        return !this.uniqueNeighbours.isEmpty();
+        boolean result = !this.uniqueNeighbours.isEmpty();
+        if (!result) {
+            this.uniqueNeighbours = null;
+        }
+        return result;
     }
 
     /**
@@ -335,6 +349,10 @@ public class Vertex implements Comparable<Vertex>{
      */
     public final Set<Face> getFaces() {
         return faces;
+    }
+
+    public final Set<Vertex> getUniqueNeighbours() {
+        return this.uniqueNeighbours;
     }
 
     /**

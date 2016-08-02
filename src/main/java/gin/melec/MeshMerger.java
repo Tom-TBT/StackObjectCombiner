@@ -62,7 +62,6 @@ public class MeshMerger {
             @Override
             public void run() {
                 CustomFrame.appendToLog("Working on " + mesh1.getFile().getName());
-                mesh1.createPrimers(DialogContentManager.ACTIVE_SPLIT);
                 mesh1.createBorders(DialogContentManager.ACTIVE_SPLIT);
                 final List<Border> tmpBorders = new ArrayList();
                 for (Border border : mesh1.getBorders()) {
@@ -89,7 +88,6 @@ public class MeshMerger {
                     tmpSplit = new DepthSplit(DialogContentManager.ACTIVE_SPLIT);
                 }
                 CustomFrame.appendToLog("Working on " + mesh2.getFile().getName());
-                mesh2.createPrimers(tmpSplit);
                 mesh2.createBorders(tmpSplit);
                 final List<Border> tmpBorders = new ArrayList();
                 for (Border border : mesh2.getBorders()) {

@@ -39,7 +39,6 @@ public class DepthSplit extends AbstractSplit{
 
     public DepthSplit(AbstractSplit original) {
         this.position = original.position;
-        this.primers = new TreeSet();
     }
 
     @Override

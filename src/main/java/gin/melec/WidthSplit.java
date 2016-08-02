@@ -26,7 +26,6 @@ public class WidthSplit extends AbstractSplit{
 
     public WidthSplit(AbstractSplit original) {
         this.position = original.position;
-        this.primers = new TreeSet();
     }
 
     @Override

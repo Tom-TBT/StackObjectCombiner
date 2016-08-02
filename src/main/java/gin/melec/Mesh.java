@@ -73,6 +73,8 @@ public class Mesh {
      */
     private final boolean merged;
 
+    private final List<Vertex> primers;
+
     /**
      * Public constructor for a mesh.
      *
@@ -97,6 +99,8 @@ public class Mesh {
         downFlats = new ArrayList<FlatBorder>();
         frontFlats = new ArrayList<FlatBorder>();
         backFlats = new ArrayList<FlatBorder>();
+
+        this.primers = new ArrayList();
     }
 
     /**
@@ -150,37 +154,25 @@ public class Mesh {
      * @param split , the split for which we create the borders.
      */
     protected final void createBorders(final AbstractSplit split) {
-        if (!split.primers.isEmpty()) {
-            for (Border border: this.borders) {
-                split.removeAlreadyLookedPrimers(border.getVertexSequence());
+        while (!this.primers.isEmpty()) {
+            final Border border = new Border(this, split);
+            if (border.getFirstVertex() == null) {
+                break;
             }
-            while (!split.primers.isEmpty()) {
-                final Border border = new Border(this, split);
-                if (border.getFirstVertex() == null) {
-                    break;
+            Vertex previousVertex = border.getFirstVertex();
+            Vertex currentVertex = border.getLastVertex();
+            Vertex nextVertex;
+            while (!currentVertex.equals(border.getFirstVertex())) {
+                nextVertex = currentVertex.getOtherUnique(previousVertex);
+                if (!nextVertex.equals(border.getFirstVertex())) {
+                    border.addNextVertex(nextVertex);
                 }
-                Vertex nextVertex = border.getLastVertex();
-                while (!nextVertex.equals(border.getFirstVertex())) {
-                    nextVertex = this.findNextVertex(border);
-                    if (!nextVertex.equals(border.getFirstVertex())) {
-                        border.addNextVertex(nextVertex);
-                    }
-                }
-                split.clearPrimers(this.garbage);
-                this.garbage.clear();
-                this.borders.add(border);
+                this.primers.remove(nextVertex);
+                previousVertex = currentVertex;
+                currentVertex = nextVertex;
             }
-            split.getPrimers().clear();
+            this.borders.add(border);
         }
-    }
-
-    /**
-     * Add the vertex that can initiate a border to the primers set.
-     *
-     * @param split , the split used for the primers.
-     */
-    protected void createPrimers(final AbstractSplit split) {
-        split.findLimitVertices(vertices);
     }
 
     /**
@@ -289,6 +281,14 @@ public class Mesh {
      */
     protected final void importMesh() throws ParseException, IOException {
         ObjReader.readMesh(this.file, this);
+    }
+
+    public void findPrimers() {
+        for (Vertex v: this.vertices) {
+            if (v.isBorderVertex()) {
+                this.primers.add(v);
+            }
+        }
     }
 
     /**
@@ -448,6 +448,10 @@ public class Mesh {
         for (FlatBorder flat : this.backFlats) {
             flat.computeProperties(split);
         }
+    }
+
+    public List<Vertex> getPrimers() {
+        return primers;
     }
 
     public List<FlatBorder> getLeftFlats() {

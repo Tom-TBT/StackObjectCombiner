@@ -75,22 +75,18 @@ public class Border {
         this.vertexSequence = new LinkedList();
         this.split = split;
 
-        Vertex firstVertex = null, secondVertex = null;
-        firstVertex = split.findCloserVertex();
+        Vertex firstVertex = null;
+        firstVertex = split.findStarter(mesh.getPrimers());
         if (firstVertex == null) {
             return;
         }
         CustomFrame.appendToLog("Detecting new border for " + mesh.getFile().getName());
         vertexSequence.add(firstVertex);
-        for (final Vertex vertex : firstVertex.getNeighbours()) {
-            if (vertex.belongToBorder() && firstVertex.isLogicalNext(vertex)) {
-                secondVertex = vertex;
-                break;
-            }
-        }
-        vertexSequence.add(secondVertex);
-        mesh.getGarbage().add(getSecondLastVertex());
-        mesh.getGarbage().add(getLastVertex());
+        mesh.getPrimers().remove(firstVertex);
+        Vertex secondVertex = firstVertex.getUniqueNeighbours().iterator().next();
+        this.addNextVertex(secondVertex);
+        mesh.getPrimers().remove(secondVertex);
+
     }
 
     private Border() {

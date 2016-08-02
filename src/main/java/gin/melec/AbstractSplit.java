@@ -18,7 +18,6 @@ package gin.melec;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -42,42 +41,20 @@ public abstract class AbstractSplit{
      */
     protected double position;
 
-    protected Set<Vertex> primers;
-
     private Edge upEdge, rightEdge, downEdge, leftEdge;
 
     private List<FlatBorder> flatBorders;
 
     public AbstractSplit() {
         this.position = 0;
-        this.primers = new TreeSet();
     }
 
     public AbstractSplit(double position) {
         this.position = position;
-         this.primers = new TreeSet();
     }
 
     public AbstractSplit(AbstractSplit original) {
         this.position = original.position;
-        this.primers = new TreeSet();
-    }
-
-    /**
-     * Find the vertices who belong to the border.
-     *
-     * @param vertices , the list of the vertex to filter.
-     * @return the list of the vertex belonging to the border.
-     */
-    public final Set findLimitVertices(final Collection<Vertex> vertices) {
-        final TreeSet<Vertex> closeVertices = new TreeSet();
-        for (Vertex vertex : vertices) {
-            if (this.isClose(vertex)) {
-                closeVertices.add(vertex);
-            }
-        }
-        this.primers.addAll(closeVertices);
-        return closeVertices;
     }
 
     /**
@@ -91,40 +68,6 @@ public abstract class AbstractSplit{
 
     public void setPosition(double position) {
         this.position = position;
-    }
-
-
-    /**
-     * A protected method called to search in a collection the closer vertex to
-     * the split.
-     *
-     * @param collection , the collection containing the vertices.
-     * @return the distance of the closest vertex to the split.
-     */
-    protected final Vertex findCloserVertex() {
-        Vertex result = null;
-        while (result == null && primers.size() > 0) {
-            for (Vertex candidat : primers) {
-                if (result == null
-                        || this.distanceTo(candidat) < this.distanceTo(result)) {
-                    result = candidat;
-                }
-            }
-            if (!result.belongToBorder()) {
-                primers.remove(result);
-                result = null;
-            }
-        }
-
-        return result;
-    }
-
-    protected void removeAlreadyLookedPrimers(final List primersLooked) {
-        this.primers.removeAll(primersLooked);
-    }
-
-    protected final void clearPrimers(final Set garbage) {
-        this.primers.removeAll(garbage);
     }
 
     protected final void storeFlatBorders(Mesh mesh){
@@ -277,7 +220,14 @@ public abstract class AbstractSplit{
         this.leftEdge = leftEdge;
     }
 
-    public Set<Vertex> getPrimers() {
-        return primers;
+    public Vertex findStarter(List<Vertex> primers) {
+        Vertex result = null;
+        for (Vertex v: primers) {
+            if(this.isClose(v)) {
+                result = v;
+                break;
+            }
+        }
+        return result;
     }
 }
