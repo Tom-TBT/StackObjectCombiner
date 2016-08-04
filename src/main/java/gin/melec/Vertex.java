@@ -325,7 +325,7 @@ public class Vertex implements Comparable<Vertex>{
         return neighbSet;
     }
 
-    public final void addFace(Face face, Vertex neighb1, Vertex neighb2) {
+    public final void addUnique(Vertex neighb1, Vertex neighb2) {
         //this.faces.add(face);
         if (!this.uniqueNeighbours.add(neighb1)) {
             this.uniqueNeighbours.remove(neighb1);
@@ -333,6 +333,10 @@ public class Vertex implements Comparable<Vertex>{
         if (!this.uniqueNeighbours.add(neighb2)) {
             this.uniqueNeighbours.remove(neighb2);
         }
+    }
+
+    public final void addFace(Face face) {
+        this.faces.add(face);
     }
 
     public final boolean isBorderVertex() {

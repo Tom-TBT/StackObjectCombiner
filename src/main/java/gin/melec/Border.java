@@ -83,7 +83,17 @@ public class Border {
         CustomFrame.appendToLog("Detecting new border for " + mesh.getFile().getName());
         vertexSequence.add(firstVertex);
         mesh.getPrimers().remove(firstVertex);
-        Vertex secondVertex = firstVertex.getUniqueNeighbours().iterator().next();
+        Iterator<Vertex> it = firstVertex.getUniqueNeighbours().iterator();
+        Vertex secondVertex = it.next();
+        for (Face face: mesh.getFaces()) {
+            if (face.include(firstVertex) && face.include(secondVertex)) {
+                firstVertex.addFace(face);
+                break;
+            }
+        }
+        if (!firstVertex.isLogicalNext(secondVertex)) {
+            secondVertex = it.next();
+        }
         this.addNextVertex(secondVertex);
         mesh.getPrimers().remove(secondVertex);
 

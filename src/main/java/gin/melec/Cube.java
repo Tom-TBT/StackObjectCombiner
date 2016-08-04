@@ -96,27 +96,28 @@ public class Cube {
         Vector3D xY = new Vector3D(x + width,y + height, z);
         Vector3D yZ = new Vector3D(x, y + height, z + depth);
         Vector3D xYZ = new Vector3D(x + width, y + height, z + depth);
-        //leftSplit && downSplit
-        if ((newSplit == leftSplit || oldSplit == leftSplit) && (newSplit == downSplit || oldSplit == downSplit)) {
-            Vector3D constructedVector = new Vector3D((origZ.getX()+100),origZ.getY(),(origZ.getZ() - 100));
-            this.plane = new Plane(origZ, yZ, constructedVector, 0.001);
+
+        //frontSplit && leftSplit
+        if ((newSplit == frontSplit || oldSplit == frontSplit) && (newSplit == leftSplit || oldSplit == leftSplit)) {
+            Vector3D constructedVector = new Vector3D((origY.getX()-100),(origY.getY()+100),origY.getZ());
+            this.plane = new Plane(origY, yZ, constructedVector, 0.001);
         }
-        //backSplit && downSplit
-        else if ((newSplit == backSplit || oldSplit == backSplit) && (newSplit == downSplit || oldSplit == downSplit)) {
-            Vector3D constructedVector = new Vector3D(origZ.getX(),(origZ.getY()+100),(origZ.getZ() - 100));
-            this.plane = new Plane(origZ, xZ, constructedVector, 0.001);
+        //frontSplit && rightSplit
+        else if ((newSplit == rightSplit || oldSplit == rightSplit) && (newSplit == frontSplit || oldSplit == frontSplit)) {
+            Vector3D constructedVector = new Vector3D((xY.getX()-100),(xY.getY()-100),xY.getZ());
+            this.plane = new Plane(xY, xYZ, constructedVector, 0.001);
         }
-        //rightSplit && downSplit
-        else if ((newSplit == rightSplit || oldSplit == rightSplit) && (newSplit == downSplit || oldSplit == downSplit)) {
-            Vector3D constructedVector = new Vector3D((xZ.getX()-100),xZ.getY(),(xZ.getZ() - 100));
-            this.plane = new Plane(xZ, xYZ, constructedVector, 0.001);
+        //frontSplit && upSplit
+        else if ((newSplit == frontSplit || oldSplit == frontSplit) && (newSplit == upSplit || oldSplit == upSplit)) {
+            Vector3D constructedVector = new Vector3D(origY.getX(),(origY.getY()-100),(origY.getZ() + 100));
+            this.plane = new Plane(origY, xY, constructedVector, 0.001);
         }
         //frontSplit && downSplit
         else if ((newSplit == frontSplit || oldSplit == frontSplit) && (newSplit == downSplit || oldSplit == downSplit)) {
             Vector3D constructedVector = new Vector3D(yZ.getX(),(yZ.getY()-100),(yZ.getZ() - 100));
             this.plane = new Plane(yZ, xYZ, constructedVector, 0.001);
         }
-        //leftSplit && backSplit
+        //backSplit && leftSplit
         else if ((newSplit == leftSplit || oldSplit == leftSplit) && (newSplit == backSplit || oldSplit == backSplit)) {
             Vector3D constructedVector = new Vector3D((orig.getX()+100),(orig.getY()+100),orig.getZ());
             this.plane = new Plane(orig, origZ, constructedVector, 0.001);
@@ -126,36 +127,120 @@ public class Cube {
             Vector3D constructedVector = new Vector3D((origX.getX()-100),(origX.getY()+100),origX.getZ());
             this.plane = new Plane(origX, xZ, constructedVector, 0.001);
         }
-        //rightSplit && frontSplit
-        else if ((newSplit == rightSplit || oldSplit == rightSplit) && (newSplit == frontSplit || oldSplit == frontSplit)) {
-            Vector3D constructedVector = new Vector3D((xY.getX()-100),(xY.getY()-100),xY.getZ());
-            this.plane = new Plane(xY, xYZ, constructedVector, 0.001);
+        //backSplit && upSplit
+        else if ((newSplit == backSplit || oldSplit == backSplit) && (newSplit == upSplit || oldSplit == upSplit)) {
+            Vector3D constructedVector = new Vector3D(orig.getX(),(orig.getY()+100),(orig.getZ() + 100));
+            this.plane = new Plane(orig, origX, constructedVector, 0.001);
         }
-        //frontSplit && leftSplit
-        else if ((newSplit == frontSplit || oldSplit == frontSplit) && (newSplit == leftSplit || oldSplit == leftSplit)) {
-            Vector3D constructedVector = new Vector3D((origY.getX()-100),(origY.getY()+100),origY.getZ());
-            this.plane = new Plane(origY, yZ, constructedVector, 0.001);
+        //backSplit && downSplit
+        else if ((newSplit == backSplit || oldSplit == backSplit) && (newSplit == downSplit || oldSplit == downSplit)) {
+            Vector3D constructedVector = new Vector3D(origZ.getX(),(origZ.getY()+100),(origZ.getZ() - 100));
+            this.plane = new Plane(origZ, xZ, constructedVector, 0.001);
         }
         //leftSplit && upSplit
         else if ((newSplit == leftSplit || oldSplit == leftSplit) && (newSplit == upSplit || oldSplit == upSplit)) {
             Vector3D constructedVector = new Vector3D((orig.getX()+100),orig.getY(),(orig.getZ() + 100));
             this.plane = new Plane(orig, origY, constructedVector, 0.001);
         }
-        //backSplit && upSplit
-        else if ((newSplit == backSplit || oldSplit == backSplit) && (newSplit == upSplit || oldSplit == upSplit)) {
-            Vector3D constructedVector = new Vector3D(orig.getX(),(orig.getY()+100),(orig.getZ() + 100));
-            this.plane = new Plane(orig, origX, constructedVector, 0.001);
+        //leftSplit && downSplit
+        else if ((newSplit == leftSplit || oldSplit == leftSplit) && (newSplit == downSplit || oldSplit == downSplit)) {
+            Vector3D constructedVector = new Vector3D((origZ.getX()+100),origZ.getY(),(origZ.getZ() - 100));
+            this.plane = new Plane(origZ, yZ, constructedVector, 0.001);
         }
         //rightSplit && upSplit
         else if ((newSplit == rightSplit || oldSplit == rightSplit) && (newSplit == upSplit || oldSplit == upSplit)) {
             Vector3D constructedVector = new Vector3D((origX.getX()-100),origX.getY(),(origX.getZ() + 100));
             this.plane = new Plane(origX, xY, constructedVector, 0.001);
         }
-        //frontSplit && upSplit
-        else if ((newSplit == frontSplit || oldSplit == frontSplit) && (newSplit == upSplit || oldSplit == upSplit)) {
-            Vector3D constructedVector = new Vector3D(origY.getX(),(origY.getY()-100),(origY.getZ() + 100));
-            this.plane = new Plane(origY, xY, constructedVector, 0.001);
+        //rightSplit && downSplit
+        else if ((newSplit == rightSplit || oldSplit == rightSplit) && (newSplit == downSplit || oldSplit == downSplit)) {
+            Vector3D constructedVector = new Vector3D((xZ.getX()-100),xZ.getY(),(xZ.getZ() - 100));
+            this.plane = new Plane(xZ, xYZ, constructedVector, 0.001);
         }
+    }
+
+    private CustomPlane[] setPlaneBis(AbstractSplit split) {
+        CustomPlane[] planes = new CustomPlane[4];
+
+        Vector3D orig= new Vector3D(x,y,z);
+        Vector3D origX= new Vector3D(width,y,z);
+        Vector3D origY= new Vector3D(x,height,z);
+        Vector3D origZ= new Vector3D(x,y,depth);
+        Vector3D xZ = new Vector3D(width, y,depth);
+        Vector3D xY = new Vector3D(width,height, z);
+        Vector3D yZ = new Vector3D(x,height,depth);
+        Vector3D xYZ = new Vector3D(width,height,depth);
+
+        Vector3D constructedVector;
+
+        constructedVector = new Vector3D((origY.getX()-100),(origY.getY()+100),origY.getZ());
+        CustomPlane frontLeftPlane = new CustomPlane(frontSplit, leftSplit, origY, yZ, constructedVector, 0.001);
+
+        constructedVector = new Vector3D((xY.getX()-100),(xY.getY()-100),xY.getZ());
+        CustomPlane frontRightPlane = new CustomPlane(frontSplit, rightSplit, xY, xYZ, constructedVector, 0.001);
+
+        constructedVector = new Vector3D(origY.getX(),(origY.getY()-100),(origY.getZ() + 100));
+        CustomPlane frontUpPlane = new CustomPlane(frontSplit, upSplit, origY, xY, constructedVector, 0.001);
+
+        constructedVector = new Vector3D(yZ.getX(),(yZ.getY()-100),(yZ.getZ() - 100));
+        CustomPlane frontDownPlane = new CustomPlane(frontSplit, downSplit, yZ, xYZ, constructedVector, 0.001);
+
+        constructedVector = new Vector3D((orig.getX()+100),(orig.getY()+100),orig.getZ());
+        CustomPlane backLeftPlane = new CustomPlane(backSplit, leftSplit, orig, origZ, constructedVector, 0.001);
+
+        constructedVector = new Vector3D((origX.getX()-100),(origX.getY()+100),origX.getZ());
+        CustomPlane backRightPlane = new CustomPlane(backSplit, rightSplit, origX, xZ, constructedVector, 0.001);
+
+        constructedVector = new Vector3D(orig.getX(),(orig.getY()+100),(orig.getZ() + 100));
+        CustomPlane backUpPlane = new CustomPlane(backSplit, upSplit, orig, origX, constructedVector, 0.001);
+
+        constructedVector = new Vector3D(origZ.getX(),(origZ.getY()+100),(origZ.getZ() - 100));
+        CustomPlane backDownPlane = new CustomPlane(backSplit, downSplit, origZ, xZ, constructedVector, 0.001);
+
+        constructedVector = new Vector3D((orig.getX()+100),orig.getY(),(orig.getZ() + 100));
+        CustomPlane leftUpPlane = new CustomPlane(leftSplit, upSplit, orig, origY, constructedVector, 0.001);
+
+        constructedVector = new Vector3D((origZ.getX()+100),origZ.getY(),(origZ.getZ() - 100));
+        CustomPlane leftDownPlane = new CustomPlane(leftSplit, downSplit, origZ, yZ, constructedVector, 0.001);
+
+        constructedVector = new Vector3D((origX.getX()-100),origX.getY(),(origX.getZ() + 100));
+        CustomPlane rightUpPlane = new CustomPlane(rightSplit, upSplit, origX, xY, constructedVector, 0.001);
+
+        constructedVector = new Vector3D((xZ.getX()-100),xZ.getY(),(xZ.getZ() - 100));
+        CustomPlane rightDownPlane = new CustomPlane(rightSplit, downSplit, xZ, xYZ, constructedVector, 0.001);
+
+        if (split == frontSplit) {
+            planes[0] = frontDownPlane;
+            planes[1] = frontUpPlane;
+            planes[2] = frontLeftPlane;
+            planes[3] = frontRightPlane;
+        } else if (split == backSplit) {
+            planes[0] = backDownPlane;
+            planes[1] = backUpPlane;
+            planes[2] = backLeftPlane;
+            planes[3] = backRightPlane;
+        } else if (split == leftSplit) {
+            planes[0] = frontLeftPlane;
+            planes[1] = leftUpPlane;
+            planes[2] = backLeftPlane;
+            planes[3] = leftDownPlane;
+        } else if (split == rightSplit) {
+            planes[0] = frontRightPlane;
+            planes[1] = rightUpPlane;
+            planes[2] = backRightPlane;
+            planes[3] = rightDownPlane;
+        } else if (split == upSplit) {
+            planes[0] = frontUpPlane;
+            planes[1] = rightUpPlane;
+            planes[2] = backUpPlane;
+            planes[3] = leftUpPlane;
+        } else if (split == downSplit) {
+            planes[0] = frontDownPlane;
+            planes[1] = rightDownPlane;
+            planes[2] = backDownPlane;
+            planes[3] = leftDownPlane;
+        }
+        return planes;
     }
 
     protected void addMesh(final Mesh mesh) {
@@ -190,14 +275,15 @@ public class Cube {
         for (Mesh mesh : meshes) {
             List<FlatBorder> tmpBorders = new ArrayList();
             for (Border currentBorder : mesh.getBorders()) {
-                separateBorder(currentBorder, mesh);
+                separateBorderBis(currentBorder, mesh);
             }
-            this.storeFlatBorders(mesh);
+            storeFlatBorders(mesh);
             setFlatsToMesh(mesh);
             computeFlatProperties(mesh);
         }
 
     }
+
     private void computeFlatProperties(final Mesh mesh) {
         mesh.computeLeftFlatProperties(this.leftSplit);
         mesh.computeRightFlatProperties(this.rightSplit);
@@ -250,13 +336,142 @@ public class Cube {
         if (index < vertexList.size()) {
             result = vertexList.get(index);
         } else {
-            result = vertexList.get(index - vertexList.size());
+            result = vertexList.get(index % vertexList.size());
         }
         return result;
     }
 
+    private int getCloserToPlane(int start, int end, List<Vertex> vertexList, Plane plane) {
+        double distanceMin = 0;
+        int result = -1;
+        for (int k = start; k <= end; k++) {
+            Vertex candidate = getVertexAtIndex(k, vertexList);
+            Vector3D vector = new Vector3D(candidate.getX(), candidate.getY(), candidate.getZ());
+            double currentDistance = plane.getOffset(vector);
+            if (result == -1 ||  currentDistance < distanceMin) {
+                distanceMin = currentDistance;
+                result = k;
+            }
+        }
+        return result;
+    }
+
+
+    protected AbstractSplit getNextSplit(final Vertex v1, final Vertex v2, CustomPlane plane, AbstractSplit currentSplit) {
+        Vector3D vect1 = new Vector3D(v1.getX(), v1.getY(), v1.getZ());
+        Vector3D vect2 = new Vector3D(v2.getX(), v2.getY(), v2.getZ());
+        Line line = new Line(vect1, vect2, 0.001);
+
+        Vector3D intersection = plane.intersection(line);
+        AbstractSplit result = null;
+        if (intersection != null && vect1.distance(vect2) > vect1.distance(intersection)) {
+            if (plane.getSplit1() == currentSplit) {
+                result = plane.getSplit2();
+            } else if (plane.getSplit2() == currentSplit){
+                result = plane.getSplit1();
+            }
+        }
+        return result;
+    }
+
+    private void separateBorderBis(Border currentBorder, Mesh mesh) {
+        List<Vertex> vertexList = new ArrayList(currentBorder.getVertexSequence());
+
+        int i = 0;
+        while (i < vertexList.size()) {
+            Vertex tmpVertex = vertexList.get(0);
+            if (vertexCloseToSeveralSplit(tmpVertex)) {
+                vertexList.remove(0);
+                vertexList.add(tmpVertex);
+            } else {
+                break;
+            }
+            i++;
+        }
+
+        if(i == vertexList.size()) {
+            //erroor, all vertex from the border are close to two borders.
+        }
+
+        AbstractSplit currSplit = null;
+        if (this.backSplit.isClose(vertexList.get(0))) {
+            currSplit = this.backSplit;
+        } else if (this.frontSplit.isClose(vertexList.get(0))) {
+            currSplit = this.frontSplit;
+        } else if (this.upSplit.isClose(vertexList.get(0))) {
+            currSplit = this.upSplit;
+        } else if (this.downSplit.isClose(vertexList.get(0))) {
+            currSplit = this.downSplit;
+        } else if (this.leftSplit.isClose(vertexList.get(0))) {
+            currSplit = this.leftSplit;
+        } else if (this.rightSplit.isClose(vertexList.get(0))) {
+            currSplit = this.rightSplit;
+        }
+
+        AbstractSplit nextSplit = null;
+        CustomPlane[] planes = setPlaneBis(currSplit);
+
+        List<Integer> crossingPositions = new ArrayList();
+        List<AbstractSplit> splitList = new ArrayList();
+        splitList.add(currSplit);
+        i = 0;
+        while (i < vertexList.size()) {
+            Vertex v1 = getVertexAtIndex(i, vertexList);
+            Vertex v2 = getVertexAtIndex(i + 1, vertexList);
+            for (int j = 0; j < 4; j++) {
+                nextSplit = getNextSplit(v1, v2, planes[j], currSplit);
+                if (nextSplit != null) {
+                    crossingPositions.add(i);
+                    splitList.add(nextSplit);
+                    planes = setPlaneBis(nextSplit);
+                    while(currSplit.isClose(getVertexAtIndex(i, vertexList))) {
+                        i++;
+                    }
+                    currSplit = nextSplit;
+                    i+=5; // After moving away from the last crossing, we still move a bit far away just in case
+                    break;
+                }
+            }
+            i++;
+        }
+
+        if (splitList.get(0) == splitList.get(splitList.size()-1)) {
+            if (splitList.size() == 1) { // cross no edge -> circular
+                FlatBorder flat = new FlatBorder(mesh);
+                flat.addElement(vertexList);
+                splitList.get(0).addFlatBorder(flat);
+            } else {
+                i = 0;
+                Edge startEdge = null;
+                Border firstBorder = null;
+                while (i < crossingPositions.size()) {
+                    Edge[] edges = getNextEdge(splitList.get(i), splitList.get(i+1));
+                    Border border;
+                    if (i == 0) {
+                        List<Vertex> tmpSequence = new ArrayList(vertexList.subList(crossingPositions.get(crossingPositions.size()-1), vertexList.size()));
+                        tmpSequence.addAll(vertexList.subList(0, crossingPositions.get(i)));
+                        border = new Border(tmpSequence, 0, tmpSequence.size(), edges[0]);
+                        firstBorder = border;
+                    } else {
+                        border = new Border(vertexList, crossingPositions.get(i-1), crossingPositions.get(i), edges[0]);
+                        startEdge.addConnector(border.getConnector());
+                    }
+                    border.setSplit(splitList.get(i));
+                    border.getConnector().setVertex(border.getFirstVertex());
+                    startEdge = edges[1];
+                    i++;
+                    if (i == crossingPositions.size()) {
+                        startEdge.addConnector(firstBorder.getConnector());
+                    }
+                }
+            }
+        } else {
+            // TERRIBLE ERROR TODO it can happen so look for a way out
+        }
+
+    }
+
     private void separateBorder(Border currentBorder, Mesh mesh) {
-        List<FlatBorder> result = new ArrayList();
         List<Border> bordersList = new ArrayList();
         AbstractSplit currSplit = currentBorder.getSplit();
         List<Vertex> vertexList = new ArrayList(currentBorder.getVertexSequence());
@@ -272,7 +487,7 @@ public class Cube {
         for (int i = 0; i < vertexList.size(); i++) {
             if (!currSplit.isClose(vertexList.get(i))) {
                 int j = i;
-                AbstractSplit nextSplit = getNextSplit(vertexList, j);
+                AbstractSplit nextSplit = Cube.this.getNextSplit(vertexList, j);
                 if (nextSplit != null) {
                     // if no split is available no need to create a subborder
                     Edge[] nextEdge = null;

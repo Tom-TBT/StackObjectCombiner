@@ -99,9 +99,9 @@ public class ObjReader {
                                     Integer.parseInt(splitedLine[3]) - 1);
                     Face face = new Face(v1, v2, v3);
                     mesh.getFaces().add(face);
-                    v1.addFace(face, v2, v3);
-                    v2.addFace(face, v1, v3);
-                    v3.addFace(face, v1, v2);
+                    v1.addUnique(v2, v3);
+                    v2.addUnique(v1, v3);
+                    v3.addUnique(v1, v2);
                 }
             }
         } finally {
