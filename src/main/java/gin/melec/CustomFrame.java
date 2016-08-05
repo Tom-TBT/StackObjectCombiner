@@ -37,11 +37,13 @@ import javax.swing.text.DefaultCaret;
 public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         KeyListener{
 
+    private javax.swing.JTextField depthValueField;
     private javax.swing.JLabel aLabel;
     private List aList;
-    private javax.swing.JButton addObjBtn;
     private javax.swing.JButton actualiseBtn;
-    private javax.swing.JToggleButton autoMerge;
+    private javax.swing.JButton addObjBtn;
+    private javax.swing.JButton autoMergeBtn;
+    private javax.swing.JCheckBox autoSaveCB;
     private javax.swing.JLabel bLabel;
     private List bList;
     private javax.swing.JLabel cLabel;
@@ -51,13 +53,24 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JButton clearMergeBtn;
     private javax.swing.JLabel dLabel;
     private List dList;
+    private javax.swing.JLabel depthLabel;
     private javax.swing.JTextField dirField;
+    private javax.swing.JLabel eLabel;
+    private List eList;
+    private javax.swing.JLabel fLabel;
+    private List fList;
+    private javax.swing.JLabel gLabel;
+    private List gList;
+    private javax.swing.JLabel hLabel;
+    private List hList;
+    private javax.swing.JTextField heightValueField;
+    private javax.swing.JLabel heightLabel;
     private javax.swing.JButton helpAddBtn;
+    private javax.swing.JButton helpAutoMerge;
     private javax.swing.JButton helpDirBtn;
     private javax.swing.JButton helpMergeBtn;
     private javax.swing.JButton helpShiftBtn;
     private javax.swing.JButton helpToURLBtn;
-    private javax.swing.JCheckBox autoSaveCB;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -68,6 +81,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private static javax.swing.JTextArea logText;
     private javax.swing.JButton mergeBtn;
     private javax.swing.JTextField obj1Field;
@@ -79,18 +96,17 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JButton shiftBtn;
     private javax.swing.JTextField tailField;
     private javax.swing.JLabel tailLabel;
+    private javax.swing.JButton unshiftBtn;
+    private javax.swing.JTextField widthValueField;
+    private javax.swing.JLabel widthLabel;
     private javax.swing.JTextField windowField;
     private javax.swing.JLabel windowLabel;
     private javax.swing.JLabel xLabel;
     private javax.swing.JTextField xValueField;
     private javax.swing.JLabel yLabel;
     private javax.swing.JTextField yValueField;
-    private javax.swing.JTextField zValueField;
     private javax.swing.JLabel zLabel;
-    private javax.swing.JButton unshiftBtn;
-    private javax.swing.JTextField width;
-    private javax.swing.JTextField height;
-    private javax.swing.JTextField depth;
+    private javax.swing.JTextField zValueField;
 
 
     public CustomFrame() {
@@ -114,31 +130,46 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         addObjBtn.addActionListener(this);
         clearMergeBtn.addActionListener(this);
         mergeBtn.addActionListener(this);
-        autoMerge.addActionListener(this);
+        autoMergeBtn.addActionListener(this);
 
         helpAddBtn.addActionListener(this);
         helpMergeBtn.addActionListener(this);
         helpDirBtn.addActionListener(this);
         helpShiftBtn.addActionListener(this);
         helpToURLBtn.addActionListener(this);
+        helpAutoMerge.addActionListener(this);
 
         aList.addItemListener(this);
         bList.addItemListener(this);
         cList.addItemListener(this);
         dList.addItemListener(this);
+        eList.addItemListener(this);
+        fList.addItemListener(this);
+        gList.addItemListener(this);
+        hList.addItemListener(this);
 
         aList.addKeyListener(this);
         bList.addKeyListener(this);
         cList.addKeyListener(this);
         dList.addKeyListener(this);
+        eList.addKeyListener(this);
+        fList.addKeyListener(this);
+        gList.addKeyListener(this);
+        hList.addKeyListener(this);
         this.addKeyListener(this);
 
         double x = Prefs.get("SOC.verticalSplit", 0);
         double y = Prefs.get("SOC.horizontalSplit", 0);
         double z = Prefs.get("SOC.depthSplit", 0);
+        double width = Prefs.get("SOC.width", 0);
+        double height = Prefs.get("SOC.height", 0);
+        double depth = Prefs.get("SOC.depth", 0);
         xValueField.setText(Double.toString(x));
         yValueField.setText(Double.toString(y));
         zValueField.setText(Double.toString(z));
+        widthValueField.setText(Double.toString(width));
+        heightValueField.setText(Double.toString(height));
+        depthValueField.setText(Double.toString(depth));
 
 
         logText.setText("=== Welcome to the Stack Object Combiner ===\n");
@@ -153,11 +184,16 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         xValueField = new javax.swing.JTextField();
         yLabel = new javax.swing.JLabel();
         yValueField = new javax.swing.JTextField();
-        zLabel = new javax.swing.JLabel();
-        zValueField = new javax.swing.JTextField();
-        shiftBtn = new javax.swing.JButton();
         helpDirBtn = new javax.swing.JButton();
         actualiseBtn = new javax.swing.JButton();
+        heightValueField = new javax.swing.JTextField();
+        depthValueField = new javax.swing.JTextField();
+        zLabel = new javax.swing.JLabel();
+        zValueField = new javax.swing.JTextField();
+        depthLabel = new javax.swing.JLabel();
+        heightLabel = new javax.swing.JLabel();
+        widthValueField = new javax.swing.JTextField();
+        widthLabel = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         obj1Label = new javax.swing.JLabel();
@@ -178,16 +214,28 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         jPanel5 = new javax.swing.JPanel();
         aLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        aList = new java.awt.List();
+        aList = new List();
         jScrollPane2 = new javax.swing.JScrollPane();
-        bList = new java.awt.List();
+        bList = new List();
         bLabel = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        cList = new java.awt.List();
+        cList = new List();
         cLabel = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        dList = new java.awt.List();
+        dList = new List();
         dLabel = new javax.swing.JLabel();
+        eLabel = new javax.swing.JLabel();
+        fLabel = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        eList = new List();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        fList = new List();
+        gLabel = new javax.swing.JLabel();
+        hLabel = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        gList = new List();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        hList = new List();
         addObjBtn = new javax.swing.JButton();
         helpAddBtn = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
@@ -196,10 +244,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         clearLogBtn = new javax.swing.JButton();
         helpShiftBtn = new javax.swing.JButton();
         unshiftBtn = new javax.swing.JButton();
-        autoMerge = new javax.swing.JToggleButton();
-        width = new javax.swing.JTextField();
-        height = new javax.swing.JTextField();
-        depth = new javax.swing.JTextField();
+        shiftBtn = new javax.swing.JButton();
+        autoMergeBtn = new javax.swing.JButton();
+        helpAutoMerge = new javax.swing.JButton();
 
         initComponentsManually();
 
@@ -221,19 +268,19 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         yLabel.setText("Shift Y");
 
-        shiftBtn.setText("Shift");
-
         helpDirBtn.setText("?");
 
         actualiseBtn.setText("Actualise");
 
-        autoMerge.setText("jToggleButton1");
+        zLabel.setText("Shift Z");
 
-        width.setText("jTextField1");
+        depthLabel.setText("Depth");
 
-        height.setText("jTextField2");
+        heightLabel.setText("Height");
 
-        depth.setText("jTextField1");
+        widthValueField.setToolTipText("");
+
+        widthLabel.setText("Width");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -243,32 +290,38 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(actualiseBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(chooseDirBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(dirField, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(helpDirBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(66, 66, 66)
-                        .addComponent(xLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(yLabel)
-                        .addGap(6, 6, 6)
-                        .addComponent(yValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(shiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(xLabel))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(156, 156, 156)
-                        .addComponent(autoMerge)
-                        .addGap(18, 18, 18)
-                        .addComponent(width, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(height, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(depth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(widthLabel)))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(xValueField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(widthValueField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(yLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(heightLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(yValueField, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                    .addComponent(heightValueField))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(zLabel)
+                    .addComponent(depthLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(depthValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(zValueField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -277,18 +330,23 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(actualiseBtn)
-                    .addComponent(autoMerge)
-                    .addComponent(width, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(height, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(depth, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(heightValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(depthLabel)
+                    .addComponent(widthLabel)
+                    .addComponent(widthValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(heightLabel)))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(dirField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(xLabel)
                 .addComponent(xValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(yLabel)
                 .addComponent(yValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(shiftBtn)
-                .addComponent(helpDirBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(helpDirBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(zLabel)
+                .addComponent(zValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(34, 46, Short.MAX_VALUE)
+                .addComponent(depthValueField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jPanel4.setName(""); // NOI18N
@@ -356,7 +414,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                                 .addComponent(helpMergeBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(36, 36, 36))))
             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-                .addGap(73, 73, 73)
+                .addGap(74, 74, 74)
                 .addComponent(helpToURLBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -390,9 +448,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(pairingLabel)
                     .addComponent(pairingField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(32, 32, 32)
                 .addComponent(helpToURLBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         aLabel.setText("A_Meshes");
@@ -411,6 +469,22 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         dLabel.setText("D_Meshes");
 
+        eLabel.setText("E_Meshes");
+
+        fLabel.setText("F_Meshes");
+
+        jScrollPane6.setViewportView(eList);
+
+        jScrollPane7.setViewportView(fList);
+
+        gLabel.setText("G_Meshes");
+
+        hLabel.setText("H_Meshes");
+
+        jScrollPane8.setViewportView(gList);
+
+        jScrollPane9.setViewportView(hList);
+
         addObjBtn.setText(">>>");
 
         helpAddBtn.setText("?");
@@ -426,54 +500,97 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(aLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(bLabel)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(eLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fLabel)))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(126, 126, 126)
+                        .addComponent(addObjBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(helpAddBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(gLabel)
+                                .addGap(103, 103, 103))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(hLabel)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(cLabel)
+                                .addGap(103, 103, 103))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel5Layout.createSequentialGroup()
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(dLabel))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(dLabel))))
                 .addContainerGap())
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(151, 151, 151)
-                .addComponent(addObjBtn)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(helpAddBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel5Layout.createSequentialGroup()
                         .addComponent(bLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(aLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(addObjBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(helpAddBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                         .addComponent(cLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(dLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(addObjBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(helpAddBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(fLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(eLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(gLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(hLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -482,7 +599,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -517,14 +635,20 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(clearLogBtn))
         );
 
         helpShiftBtn.setText("?");
 
         unshiftBtn.setText("Unshift");
+
+        shiftBtn.setText("Shift");
+
+        autoMergeBtn.setText("Automatic Merging");
+
+        helpAutoMerge.setText("?");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -534,14 +658,23 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(unshiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(helpShiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(shiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(unshiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(helpShiftBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(autoMergeBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(helpAutoMerge, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(42, 42, 42))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -549,10 +682,17 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(helpShiftBtn)
-                    .addComponent(unshiftBtn))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(unshiftBtn)
+                            .addComponent(shiftBtn)
+                            .addComponent(helpShiftBtn))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(autoMergeBtn)
+                            .addComponent(helpAutoMerge))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -567,23 +707,18 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     @Override
     public void itemStateChanged(ItemEvent e) {
         Object source = e.getSource();
-        if (source == aList) {
-            bList.deselect(bList.getSelectedIndex());
-            cList.deselect(cList.getSelectedIndex());
-            dList.deselect(dList.getSelectedIndex());
-        } else if (source == bList) {
-            aList.deselect(aList.getSelectedIndex());
-            cList.deselect(cList.getSelectedIndex());
-            dList.deselect(dList.getSelectedIndex());
-        } else if (source == cList) {
-            aList.deselect(aList.getSelectedIndex());
-            bList.deselect(bList.getSelectedIndex());
-            dList.deselect(dList.getSelectedIndex());
-        } else if (source == dList) {
-            aList.deselect(aList.getSelectedIndex());
-            bList.deselect(bList.getSelectedIndex());
-            cList.deselect(cList.getSelectedIndex());
-        }
+        List listSource = (List)source;
+        int selectedIndex = listSource.getSelectedIndex();
+        aList.deselect(aList.getSelectedIndex());
+        bList.deselect(bList.getSelectedIndex());
+        cList.deselect(cList.getSelectedIndex());
+        dList.deselect(dList.getSelectedIndex());
+        eList.deselect(eList.getSelectedIndex());
+        fList.deselect(fList.getSelectedIndex());
+        gList.deselect(gList.getSelectedIndex());
+        hList.deselect(hList.getSelectedIndex());
+        listSource.select(selectedIndex);
+
     }
 
     @Override
@@ -615,9 +750,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             }
         }   else if (button == shiftBtn) {
             try {
-                double x = 807;//ParseDouble(xValueField.getText());
-                double y = 596;//ParseDouble(yValueField.getText());
-                double z = 317;//ParseDouble(zValueField.getText());
+                double x = ParseDouble(xValueField.getText());
+                double y = ParseDouble(yValueField.getText());
+                double z = ParseDouble(zValueField.getText());
                 Prefs.set("SOC.verticalSplit", x);
                 Prefs.set("SOC.horizontalSplit", y);
                 Prefs.set("SOC.depthSplit", z);
@@ -655,9 +790,13 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             bList.setEnabled(true);
             cList.setEnabled(true);
             dList.setEnabled(true);
+            eList.setEnabled(true);
+            fList.setEnabled(true);
+            gList.setEnabled(true);
+            hList.setEnabled(true);
         } else if (button == mergeBtn) {
             merge();
-        } else if (button == autoMerge) {
+        } else if (button == autoMergeBtn) {
             autoMerge();
         } else if (button == helpAddBtn) {
             IJ.showMessage("To add a mesh for merging, select it from\n"
@@ -684,6 +823,13 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                     + "Window : The size of the window into which a vertex is\n"
                     + "considered as close to the border.\n"
                     + "Pairing : The size of the set used to create set of faces.");
+        } else if (button == helpAutoMerge) {
+            IJ.showMessage("Click on the AutoMerge button to merge all\n"
+                    + "the listed meshes automatically.\n"
+                    + "The Stack Object Combiner will seek for compatible\n"
+                    + "objects to merge and assemble them.\n"
+                    + "However it need the width, height and depth of\n"
+                    + "the original image.");
         } else if (button == helpToURLBtn) {
             String macro = "run('URL...', "
                         + "'url=http://imagej.net/StackObjectCombiner');";
@@ -692,17 +838,22 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     }
 
     private void addObj() {
-        String aItem, bItem, cItem, dItem;
-        aItem = aList.getSelectedItem(); bItem = bList.getSelectedItem();
-        cItem = cList.getSelectedItem(); dItem = dList.getSelectedItem();
-        if (aItem != null) {
-            addObjToMerge(aItem, 'A');
-        } else if (bItem != null) {
-            addObjToMerge(bItem, 'B');
-        } else if (cItem != null) {
-            addObjToMerge(cItem, 'C');
-        } else if (dItem != null) {
-            addObjToMerge(dItem, 'D');
+        if (aList.getSelectedItem() != null) {
+            addObjToMerge(aList);
+        } else if (bList.getSelectedItem() != null) {
+            addObjToMerge(bList);
+        } else if (cList.getSelectedItem() != null) {
+            addObjToMerge(cList);
+        } else if (dList.getSelectedItem() != null) {
+            addObjToMerge(dList);
+        } else if (eList.getSelectedItem() != null) {
+            addObjToMerge(eList);
+        } else if (fList.getSelectedItem() != null) {
+            addObjToMerge(fList);
+        } else if (gList.getSelectedItem() != null) {
+            addObjToMerge(gList);
+        } else if (hList.getSelectedItem() != null) {
+            addObjToMerge(hList);
         }
     }
 
@@ -723,6 +874,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             bList.setEnabled(true);
             cList.setEnabled(true);
             dList.setEnabled(true);
+            eList.setEnabled(true);
+            fList.setEnabled(true);
+            gList.setEnabled(true);
+            hList.setEnabled(true);
             DialogContentManager.setWorkingDir(dirField.getText());
             listMeshes();
         }
@@ -907,32 +1062,63 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         return result;
     }
 
-    protected void addObjToMerge(final String name, final char source) {
+    protected void addObjToMerge(List source) {
+        String item = source.getSelectedItem();
+        source.deselect(source.getSelectedIndex());
+        source.setEnabled(false);
         if (obj1Field.getText().isEmpty()) {
-            obj1Field.setText(name);
-            if (source == 'A') {
+            obj1Field.setText(item);
+            if (source == aList) {
                 dList.setEnabled(false);
-                aList.setEnabled(false);
-                aList.deselect(aList.getSelectedIndex());
-            } else if (source == 'B'){
+                fList.setEnabled(false);
+                gList.setEnabled(false);
+                hList.setEnabled(false);
+            } else if (source == bList){
                 cList.setEnabled(false);
+                eList.setEnabled(false);
+                gList.setEnabled(false);
+                hList.setEnabled(false);
+            } else if (source == cList){
                 bList.setEnabled(false);
-                bList.deselect(bList.getSelectedIndex());
-            } else if (source == 'C'){
+                eList.setEnabled(false);
+                fList.setEnabled(false);
+                hList.setEnabled(false);
+            } else if (source == dList){
+                aList.setEnabled(false);
+                eList.setEnabled(false);
+                fList.setEnabled(false);
+                gList.setEnabled(false);
+            } else if (source == eList){
                 bList.setEnabled(false);
                 cList.setEnabled(false);
-                cList.deselect(cList.getSelectedIndex());
-            } else if (source == 'D'){
-                aList.setEnabled(false);
                 dList.setEnabled(false);
-                dList.deselect(dList.getSelectedIndex());
+                hList.setEnabled(false);
+            } else if (source == fList){
+                aList.setEnabled(false);
+                cList.setEnabled(false);
+                dList.setEnabled(false);
+                gList.setEnabled(false);
+            } else if (source == gList){
+                aList.setEnabled(false);
+                bList.setEnabled(false);
+                dList.setEnabled(false);
+                fList.setEnabled(false);
+            } else if (source == hList){
+                aList.setEnabled(false);
+                bList.setEnabled(false);
+                cList.setEnabled(false);
+                eList.setEnabled(false);
             }
         } else if (obj2Field.getText().isEmpty()) {
-            obj2Field.setText(name);
+            obj2Field.setText(item);
             aList.setEnabled(false);
             bList.setEnabled(false);
             cList.setEnabled(false);
             dList.setEnabled(false);
+            eList.setEnabled(false);
+            fList.setEnabled(false);
+            gList.setEnabled(false);
+            hList.setEnabled(false);
             this.requestFocus();
         }
     }
@@ -968,6 +1154,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         bList.removeAll();
         cList.removeAll();
         dList.removeAll();
+        eList.removeAll();
+        fList.removeAll();
+        gList.removeAll();
+        hList.removeAll();
         Collection<String> meshNames =
                 new TreeSet<String>(Collator.getInstance());
         for (Mesh mesh : DialogContentManager.A_MESHES) {
@@ -996,6 +1186,34 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
         for (String name : meshNames) {
             dList.add(name);
+        }
+        meshNames = new TreeSet<String>(Collator.getInstance());
+        for (Mesh mesh : DialogContentManager.E_MESHES) {
+            meshNames.add(mesh.toString());
+        }
+        for (String name : meshNames) {
+            eList.add(name);
+        }
+        meshNames = new TreeSet<String>(Collator.getInstance());
+        for (Mesh mesh : DialogContentManager.F_MESHES) {
+            meshNames.add(mesh.toString());
+        }
+        for (String name : meshNames) {
+            fList.add(name);
+        }
+        meshNames = new TreeSet<String>(Collator.getInstance());
+        for (Mesh mesh : DialogContentManager.G_MESHES) {
+            meshNames.add(mesh.toString());
+        }
+        for (String name : meshNames) {
+            gList.add(name);
+        }
+        meshNames = new TreeSet<String>(Collator.getInstance());
+        for (Mesh mesh : DialogContentManager.H_MESHES) {
+            meshNames.add(mesh.toString());
+        }
+        for (String name : meshNames) {
+            hList.add(name);
         }
     }
 
