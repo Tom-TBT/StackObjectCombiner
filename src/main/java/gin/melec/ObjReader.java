@@ -66,6 +66,7 @@ public class ObjReader {
      */
     static void readMesh(final File file, final Mesh mesh)
             throws IOException, ParseException {
+        CustomFrame.appendToLog("Loading "+mesh.getFile().getName());
         final List<Vertex> tmpVertices;
 
         final InputStream ips = new FileInputStream(file.toString());
@@ -107,7 +108,6 @@ public class ObjReader {
         } finally {
             buR.close();
         }
-        CustomFrame.appendToLog(mesh.getFile().getName() + " loaded");
     }
 
     /**

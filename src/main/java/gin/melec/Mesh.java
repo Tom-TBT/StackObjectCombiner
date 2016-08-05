@@ -115,35 +115,6 @@ public class Mesh {
     }**/
 
     /**
-     * Find the next vertex to add to the border. It is find according to the
-     * appartenance of a face in which is also the last vertex added.
-     *
-     * @param border , the border for which we search the next vertex.
-     * @return the next vertex to add to the border.
-     */
-    private Vertex findNextVertex(final Border border) {
-        Vertex nextVertex = border.getSecondLastVertex();
-        Face currentFace = null;
-        final Set<Face> facesRemaining = new HashSet();
-        facesRemaining.addAll(border.getLastVertex().getFaces());
-
-        while (!facesRemaining.isEmpty()) {
-            for (Face face : facesRemaining) {
-                if (face.include(nextVertex)) {
-                    currentFace = face;
-                    break;
-                }
-            }
-            facesRemaining.remove(currentFace);
-            garbage.addAll(nextVertex.getNeighbours());
-            nextVertex = currentFace.getThirdVertex(border.getLastVertex(),
-                    nextVertex);
-        }
-        //this.garbage.add(nextVertex);
-        return nextVertex;
-    }
-
-    /**
      * This is the principal method for creating every borders of a mesh. It
      * first create primers (vertex of the mesh) which can potentially initiate
      * a new border. Then a border is created from the primers, and once the

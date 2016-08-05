@@ -103,7 +103,7 @@ public class ObjWriter {
                 }
             }
         }
-        CustomFrame.appendToLog("Saving the new object");
+        CustomFrame.appendToLog("Saving the new object as "+ newMesh.getName());
         final FileWriter fiW = new FileWriter(newMesh.toString());
         final BufferedWriter bfW = new BufferedWriter(fiW);
         final PrintWriter prW = new PrintWriter(bfW);
@@ -118,6 +118,7 @@ public class ObjWriter {
         } finally {
             prW.close();
         }
+        CustomFrame.appendToLog(newMesh.getName()+" successfully saved");
     }
 
     protected static void exportFusion(Mesh mesh1, Mesh mesh2,

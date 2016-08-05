@@ -107,36 +107,38 @@ public class MeshMerger {
             IJ.handleException(ex);
         }
 
+        boolean bordersDetected = true;
         if (mesh1.getBorders().isEmpty()) {
-            IJ.showMessage("Error 3 : " + mesh1.getFile().getName()
+            CustomFrame.appendToLog("Error : " + mesh1.getFile().getName()
                     + " don't cross to the border");
-        } else {
-
-            if (mesh2.getBorders().isEmpty()) {
-                IJ.showMessage("Error 3 : " + mesh2.getFile().getName()
-                        + " don't cross to the border");
-            } else {
-                final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
-                        mesh2.getBorders());
-                final List<Face> newFaces = new ArrayList();
-                CustomFrame.appendToLog("Computing the new faces");
-                for (Border[] couple : couples) {
-                    if (couple[0].distanceTo(couple[1]) < 100) {
+            bordersDetected = false;
+        }
+        if (mesh2.getBorders().isEmpty()) {
+            CustomFrame.appendToLog("Error : " + mesh2.getFile().getName()
+                + " don't cross to the border");
+            bordersDetected = false;
+        }
+        if (bordersDetected) {
+            final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
+                    mesh2.getBorders());
+            final List<Face> newFaces = new ArrayList();
+            CustomFrame.appendToLog("Computing the new faces");
+            for (Border[] couple : couples) {
+                if (couple[0].distanceTo(couple[1]) < 100) {
 //                    double dis = couple[0].distanceTo(couple[1]);
-                        couple[0].alignOn(couple[1]);
-                        newFaces.addAll(Linker.createFacesBetween(couple[0].getVertexSequence(), couple[1].getVertexSequence(), couple[0].isCircular()));
-                    }
+                    couple[0].alignOn(couple[1]);
+                    newFaces.addAll(Linker.createFacesBetween(couple[0].getVertexSequence(), couple[1].getVertexSequence(), couple[0].isCircular()));
                 }
-                try {
-                    ObjWriter.exportFusion(mesh1, mesh2, newFaces);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
-                CustomFrame.appendToLog("Done");
-                CustomFrame.appendToLog("-----------------------");
-                mesh1.clear();
-                mesh2.clear();
             }
+            try {
+                ObjWriter.exportFusion(mesh1, mesh2, newFaces);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
+            CustomFrame.appendToLog("Done");
+            CustomFrame.appendToLog("-----------------------");
+            mesh1.clear();
+            mesh2.clear();
         }
     }
 

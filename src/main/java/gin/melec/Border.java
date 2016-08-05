@@ -80,7 +80,7 @@ public class Border {
         if (firstVertex == null) {
             return;
         }
-        CustomFrame.appendToLog("Detecting new border for " + mesh.getFile().getName());
+
         vertexSequence.add(firstVertex);
         mesh.getPrimers().remove(firstVertex);
         Iterator<Vertex> it = firstVertex.getUniqueNeighbours().iterator();

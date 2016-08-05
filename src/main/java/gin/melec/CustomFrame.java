@@ -795,9 +795,31 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             gList.setEnabled(true);
             hList.setEnabled(true);
         } else if (button == mergeBtn) {
-            merge();
+            Thread thread = new Thread() {
+                {
+                    setPriority(Thread.NORM_PRIORITY);
+                }
+
+                @Override
+                public void run() {
+                    merge();
+                }
+            };
+            thread.start();
+            this.mergeBtn.setEnabled(false);
         } else if (button == autoMergeBtn) {
-            autoMerge();
+            Thread thread = new Thread() {
+                {
+                    setPriority(Thread.NORM_PRIORITY);
+                }
+
+                @Override
+                public void run() {
+                    autoMerge();
+                }
+            };
+            thread.start();
+            this.mergeBtn.setEnabled(false);
         } else if (button == helpAddBtn) {
             IJ.showMessage("To add a mesh for merging, select it from\n"
                     + "one of the lists. Then you can either\n "
@@ -880,18 +902,36 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             hList.setEnabled(true);
             DialogContentManager.setWorkingDir(dirField.getText());
             listMeshes();
+            this.mergeBtn.setEnabled(true);
         }
     }
 
     protected void autoMerge() {
-        Cube cube_A = new Cube(-0.5,-0.5,-0.5,807.5,596.5,317.5); //-0.5,-0.5,-0.5,191.5,213.5,282.5
-        Cube cube_B = new Cube(807.5,-0.5,-0.5,1617,596.5,317.5);
-        Cube cube_C = new Cube(-0.5,596.5,-0.5,807.5,1191,317.5);
-        Cube cube_D = new Cube(807.5,596.5,-0.5,1617,1191,317.5); //191.5,213.5,-0.5,400,600,282.5
-        Cube cube_E = new Cube(-0.5,-0.5,317.5,807.5,596.5,634);
-        Cube cube_F = new Cube(807.5,-0.5,317.5,1617,596.5,634);
-        Cube cube_G = new Cube(-0.5,596.5,317.5,807.5,1191,634);
-        Cube cube_H = new Cube(807.5,596.5,317.5,1617,1191,634);
+        appendToLog("Starting the automatic merging");
+        double x = ParseDouble(xValueField.getText());
+        double y = ParseDouble(yValueField.getText());
+        double z = ParseDouble(zValueField.getText());
+        double width = ParseDouble(widthValueField.getText());
+        double height = ParseDouble(heightValueField.getText());
+        double depth = ParseDouble(depthValueField.getText());
+
+        Prefs.set("SOC.verticalSplit", x);
+        Prefs.set("SOC.horizontalSplit", y);
+        Prefs.set("SOC.depthSplit", z);
+        Prefs.set("SOC.width", width);
+        Prefs.set("SOC.height", height);
+        Prefs.set("SOC.depth", depth);
+
+        // 0.5 values are added/substracted to place the split between the cubes
+        Cube cube_A = new Cube(-0.5,-0.5,-0.5,x+0.5,y+0.5,z+0.5); //-0.5,-0.5,-0.5,191.5,213.5,282.5
+        Cube cube_B = new Cube(x+0.5,-0.5,-0.5,width+0.5,y+0.5,z+0.5);
+        Cube cube_C = new Cube(-0.5,y+0.5,-0.5,x+0.5,height+0.5,z+0.5);
+        Cube cube_D = new Cube(x+0.5,y+0.5,-0.5,width+0.5,height+0.5,z+0.5); //191.5,213.5,-0.5,400,600,282.5
+        Cube cube_E = new Cube(-0.5,-0.5,z+0.5,x+0.5,y+0.5,depth+0.5);
+        Cube cube_F = new Cube(x+0.5,-0.5,z+0.5,width+0.5,y+0.5,depth+0.5);
+        Cube cube_G = new Cube(-0.5,y+0.5,z+0.5,x+0.5,height+0.5,depth+0.5);
+        Cube cube_H = new Cube(x+0.5,y+0.5,z+0.5,width+0.5,height+0.5,depth+0.5);
+
         cube_A.addAllMesh(DialogContentManager.A_MESHES);
         cube_B.addAllMesh(DialogContentManager.B_MESHES);
         cube_C.addAllMesh(DialogContentManager.C_MESHES);
@@ -909,15 +949,6 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         cube_F.detectMeshBorders();
         cube_G.detectMeshBorders();
         cube_H.detectMeshBorders();
-
-        cube_A.prepareMeshBorders();
-        cube_B.prepareMeshBorders();
-        cube_C.prepareMeshBorders();
-        cube_D.prepareMeshBorders();
-        cube_E.prepareMeshBorders();
-        cube_F.prepareMeshBorders();
-        cube_G.prepareMeshBorders();
-        cube_H.prepareMeshBorders();
 
         java.util.List<Couple> couples = new ArrayList();
         //R: Right, L: Left, U: Up, D: Down, F: Front, B:, Back
@@ -996,8 +1027,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 i++;
             }
         }
-
-        int g = 0;
+        this.mergeBtn.setEnabled(true);
     }
 
     private java.util.List<Couple> getCouples(Cube cube1, Cube cube2, char split1, char split2) {
