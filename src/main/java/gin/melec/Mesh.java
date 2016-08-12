@@ -349,7 +349,6 @@ public class Mesh {
      * memory because of the size of these arrays.
      */
     void clear() {
-        this.borders.clear();
         this.faces.clear();
         this.vertices.clear();
     }

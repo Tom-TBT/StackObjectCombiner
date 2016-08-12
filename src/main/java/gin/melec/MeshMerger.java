@@ -16,13 +16,17 @@
  */
 package gin.melec;
 
+import static gin.melec.CustomFrame.appendToLog;
 import ij.IJ;
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -210,6 +214,221 @@ public class MeshMerger {
                 }
             }
             result.add(distances);
+        }
+        return result;
+    }
+
+    public static void workOnCubes(String workingDir) {
+        DialogContentManager.CUBE_A.detectMeshBorders();
+        DialogContentManager.CUBE_B.detectMeshBorders();
+        DialogContentManager.CUBE_C.detectMeshBorders();
+        DialogContentManager.CUBE_D.detectMeshBorders();
+        DialogContentManager.CUBE_E.detectMeshBorders();
+        DialogContentManager.CUBE_F.detectMeshBorders();
+        DialogContentManager.CUBE_G.detectMeshBorders();
+        DialogContentManager.CUBE_H.detectMeshBorders();
+
+        java.util.List<Couple> couples = createCouples();
+
+        File saveDirectory = new File(workingDir + "SOC - AutoMerge Result");
+        saveDirectory.mkdir();
+
+        int i = 1;
+        while (couples.size() > 0) {
+            Set<Mesh> meshToFuse = new HashSet();
+            Set<Couple> coupleToFuse = new HashSet();
+            getCouplesAndMeshToFuse(meshToFuse, coupleToFuse, couples, couples.get(0));
+
+            List<Vertex> vertices = new ArrayList();
+            List<Face> faces = new ArrayList();
+            String message = "The meshes ";
+            for (Mesh mesh: meshToFuse) {
+                message = message.concat(mesh.toString() + ", ");
+                mesh.incremVertices(vertices.size());
+                vertices.addAll(mesh.getVertices());
+                faces.addAll(mesh.getFaces());
+            }
+            message = message.concat("are compatible");
+            CustomFrame.appendToLog(message);
+            for (Couple couple:couples) {
+                couple.alignFlats();
+                couple.merge();
+                faces.addAll(couple.getNewFaces());
+            }
+            try {
+                ObjWriter.writeResult(vertices, faces, "Mesh-"+i+".obj", saveDirectory);
+            } catch (IOException ex) {
+                CustomFrame.appendToLog("Error while writing the new file");
+                IJ.handleException(ex);
+            }
+            couples.removeAll(coupleToFuse);
+            i++;
+        }
+    }
+
+    private static void getCouplesAndMeshToFuse(Set<Mesh> meshResult, Set<Couple> coupleResult,
+            List<Couple> couples, Couple initCouple) {
+        Mesh mesh1 = initCouple.getMesh1();
+        Mesh mesh2 = initCouple.getMesh2();
+        if (!meshResult.contains(mesh1)) {
+            meshResult.add(mesh1);
+            for (Couple currCouple: couples) {
+                if (currCouple.contain(mesh1)) {
+                    coupleResult.add(currCouple);
+                    getCouplesAndMeshToFuse(meshResult, coupleResult, couples, currCouple);
+                }
+            }
+        }
+        if (!meshResult.contains(mesh2)) {
+            meshResult.add(mesh2);
+            for (Couple currCouple: couples) {
+                if (currCouple.contain(mesh2)) {
+                    coupleResult.add(currCouple);
+                    getCouplesAndMeshToFuse(meshResult, coupleResult, couples, currCouple);
+                }
+            }
+        }
+    }
+
+    private static java.util.List<Couple> createCouples() {
+        java.util.List<Couple> result= new ArrayList();
+
+        result.addAll(getCouples(DialogContentManager.CUBE_A, DialogContentManager.CUBE_B, 'R', 'L'));
+        result.addAll(getCouples(DialogContentManager.CUBE_C, DialogContentManager.CUBE_D, 'R', 'L'));
+        result.addAll(getCouples(DialogContentManager.CUBE_A, DialogContentManager.CUBE_C, 'F', 'B'));
+        result.addAll(getCouples(DialogContentManager.CUBE_B, DialogContentManager.CUBE_D, 'F', 'B'));
+
+        result.addAll(getCouples(DialogContentManager.CUBE_E, DialogContentManager.CUBE_F, 'R', 'L'));
+        result.addAll(getCouples(DialogContentManager.CUBE_G, DialogContentManager.CUBE_H, 'R', 'L'));
+        result.addAll(getCouples(DialogContentManager.CUBE_E, DialogContentManager.CUBE_G, 'F', 'B'));
+        result.addAll(getCouples(DialogContentManager.CUBE_F, DialogContentManager.CUBE_H, 'F', 'B'));
+
+        result.addAll(getCouples(DialogContentManager.CUBE_A, DialogContentManager.CUBE_E, 'D', 'U'));
+        result.addAll(getCouples(DialogContentManager.CUBE_B, DialogContentManager.CUBE_F, 'D', 'U'));
+        result.addAll(getCouples(DialogContentManager.CUBE_C, DialogContentManager.CUBE_G, 'D', 'U'));
+        result.addAll(getCouples(DialogContentManager.CUBE_D, DialogContentManager.CUBE_H, 'D', 'U'));
+
+        keepOneCouplePerBorder(result);
+        return result;
+    }
+
+    private static void keepOneCouplePerBorder(List<Couple> couples) {
+        Set<Couple> toRemove = new HashSet();
+        Set<FlatBorder> bordersToCheck = new HashSet();
+
+        // Creation of the list of all the flats seen in the couples
+        for (Couple couple: couples) {
+            bordersToCheck.add(couple.getFlat1());
+            bordersToCheck.add(couple.getFlat2());
+        }
+
+        // Now we will look for the flats that appear more than once, and remove
+        // the couple where they have the weakest similarity
+        for (FlatBorder currentFlat: bordersToCheck) {
+            List<Couple> flatCouples = new ArrayList();
+
+            // Adding to a list all the couples of the current flat
+            for (Couple couple: couples) {
+                if (couple.contain(currentFlat)) {
+                    flatCouples.add(couple);
+                }
+            }
+
+            // If the current flat appear more than one time
+            if (flatCouples.size() > 1) {
+                Couple bestSimilarityCouple = flatCouples.get(0);
+                double bestSimilarity = bestSimilarityCouple.getSimilarity();
+                int i = 0;
+                // Look for the couple with the best affinity
+                while (i < flatCouples.size()) {
+                    if (flatCouples.get(i).getSimilarity() > bestSimilarity) {
+                        bestSimilarityCouple = flatCouples.get(i);
+                        bestSimilarity = bestSimilarityCouple.getSimilarity();
+                    }
+                    i++;
+                }
+                // All couples are added to the remove, except the one with the best affinity
+                flatCouples.remove(bestSimilarityCouple);
+                toRemove.addAll(flatCouples);
+            }
+        }
+        couples.removeAll(toRemove);
+    }
+
+    private static java.util.List<Couple> getCouples(Cube cube1, Cube cube2,
+            char split1, char split2) {
+        java.util.List<Couple> result = new ArrayList();
+        java.util.List<FlatBorder> flats1 = null;
+        java.util.List<FlatBorder> flats2 = null;
+        for (Mesh mesh1 : cube1.getMeshes()) {
+            switch (split1) {
+                case 'R':
+                    flats1 = mesh1.getRightFlats();
+                    break;
+                case 'L':
+                    flats1 = mesh1.getLeftFlats();
+                    break;
+                case 'U':
+                    flats1 = mesh1.getUpFlats();
+                    break;
+                case 'D':
+                    flats1 = mesh1.getDownFlats();
+                    break;
+                case 'F':
+                    flats1 = mesh1.getFrontFlats();
+                    break;
+                case 'B':
+                    flats1 = mesh1.getBackFlats();
+                    break;
+            }
+            for (Mesh mesh2 : cube2.getMeshes()) {
+                switch (split2) {
+                    case 'R':
+                        flats2 = mesh2.getRightFlats();
+                        break;
+                    case 'L':
+                        flats2 = mesh2.getLeftFlats();
+                        break;
+                    case 'U':
+                        flats2 = mesh2.getUpFlats();
+                        break;
+                    case 'D':
+                        flats2 = mesh2.getDownFlats();
+                        break;
+                    case 'F':
+                        flats2 = mesh2.getFrontFlats();
+                        break;
+                    case 'B':
+                        flats2 = mesh2.getBackFlats();
+                        break;
+                }
+                java.util.List<Couple> tmpList = new ArrayList();
+                tmpList.addAll(createCouples(flats1, flats2));
+                removeUncompatibleCouples(tmpList);
+                result.addAll(tmpList);
+            }
+        }
+        return result;
+    }
+
+    private static void removeUncompatibleCouples(List<Couple> couples) {
+        List<Couple> toRemove = new ArrayList();
+        for (Couple couple: couples) {
+            if (!couple.compatible()) {
+                toRemove.add(couple);
+            }
+        }
+        couples.removeAll(toRemove);
+    }
+
+
+    private static java.util.List<Couple> createCouples(java.util.List<FlatBorder> flats1,
+            java.util.List<FlatBorder> flats2) {
+        java.util.List<Couple> result = new ArrayList();
+        for (FlatBorder flat1: flats1) {
+            for (FlatBorder flat2: flats2) {
+                result.add(new Couple(flat1, flat2));
+            }
         }
         return result;
     }

@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -36,6 +38,8 @@ import javax.swing.text.DefaultCaret;
  */
 public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         KeyListener{
+
+    private static int THREAD_COUNT;
 
     private javax.swing.JTextField depthValueField;
     private javax.swing.JLabel aLabel;
@@ -806,7 +810,6 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 }
             };
             thread.start();
-            this.mergeBtn.setEnabled(false);
         } else if (button == autoMergeBtn) {
             Thread thread = new Thread() {
                 {
@@ -889,6 +892,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         DialogContentManager.setSplits(x, y, z);
         if (DialogContentManager.setActiveSplits(obj1Field.getText(),
                 obj2Field.getText()) && setParameters()) {
+            this.mergeBtn.setEnabled(false);
             MeshMerger.merge();
             obj1Field.setText("");
             obj2Field.setText("");
@@ -906,7 +910,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
-    protected void autoMerge() {
+    protected void autoMerge(){
         appendToLog("Starting the automatic merging");
         double x = ParseDouble(xValueField.getText());
         double y = ParseDouble(yValueField.getText());
@@ -922,174 +926,13 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         Prefs.set("SOC.height", height);
         Prefs.set("SOC.depth", depth);
 
-        // 0.5 values are added/substracted to place the split between the cubes
-        Cube cube_A = new Cube(-0.5,-0.5,-0.5,x+0.5,y+0.5,z+0.5); //-0.5,-0.5,-0.5,191.5,213.5,282.5
-        Cube cube_B = new Cube(x+0.5,-0.5,-0.5,width+0.5,y+0.5,z+0.5);
-        Cube cube_C = new Cube(-0.5,y+0.5,-0.5,x+0.5,height+0.5,z+0.5);
-        Cube cube_D = new Cube(x+0.5,y+0.5,-0.5,width+0.5,height+0.5,z+0.5); //191.5,213.5,-0.5,400,600,282.5
-        Cube cube_E = new Cube(-0.5,-0.5,z+0.5,x+0.5,y+0.5,depth+0.5);
-        Cube cube_F = new Cube(x+0.5,-0.5,z+0.5,width+0.5,y+0.5,depth+0.5);
-        Cube cube_G = new Cube(-0.5,y+0.5,z+0.5,x+0.5,height+0.5,depth+0.5);
-        Cube cube_H = new Cube(x+0.5,y+0.5,z+0.5,width+0.5,height+0.5,depth+0.5);
+        // Check for sparsed Cubes (Borders of the meshes)
 
-        cube_A.addAllMesh(DialogContentManager.A_MESHES);
-        cube_B.addAllMesh(DialogContentManager.B_MESHES);
-        cube_C.addAllMesh(DialogContentManager.C_MESHES);
-        cube_D.addAllMesh(DialogContentManager.D_MESHES);
-        cube_E.addAllMesh(DialogContentManager.E_MESHES);
-        cube_F.addAllMesh(DialogContentManager.F_MESHES);
-        cube_G.addAllMesh(DialogContentManager.G_MESHES);
-        cube_H.addAllMesh(DialogContentManager.H_MESHES);
+        DialogContentManager.generateCubes(x, y, z, width, height, depth);
 
-        cube_A.detectMeshBorders();
-        cube_B.detectMeshBorders();
-        cube_C.detectMeshBorders();
-        cube_D.detectMeshBorders();
-        cube_E.detectMeshBorders();
-        cube_F.detectMeshBorders();
-        cube_G.detectMeshBorders();
-        cube_H.detectMeshBorders();
+        MeshMerger.workOnCubes(this.dirField.getText());
 
-        java.util.List<Couple> couples = new ArrayList();
-        //R: Right, L: Left, U: Up, D: Down, F: Front, B:, Back
-        couples.addAll(getCouples(cube_A, cube_B, 'R', 'L'));
-        couples.addAll(getCouples(cube_C, cube_D, 'R', 'L'));
-        couples.addAll(getCouples(cube_A, cube_C, 'F', 'B'));
-        couples.addAll(getCouples(cube_B, cube_D, 'F', 'B'));
-
-        couples.addAll(getCouples(cube_E, cube_F, 'R', 'L'));
-        couples.addAll(getCouples(cube_G, cube_H, 'R', 'L'));
-        couples.addAll(getCouples(cube_E, cube_G, 'F', 'B'));
-        couples.addAll(getCouples(cube_F, cube_H, 'F', 'B'));
-
-        couples.addAll(getCouples(cube_A, cube_E, 'D', 'U'));
-        couples.addAll(getCouples(cube_B, cube_F, 'D', 'U'));
-        couples.addAll(getCouples(cube_C, cube_G, 'D', 'U'));
-        couples.addAll(getCouples(cube_D, cube_H, 'D', 'U'));
-
-        for (Couple couple:couples) {
-            if (couple.compatible()) {
-                couple.alignFlats();
-                couple.merge();
-            }
-        }
-
-        java.util.List<Mesh> meshToCheck = new ArrayList();
-        meshToCheck.addAll(DialogContentManager.A_MESHES);
-        meshToCheck.addAll(DialogContentManager.B_MESHES);
-        meshToCheck.addAll(DialogContentManager.C_MESHES);
-        meshToCheck.addAll(DialogContentManager.D_MESHES);
-        meshToCheck.addAll(DialogContentManager.E_MESHES);
-        meshToCheck.addAll(DialogContentManager.F_MESHES);
-        meshToCheck.addAll(DialogContentManager.G_MESHES);
-        meshToCheck.addAll(DialogContentManager.H_MESHES);
-
-        Set<Mesh> meshChecked = new HashSet();
-        Set<Mesh> currentFamily = new HashSet();
-        int i = 1;
-        for (Mesh mesh: meshToCheck) {
-            Set<Couple> currentCouples = new HashSet();
-            if (!meshChecked.contains(mesh)) {
-                currentFamily.add(mesh);
-                meshChecked.add(mesh);
-                java.util.List<Mesh> tmpFamily = new ArrayList();
-                java.util.List<Vertex> vertices = new ArrayList();
-                java.util.List<Face> faces = new ArrayList();
-                do {
-                    for (Couple couple: couples) {
-                        if (couple.compatible() && couple.contain(mesh)) {
-                            currentCouples.add(couple);
-                            Mesh tmpMesh = couple.getOther(mesh);
-                            if (!meshChecked.contains(tmpMesh)) {
-                                tmpFamily.add(tmpMesh);
-                                meshChecked.add(tmpMesh);
-                            }
-                            currentFamily.add(tmpMesh);
-
-                        }
-                    }
-                    vertices.addAll(mesh.getVertices());
-                    faces.addAll(mesh.getFaces());
-                    tmpFamily.remove(mesh);
-                    if (tmpFamily.size() > 0) {
-                        mesh = tmpFamily.get(0);
-                        mesh.incremVertices(vertices.size());
-                    }
-                } while(!tmpFamily.isEmpty());
-                for (Couple couple: currentCouples) {
-                    faces.addAll(couple.getNewFaces());
-                }
-                try {
-                    ObjWriter.writeResult(vertices, faces, "Mesh-"+i, new File(dirField.getText()));
-                } catch (IOException ex) {
-                    Logger.getLogger(CustomFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                i++;
-            }
-        }
         this.mergeBtn.setEnabled(true);
-    }
-
-    private java.util.List<Couple> getCouples(Cube cube1, Cube cube2, char split1, char split2) {
-        java.util.List<Couple> result = new ArrayList();
-        java.util.List<FlatBorder> flats1 = null;
-        java.util.List<FlatBorder> flats2 = null;
-        for (Mesh mesh1 : cube1.getMeshes()) {
-            switch (split1) {
-                case 'R':
-                    flats1 = mesh1.getRightFlats();
-                    break;
-                case 'L':
-                    flats1 = mesh1.getLeftFlats();
-                    break;
-                case 'U':
-                    flats1 = mesh1.getUpFlats();
-                    break;
-                case 'D':
-                    flats1 = mesh1.getDownFlats();
-                    break;
-                case 'F':
-                    flats1 = mesh1.getFrontFlats();
-                    break;
-                case 'B':
-                    flats1 = mesh1.getBackFlats();
-                    break;
-            }
-            for (Mesh mesh2 : cube2.getMeshes()) {
-                switch (split2) {
-                    case 'R':
-                        flats2 = mesh2.getRightFlats();
-                        break;
-                    case 'L':
-                        flats2 = mesh2.getLeftFlats();
-                        break;
-                    case 'U':
-                        flats2 = mesh2.getUpFlats();
-                        break;
-                    case 'D':
-                        flats2 = mesh2.getDownFlats();
-                        break;
-                    case 'F':
-                        flats2 = mesh2.getFrontFlats();
-                        break;
-                    case 'B':
-                        flats2 = mesh2.getBackFlats();
-                        break;
-                }
-                result.addAll(createCouples(flats1, flats2));
-            }
-        }
-        return result;
-    }
-
-    private java.util.List<Couple> createCouples(java.util.List<FlatBorder> flats1, java.util.List<FlatBorder> flats2) {
-        java.util.List<Couple> result = new ArrayList();
-        for (FlatBorder flat1: flats1) {
-            for (FlatBorder flat2: flats2) {
-                result.add(new Couple(flat1, flat2));
-            }
-        }
-        return result;
     }
 
     protected void addObjToMerge(List source) {
@@ -1155,7 +998,6 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
     protected static void appendToLog(final String msg) {
         logText.append(msg + "\n");
-        //TODO The action need to be in a thread so the log can repaint aside
     }
 
     double ParseDouble(String strNumber) {

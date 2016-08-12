@@ -40,7 +40,7 @@ public class Couple{
 
     private boolean compatible;
 
-    private List<Face> newFaces;
+    private final List<Face> newFaces;
 
     private final static double COMPATIBLE_TOLERANCE = 0.5;
 
@@ -164,6 +164,11 @@ public class Couple{
                 this.flat2.getParentMesh().equals(mesh));
     }
 
+    public boolean contain(FlatBorder flat) {
+        return (this.flat1.equals(flat) ||
+                this.flat2.equals(flat));
+    }
+
     public Mesh getOther(Mesh mesh) {
         Mesh result = null;
         if (flat1.getParentMesh().equals(mesh)) {
@@ -174,7 +179,27 @@ public class Couple{
         return result;
     }
 
+    public Mesh getMesh1() {
+        return flat1.getParentMesh();
+    }
+
+    public Mesh getMesh2() {
+        return flat2.getParentMesh();
+    }
+
+    public FlatBorder getFlat1() {
+        return flat1;
+    }
+
+    public FlatBorder getFlat2() {
+        return flat2;
+    }
+
     public List<Face> getNewFaces() {
         return this.newFaces;
+    }
+
+    public double getSimilarity() {
+        return this.similarity;
     }
 }

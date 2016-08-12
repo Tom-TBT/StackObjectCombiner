@@ -58,6 +58,15 @@ public class DialogContentManager {
      */
     protected static final List<Mesh> H_MESHES = new ArrayList();
 
+    protected static Cube CUBE_A;
+    protected static Cube CUBE_B;
+    protected static Cube CUBE_C;
+    protected static Cube CUBE_D;
+    protected static Cube CUBE_E;
+    protected static Cube CUBE_F;
+    protected static Cube CUBE_G;
+    protected static Cube CUBE_H;
+
     protected static final AbstractSplit WIDTH_SPLIT = new WidthSplit();
     protected static final AbstractSplit HEIGHT_SPLIT = new HeightSplit();
     protected static final AbstractSplit DEPTH_SPLIT = new DepthSplit();
@@ -329,5 +338,35 @@ public class DialogContentManager {
             }
         }
         return result;
+    }
+
+    public static void generateCubes(double xPos, double yPos, double zPos, double width,
+            double height, double depth) {
+        // Here we displace from half a pixel the different positions
+        double basePos = -0.5;
+        xPos -= 0.5;
+        yPos -= 0.5;
+        zPos -= 0.5;
+        width -= 0.5;
+        height -= 0.5;
+        depth -= 0.5;
+
+        // 0.5 values are added/substracted to place the split between the cubes
+        CUBE_A = new Cube(basePos,basePos,basePos,xPos,yPos,zPos);
+        CUBE_A.addAllMesh(A_MESHES);
+        CUBE_B = new Cube(xPos,basePos,basePos,width,yPos,zPos);
+        CUBE_B.addAllMesh(B_MESHES);
+        CUBE_C = new Cube(basePos,yPos,basePos,xPos,height,zPos);
+        CUBE_C.addAllMesh(C_MESHES);
+        CUBE_D = new Cube(xPos,yPos,basePos,width,height,zPos);
+        CUBE_D.addAllMesh(D_MESHES);
+        CUBE_E = new Cube(basePos,basePos,zPos,xPos,yPos,depth);
+        CUBE_E.addAllMesh(E_MESHES);
+        CUBE_F = new Cube(xPos,basePos,zPos,width,yPos,depth);
+        CUBE_F.addAllMesh(F_MESHES);
+        CUBE_G = new Cube(basePos,yPos,zPos,xPos,height,depth);
+        CUBE_G.addAllMesh(G_MESHES);
+        CUBE_H = new Cube(xPos,yPos,zPos,width,height,depth);
+        CUBE_H.addAllMesh(H_MESHES);
     }
 }

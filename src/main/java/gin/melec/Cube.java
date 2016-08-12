@@ -109,6 +109,8 @@ public class Cube {
                     mesh.getLeftFlats().size() + mesh.getRightFlats().size()+
                     mesh.getUpFlats().size() + mesh.getDownFlats().size();
             CustomFrame.appendToLog(borderNumber+" borders detected for "+mesh.getFile().getName());
+            //mesh.clear(); Uncomment when memory safe
+            //rt.gc();
         }
     }
 
