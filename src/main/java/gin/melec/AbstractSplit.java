@@ -17,10 +17,7 @@
 package gin.melec;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /**

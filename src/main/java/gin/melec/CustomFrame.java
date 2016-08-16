@@ -16,19 +16,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
 import java.io.IOException;
 import java.text.Collator;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.swing.JFrame;
 import javax.swing.text.DefaultCaret;
 
@@ -48,6 +41,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JButton addObjBtn;
     private javax.swing.JButton autoMergeBtn;
     private javax.swing.JCheckBox autoSaveCB;
+    private javax.swing.JTextField borderSepField;
+    private javax.swing.JLabel borderSepLabel;
     private javax.swing.JLabel bLabel;
     private List bList;
     private javax.swing.JLabel cLabel;
@@ -91,6 +86,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JScrollPane jScrollPane9;
     private static javax.swing.JTextArea logText;
     private javax.swing.JButton mergeBtn;
+    private javax.swing.JTextField minAffinityField;
+    private javax.swing.JLabel minAffinityLabel;
+    private javax.swing.JCheckBox namePatternCBox;
+    private static javax.swing.JTextField namePatternField;
     private javax.swing.JTextField obj1Field;
     private javax.swing.JLabel obj1Label;
     private javax.swing.JTextField obj2Field;
@@ -111,7 +110,6 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private javax.swing.JTextField yValueField;
     private javax.swing.JLabel zLabel;
     private javax.swing.JTextField zValueField;
-
 
     public CustomFrame() {
         initComponents();
@@ -135,6 +133,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         clearMergeBtn.addActionListener(this);
         mergeBtn.addActionListener(this);
         autoMergeBtn.addActionListener(this);
+        namePatternCBox.addActionListener(this);
 
         helpAddBtn.addActionListener(this);
         helpMergeBtn.addActionListener(this);
@@ -175,6 +174,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         heightValueField.setText(Double.toString(height));
         depthValueField.setText(Double.toString(depth));
 
+        namePatternCBox.setSelected(false);
+        DialogContentManager.USE_NAME_PATTERN = false;
 
         logText.setText("=== Welcome to the Stack Object Combiner ===\n");
     }
@@ -251,6 +252,12 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         shiftBtn = new javax.swing.JButton();
         autoMergeBtn = new javax.swing.JButton();
         helpAutoMerge = new javax.swing.JButton();
+        borderSepField = new javax.swing.JTextField();
+        borderSepLabel = new javax.swing.JLabel();
+        minAffinityField = new javax.swing.JTextField();
+        minAffinityLabel = new javax.swing.JLabel();
+        namePatternCBox = new javax.swing.JCheckBox();
+        namePatternField = new javax.swing.JTextField();
 
         initComponentsManually();
 
@@ -738,21 +745,21 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
     @Override
     public void actionPerformed(ActionEvent e) {
-       Object button = e.getSource();
-        if (button==chooseDirBtn) {
+       Object source = e.getSource();
+        if (source==chooseDirBtn) {
             DirectoryChooser dc = new DirectoryChooser("Select the folder"
             + " containing the .obj files");
             String directory = dc.getDirectory();
             dirField.setText(directory);
             DialogContentManager.setWorkingDir(directory);
             listMeshes();
-        }   else if (button == actualiseBtn) {
+        }   else if (source == actualiseBtn) {
             String directory = dirField.getText();
             if (directory.length() != 0) {
                 DialogContentManager.setWorkingDir(directory);
                 listMeshes();
             }
-        }   else if (button == shiftBtn) {
+        }   else if (source == shiftBtn) {
             try {
                 double x = ParseDouble(xValueField.getText());
                 double y = ParseDouble(yValueField.getText());
@@ -774,7 +781,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             } catch (IOException ex) {
                 IJ.handleException(ex);
             }
-        }   else if (button == unshiftBtn) {
+        }   else if (source == unshiftBtn) {
            try {
                MeshMover.unshiftMeshes();
            } catch (ParseException ex) {
@@ -783,11 +790,14 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                IJ.handleException(ex);
            }
         }
-            else if (button == clearLogBtn) {
+            else if (source == clearLogBtn) {
             logText.setText("");
-        } else if (button == addObjBtn) {
+        } else if (source == addObjBtn) {
             addObj();
-        } else if (button == clearMergeBtn) {
+        } else if (source == namePatternCBox){
+            DialogContentManager.USE_NAME_PATTERN = namePatternCBox.isSelected();
+            namePatternField.setEnabled(namePatternCBox.isSelected());
+        } else if (source == clearMergeBtn) {
             obj1Field.setText("");
             obj2Field.setText("");
             aList.setEnabled(true);
@@ -798,7 +808,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             fList.setEnabled(true);
             gList.setEnabled(true);
             hList.setEnabled(true);
-        } else if (button == mergeBtn) {
+        } else if (source == mergeBtn) {
             Thread thread = new Thread() {
                 {
                     setPriority(Thread.NORM_PRIORITY);
@@ -810,7 +820,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 }
             };
             thread.start();
-        } else if (button == autoMergeBtn) {
+        } else if (source == autoMergeBtn) {
             Thread thread = new Thread() {
                 {
                     setPriority(Thread.NORM_PRIORITY);
@@ -823,20 +833,20 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             };
             thread.start();
             this.mergeBtn.setEnabled(false);
-        } else if (button == helpAddBtn) {
+        } else if (source == helpAddBtn) {
             IJ.showMessage("To add a mesh for merging, select it from\n"
                     + "one of the lists. Then you can either\n "
                     + "click on the \">>>\"button or press \'a\' to add it.");
-        } else if (button == helpDirBtn) {
+        } else if (source == helpDirBtn) {
             IJ.showMessage("Select the directory where the meshes are stocked.");
-        } else if (button == helpShiftBtn) {
+        } else if (source == helpShiftBtn) {
             IJ.showMessage("Here you can shift your meshes to their "
                     + "original position. \nThe X and Y shift correspond "
                     + "respectively to the X and Y size of the A sub-stack.\n"
                     + "You can also unshift a mesh that has been treated by \nthe"
                     + " SOC with the Unshift button. Note that merged mesh can't be\n"
                     + " unshifted");
-        } else if (button == helpMergeBtn) {
+        } else if (source == helpMergeBtn) {
             IJ.showMessage("Here you can merge meshes two by two.\n"
                     + "Select first two meshes. Then click on the \"Merge\"\n"
                     + "button or press 's' to merge them.\n"
@@ -848,14 +858,14 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                     + "Window : The size of the window into which a vertex is\n"
                     + "considered as close to the border.\n"
                     + "Pairing : The size of the set used to create set of faces.");
-        } else if (button == helpAutoMerge) {
+        } else if (source == helpAutoMerge) {
             IJ.showMessage("Click on the AutoMerge button to merge all\n"
                     + "the listed meshes automatically.\n"
                     + "The Stack Object Combiner will seek for compatible\n"
                     + "objects to merge and assemble them.\n"
                     + "However it need the width, height and depth of\n"
                     + "the original image.");
-        } else if (button == helpToURLBtn) {
+        } else if (source == helpToURLBtn) {
             String macro = "run('URL...', "
                         + "'url=http://imagej.net/StackObjectCombiner');";
                 new MacroRunner(macro);
@@ -911,6 +921,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     }
 
     protected void autoMerge(){
+        if (!setParameters()) {
+            return;
+        }
         appendToLog("Starting the automatic merging");
         double x = ParseDouble(xValueField.getText());
         double y = ParseDouble(yValueField.getText());
@@ -1095,29 +1108,50 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         tmpInt = ParseInt(tailField.getText());
         if (tmpInt < 0) {
             IJ.showMessage("The tail lenght must be a positive integer.");
-            appendToLog("Merging aborted");
+            appendToLog("Parameter error: Merging aborted");
             return false;
         } else {
             Border.TAIL_SIZE = tmpInt;
         }
         tmpInt = ParseInt(pairingField.getText());
         if (tmpInt < 1) {
-            IJ.showMessage("The pairing value must be bigger than 1.");
-            appendToLog("Merging aborted");
+            IJ.showMessage("The vertex pairing value must be bigger than 1.");
+            appendToLog("Parameter error: Merging aborted");
             return false;
         } else {
             Linker.INCREM = tmpInt;
         }
         tmpDouble = ParseDouble(windowField.getText());
         if (tmpDouble < 0) {
-            IJ.showMessage("The window size must be a positive number.");
-            appendToLog("Merging aborted");
+            IJ.showMessage("The distance window must be a positive number.");
+            appendToLog("Parameter error: Merging aborted");
             return false;
         } else {
             AbstractSplit.WINDOW = tmpDouble;
         }
+        tmpDouble = ParseDouble(minAffinityField.getText());
+        if (tmpDouble < 0 || tmpDouble > 1) {
+            IJ.showMessage("The border min affinity value must be between 0 and 1.");
+            appendToLog("Parameter error: Merging aborted");
+            return false;
+        } else {
+            Couple.MIN_AFFINITY = tmpDouble;
+        }
+
+        tmpInt = ParseInt(borderSepField.getText());
+        if (tmpInt < 0) {
+            IJ.showMessage("The border separation value must be a positive integer.");
+            appendToLog("Parameter error: Merging aborted");
+        } else {
+            Cube.BORDER_SEPARATION = tmpInt;
+        }
+
         ObjWriter.AUTOSAVE = autoSaveCB.isSelected();
         return true;
+    }
+
+    public static String getNamePattern() {
+        return namePatternField.getText();
     }
 
     @Override

@@ -18,6 +18,8 @@ import java.util.List;
  */
 public class DialogContentManager {
 
+    public static boolean USE_NAME_PATTERN = false;
+
     /**
      * The filters for the obj files.
      */
@@ -77,12 +79,9 @@ public class DialogContentManager {
 
     protected static Mesh ACTIVE_MESH_2;
 
-    static {
-        setObjFilters();
-    }
-
     public static void setWorkingDir(final String dir) {
         WORKING_DIR = new File(dir);
+        setObjFilters();
         getFiles(OBJ_FILTERS);
     }
 
@@ -199,7 +198,8 @@ public class DialogContentManager {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("A_.*");
+                        && name.matches("A_.*")
+                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
             }
         };
         OBJ_FILTERS[1] = new FilenameFilter() {
@@ -207,7 +207,8 @@ public class DialogContentManager {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("B_.*");
+                        && name.matches("B_.*")
+                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
             }
         };
         OBJ_FILTERS[2] = new FilenameFilter() {
@@ -215,7 +216,8 @@ public class DialogContentManager {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("C_.*");
+                        && name.matches("C_.*")
+                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
             }
         };
         OBJ_FILTERS[3] = new FilenameFilter() {
@@ -223,7 +225,8 @@ public class DialogContentManager {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("D_.*");
+                        && name.matches("D_.*")
+                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
             }
         };
         OBJ_FILTERS[4] = new FilenameFilter() {
@@ -231,7 +234,8 @@ public class DialogContentManager {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("E_.*");
+                        && name.matches("E_.*")
+                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
             }
         };
         OBJ_FILTERS[5] = new FilenameFilter() {
@@ -239,7 +243,8 @@ public class DialogContentManager {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("F_.*");
+                        && name.matches("F_.*")
+                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
             }
         };
         OBJ_FILTERS[6] = new FilenameFilter() {
@@ -247,7 +252,8 @@ public class DialogContentManager {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("G_.*");
+                        && name.matches("G_.*")
+                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
             }
         };
         OBJ_FILTERS[7] = new FilenameFilter() {
@@ -255,7 +261,8 @@ public class DialogContentManager {
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("H_.*");
+                        && name.matches("H_.*")
+                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
             }
         };
     }

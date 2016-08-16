@@ -31,6 +31,8 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
 public class Cube {
+    public static int BORDER_SEPARATION = 5;
+
     private final List<Mesh> meshes;
     private final double x;
     private final double y;
@@ -201,7 +203,7 @@ public class Cube {
                         i++;
                     }
                     currSplit = nextSplit;
-                    i+=5; // After moving away from the last crossing, we still move a bit far away just in case
+                    i+=BORDER_SEPARATION; // After moving away from the last crossing, we still move a bit far away just in case
                     break;
                 }
             }
