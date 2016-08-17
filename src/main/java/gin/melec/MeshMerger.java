@@ -50,8 +50,8 @@ public class MeshMerger {
         final Mesh mesh1 = DialogContentManager.ACTIVE_MESH_1;
         final Mesh mesh2 = DialogContentManager.ACTIVE_MESH_2;
         try {
-            mesh1.importMesh();
-            mesh2.importMesh();
+            mesh1.importMesh(true);
+            mesh2.importMesh(true);
         } catch (ParseException ex) {
             IJ.handleException(ex);
         } catch (IOException ex) {
@@ -243,6 +243,13 @@ public class MeshMerger {
             List<Face> faces = new ArrayList();
             String message = "The meshes ";
             for (Mesh mesh: meshToFuse) {
+                try {
+                    mesh.reload();
+                } catch (ParseException ex) {
+                    IJ.handleException(ex);
+                } catch (IOException ex) {
+                    IJ.handleException(ex);
+                }
                 message = message.concat(mesh.toString() + ", ");
                 mesh.incremVertices(vertices.size());
                 vertices.addAll(mesh.getVertices());

@@ -30,7 +30,7 @@ import java.util.TreeSet;
  */
 public class Linker {
 
-    protected static int INCREM = 10;
+    protected static int PAIRING_SET = 10;
 
     private Linker() {
     }
@@ -104,7 +104,7 @@ public class Linker {
         Vertex nextDestSpot = destination.get(0);
         // add new next link
         links.add(new Link(nextOrigSpot, nextDestSpot));
-        int j = INCREM;
+        int j = PAIRING_SET;
         boolean notFinished = true;
         while (notFinished) {
             if (j >= origSequence.size()) {
@@ -145,7 +145,7 @@ public class Linker {
                 }
             }
 
-            j += INCREM;
+            j += PAIRING_SET;
         }
         SetIndexToLinks(links, origSequence, destSequence);
         Set<Link> tmpLinks = new TreeSet(links);

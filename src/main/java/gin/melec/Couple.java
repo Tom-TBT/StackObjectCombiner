@@ -42,7 +42,7 @@ public class Couple{
 
     private final List<Face> newFaces;
 
-    public static double MIN_AFFINITY = 0.2;
+    public static double MIN_AFFINITY = 0.8;
 
     protected Couple(final FlatBorder b1, final FlatBorder b2) {
         flat1 = b1;
@@ -58,19 +58,19 @@ public class Couple{
 
     private void checkCompatible() {
         this.compatible = false;
-        if (valueDistance(flat1.getPerimeter(), flat2.getPerimeter()) < MIN_AFFINITY) {
-            if (valueDistance(flat1.getSize(), flat2.getSize()) < MIN_AFFINITY) {
+        if (valueDistance(flat1.getPerimeter(), flat2.getPerimeter()) < 1-MIN_AFFINITY) {
+            if (valueDistance(flat1.getSize(), flat2.getSize()) < 1-MIN_AFFINITY) {
                 Rectangle2D rect1 = flat1.getRectangle();
                 Rectangle2D rect2 = flat2.getRectangle();
-                if (valueDistance(rect1.getWidth(), rect2.getWidth()) < MIN_AFFINITY &&
-                        valueDistance(rect1.getHeight(), rect2.getHeight()) < MIN_AFFINITY) {
+                if (valueDistance(rect1.getWidth(), rect2.getWidth()) < 1-MIN_AFFINITY &&
+                        valueDistance(rect1.getHeight(), rect2.getHeight()) < 1-MIN_AFFINITY) {
                     Point2D point1 = flat1.getBarycenter();
                     Point2D point2 = flat2.getBarycenter();
                     double factor = (rect1.getWidth()+rect2.getWidth())/(rect1.getHeight()+rect2.getHeight());
                     double distanceX = Math.abs(point1.getX() - point2.getX());
                     double distanceY = Math.abs(point1.getY() - point2.getY());
                     double distance = Math.sqrt(Math.pow(distanceX/factor, 2)+Math.pow(distanceY*factor, 2));
-                    this.compatible = distance < MIN_AFFINITY*Math.sqrt(Math.pow((rect1.getWidth()+rect2.getWidth())/2, 2)+Math.pow((rect1.getHeight()+rect2.getHeight()), 2));
+                    this.compatible = distance < (1-MIN_AFFINITY)*Math.sqrt(Math.pow((rect1.getWidth()+rect2.getWidth())/2, 2)+Math.pow((rect1.getHeight()+rect2.getHeight()), 2));
                 }
             }
         }

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import ij.IJ;
 
 /**
  *
@@ -64,6 +65,11 @@ public class Mesh {
     private final File file;
 
     /**
+     * Boolean to indicate if the mesh is currently loaded into the memory.
+     */
+    private boolean inMemory;
+
+    /**
      * The boolean that indicate if the mesh has already been moved.
      */
     private boolean moved;
@@ -89,6 +95,7 @@ public class Mesh {
         this.vertices = new ArrayList();
         this.garbage = new HashSet();
         this.borders = new ArrayList();
+        this.inMemory = false;
 
         this.moved = ObjReader.isMeshMoved(this.file);
         this.merged = ObjReader.isMeshMerged(this.file);
@@ -250,8 +257,58 @@ public class Mesh {
      * @throws java.text.ParseException
      * @throws java.io.IOException
      */
-    protected final void importMesh() throws ParseException, IOException {
-        ObjReader.readMesh(this.file, this);
+    protected final void importMesh(boolean checkForPrimers) throws ParseException, IOException {
+        boolean outOfMem = false;
+        Runtime rT = Runtime.getRuntime();
+        if (rT.maxMemory() - (rT.totalMemory() - rT.freeMemory())
+                < DialogContentManager.MEMORY_WATCHER*1000000) { // Multiplied by one million to make it megabyte
+            DialogContentManager.unloadMeshes();
+        }
+        try {
+        ObjReader.readMesh(this.file, this, checkForPrimers);
+        } catch (OutOfMemoryError e) {
+            DialogContentManager.unloadMeshes();
+            outOfMem = true;
+        }
+        if (outOfMem) {
+            ObjReader.readMesh(this.file, this, checkForPrimers);
+        }
+        this.inMemory = true;
+    }
+
+    public final void unload() {
+        this.inMemory = false;
+        this.clear();
+    }
+
+    public final void reload() throws ParseException, IOException {
+        if (!inMemory) {
+            this.importMesh(false);
+            replaceVerticesInBorders();
+        }
+    }
+
+    private void replaceVerticesInBorders() {
+        List<FlatBorder> flats = new ArrayList();
+        flats.addAll(this.backFlats);
+        flats.addAll(this.frontFlats);
+        flats.addAll(this.leftFlats);
+        flats.addAll(this.rightFlats);
+        flats.addAll(this.upFlats);
+        flats.addAll(this.downFlats);
+
+        for (FlatBorder currFlat: flats) {
+            for (Object element: currFlat.getElements()) {
+                List<Vertex> vertList;
+                if (element instanceof List) {
+                    vertList = (List) element;
+                    for (int i = 0; i < vertList.size(); i++) {
+                        Vertex currVertex = vertList.get(i);
+                        vertList.set(i, this.vertices.get(currVertex.id - 1));
+                    }
+                }
+            }
+        }
     }
 
     public void findPrimers() {

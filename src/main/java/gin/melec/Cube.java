@@ -82,17 +82,27 @@ public class Cube {
         meshes = new ArrayList<Mesh>();
     }
 
-    protected void detectMeshBorders() {
-        try {
-            for (Mesh mesh : meshes) {
-                mesh.importMesh();
+    public void reloadMeshes() {
+        for (Mesh mesh: this.meshes) {
+            try {
+                mesh.reload();
+            } catch (ParseException ex) {
+                IJ.handleException(ex);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
             }
-        } catch (ParseException ex) {
-            IJ.handleException(ex);
-        } catch (IOException ex) {
-            IJ.handleException(ex);
         }
+    }
+
+    protected void detectMeshBorders() {
         for (Mesh mesh : meshes) {
+            try {
+                mesh.importMesh(true);
+            } catch (ParseException ex) {
+                IJ.handleException(ex);
+            } catch (IOException ex) {
+                IJ.handleException(ex);
+            }
             CustomFrame.appendToLog("Detecting and preparing borders for "+mesh.getFile().getName());
             mesh.findPrimers();
             mesh.createBorders(leftSplit);
@@ -111,8 +121,6 @@ public class Cube {
                     mesh.getLeftFlats().size() + mesh.getRightFlats().size()+
                     mesh.getUpFlats().size() + mesh.getDownFlats().size();
             CustomFrame.appendToLog(borderNumber+" borders detected for "+mesh.getFile().getName());
-            //mesh.clear(); Uncomment when memory safe
-            //rt.gc();
         }
     }
 

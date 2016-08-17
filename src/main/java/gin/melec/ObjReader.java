@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,10 +65,11 @@ public class ObjReader {
      * @throws java.text.ParseException if their is an error while parsing the
      * values of the vertices.
      */
-    static void readMesh(final File file, final Mesh mesh)
+    static void readMesh(final File file, final Mesh mesh, final boolean checkForPrimers)
             throws IOException, ParseException {
         CustomFrame.appendToLog("Loading "+mesh.getFile().getName());
         final List<Vertex> tmpVertices;
+        final Set<Face> tmpFaces;
 
         final InputStream ips = new FileInputStream(file.toString());
         final InputStreamReader ipsr = new InputStreamReader(ips);
@@ -75,6 +77,7 @@ public class ObjReader {
         try{
             NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
             tmpVertices = mesh.getVertices();
+            tmpFaces = mesh.getFaces();
             String currentLine;
             String[] splitedLine;
             int id = 1;
@@ -99,10 +102,12 @@ public class ObjReader {
                     Vertex v3 = tmpVertices.get(
                                     Integer.parseInt(splitedLine[3]) - 1);
                     Face face = new Face(v1, v2, v3);
-                    mesh.getFaces().add(face);
-                    v1.addUnique(v2, v3);
-                    v2.addUnique(v1, v3);
-                    v3.addUnique(v1, v2);
+                    tmpFaces.add(face);
+                    if (checkForPrimers) {
+                        v1.addUnique(v2, v3);
+                        v2.addUnique(v1, v3);
+                        v3.addUnique(v1, v2);
+                    }
                 }
             }
         } finally {

@@ -53,7 +53,7 @@ public class MeshMover {
         int nbMoved = 0;
         for (Mesh mesh : DialogContentManager.A_MESHES) {
             if (!mesh.isMoved()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 mesh.shift(new ArrayList());
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " has been shifted");
@@ -66,7 +66,7 @@ public class MeshMover {
         }
         for (Mesh mesh : DialogContentManager.B_MESHES) {
             if (!mesh.isMoved()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 List splits = new ArrayList();
                 splits.add(DialogContentManager.WIDTH_SPLIT);
                 mesh.shift(splits);
@@ -81,7 +81,7 @@ public class MeshMover {
         }
         for (Mesh mesh : DialogContentManager.C_MESHES) {
             if (!mesh.isMoved()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 List splits = new ArrayList();
                 splits.add(DialogContentManager.HEIGHT_SPLIT);
                 mesh.shift(splits);
@@ -96,7 +96,7 @@ public class MeshMover {
         }
         for (Mesh mesh : DialogContentManager.D_MESHES) {
             if (!mesh.isMoved()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 List splits = new ArrayList();
                 splits.add(DialogContentManager.HEIGHT_SPLIT);
                 splits.add(DialogContentManager.WIDTH_SPLIT);
@@ -112,7 +112,7 @@ public class MeshMover {
         }
         for (Mesh mesh : DialogContentManager.E_MESHES) {
             if (!mesh.isMoved()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 List splits = new ArrayList();
                 splits.add(DialogContentManager.DEPTH_SPLIT);
                 mesh.shift(splits);
@@ -127,7 +127,7 @@ public class MeshMover {
         }
         for (Mesh mesh : DialogContentManager.F_MESHES) {
             if (!mesh.isMoved()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 List splits = new ArrayList();
                 splits.add(DialogContentManager.DEPTH_SPLIT);
                 splits.add(DialogContentManager.WIDTH_SPLIT);
@@ -143,7 +143,7 @@ public class MeshMover {
         }
         for (Mesh mesh : DialogContentManager.G_MESHES) {
             if (!mesh.isMoved()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 List splits = new ArrayList();
                 splits.add(DialogContentManager.DEPTH_SPLIT);
                 splits.add(DialogContentManager.HEIGHT_SPLIT);
@@ -159,7 +159,7 @@ public class MeshMover {
         }
         for (Mesh mesh : DialogContentManager.H_MESHES) {
             if (!mesh.isMoved()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 List splits = new ArrayList();
                 splits.add(DialogContentManager.WIDTH_SPLIT);
                 splits.add(DialogContentManager.HEIGHT_SPLIT);
@@ -184,9 +184,13 @@ public class MeshMover {
         ALL_MESHES.addAll(DialogContentManager.B_MESHES);
         ALL_MESHES.addAll(DialogContentManager.C_MESHES);
         ALL_MESHES.addAll(DialogContentManager.D_MESHES);
+        ALL_MESHES.addAll(DialogContentManager.E_MESHES);
+        ALL_MESHES.addAll(DialogContentManager.F_MESHES);
+        ALL_MESHES.addAll(DialogContentManager.G_MESHES);
+        ALL_MESHES.addAll(DialogContentManager.H_MESHES);
         for (Mesh mesh : ALL_MESHES) {
             if (mesh.isMoved() && !mesh.isMerged()) {
-                mesh.importMesh();
+                mesh.importMesh(false);
                 mesh.unshift();
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " has been unshifted");

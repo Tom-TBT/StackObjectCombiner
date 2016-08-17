@@ -20,6 +20,8 @@ public class DialogContentManager {
 
     public static boolean USE_NAME_PATTERN = false;
 
+    public static double MEMORY_WATCHER = 400; // the millions correspond to Megabytes
+
     /**
      * The filters for the obj files.
      */
@@ -186,6 +188,22 @@ public class DialogContentManager {
         }
     }
 
+    public static void unloadMeshes() {
+        List<Mesh> allMeshes = new ArrayList();
+        allMeshes.addAll(CUBE_A.getMeshes());
+        allMeshes.addAll(CUBE_B.getMeshes());
+        allMeshes.addAll(CUBE_C.getMeshes());
+        allMeshes.addAll(CUBE_D.getMeshes());
+        allMeshes.addAll(CUBE_E.getMeshes());
+        allMeshes.addAll(CUBE_F.getMeshes());
+        allMeshes.addAll(CUBE_G.getMeshes());
+        allMeshes.addAll(CUBE_H.getMeshes());
+        for (Mesh mesh:allMeshes) {
+            mesh.unload();
+        }
+        Runtime.getRuntime().gc();
+    }
+
     /**
      * This method create FilenameFilters we need to filter the .obj files with
      * the prefix A_, B_, C_ or D_.
@@ -197,72 +215,80 @@ public class DialogContentManager {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
+                String pattern = CustomFrame.getNamePattern().toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("A_.*")
-                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
+                        && lowercaseName.matches("a_.*")
+                        && (!USE_NAME_PATTERN || lowercaseName.matches(".*"+pattern+".*"));
             }
         };
         OBJ_FILTERS[1] = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
+                String pattern = CustomFrame.getNamePattern().toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("B_.*")
-                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
+                        && lowercaseName.matches("b_.*")
+                        && (!USE_NAME_PATTERN || lowercaseName.matches(".*"+pattern+".*"));
             }
         };
         OBJ_FILTERS[2] = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
+                String pattern = CustomFrame.getNamePattern().toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("C_.*")
-                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
+                        && lowercaseName.matches("c_.*")
+                        && (!USE_NAME_PATTERN || lowercaseName.matches(".*"+pattern+".*"));
             }
         };
         OBJ_FILTERS[3] = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
+                String pattern = CustomFrame.getNamePattern().toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("D_.*")
-                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
+                        && lowercaseName.matches("d_.*")
+                        && (!USE_NAME_PATTERN || lowercaseName.matches(".*"+pattern+".*"));
             }
         };
         OBJ_FILTERS[4] = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
+                String pattern = CustomFrame.getNamePattern().toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("E_.*")
-                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
+                        && lowercaseName.matches("e_.*")
+                        && (!USE_NAME_PATTERN || lowercaseName.matches(".*"+pattern+".*"));
             }
         };
         OBJ_FILTERS[5] = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
+                String pattern = CustomFrame.getNamePattern().toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("F_.*")
-                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
+                        && lowercaseName.matches("f_.*")
+                        && (!USE_NAME_PATTERN || lowercaseName.matches(".*"+pattern+".*"));
             }
         };
         OBJ_FILTERS[6] = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
+                String pattern = CustomFrame.getNamePattern().toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("G_.*")
-                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
+                        && lowercaseName.matches("g_.*")
+                        && (!USE_NAME_PATTERN || lowercaseName.matches(".*"+pattern+".*"));
             }
         };
         OBJ_FILTERS[7] = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 String lowercaseName = name.toLowerCase();
+                String pattern = CustomFrame.getNamePattern().toLowerCase();
                 return lowercaseName.endsWith(".obj")
-                        && name.matches("H_.*")
-                        && (!USE_NAME_PATTERN || name.matches(".*"+CustomFrame.getNamePattern()+".*"));
+                        && lowercaseName.matches("h_.*")
+                        && (!USE_NAME_PATTERN || lowercaseName.matches(".*"+pattern+".*"));
             }
         };
     }

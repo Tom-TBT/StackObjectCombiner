@@ -25,7 +25,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
-public abstract class AbstractSplit{
+public abstract class AbstractSplit {
 
     /**
      * The maximal distance to the split from which a vertex does no longer
