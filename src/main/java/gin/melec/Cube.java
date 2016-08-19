@@ -161,6 +161,7 @@ public class Cube {
         List<Vertex> vertexList = new ArrayList(currentBorder.getVertexSequence());
 
         int i = 0;
+        // Moving outside of the range of a split.
         while (i < vertexList.size()) {
             Vertex tmpVertex = vertexList.get(0);
             if (vertexCloseToSeveralSplit(tmpVertex)) {
@@ -240,7 +241,8 @@ public class Cube {
                         startEdge.addConnector(border.getConnector());
                     }
                     border.setSplit(splitList.get(i));
-                    border.getConnector().setVertex(border.getFirstVertex());
+                    border.getVertexSequence().add(vertexList.get(crossingPositions.get(i)));
+                    //border.getConnector().setVertex(border.getFirstVertex());
                     startEdge = edges[1];
                     i++;
                     if (i == crossingPositions.size()) {

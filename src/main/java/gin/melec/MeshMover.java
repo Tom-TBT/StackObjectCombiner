@@ -62,7 +62,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is already shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         for (Mesh mesh : DialogContentManager.B_MESHES) {
             if (!mesh.isMoved()) {
@@ -77,7 +77,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is already shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         for (Mesh mesh : DialogContentManager.C_MESHES) {
             if (!mesh.isMoved()) {
@@ -92,7 +92,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is already shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         for (Mesh mesh : DialogContentManager.D_MESHES) {
             if (!mesh.isMoved()) {
@@ -108,7 +108,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is already shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         for (Mesh mesh : DialogContentManager.E_MESHES) {
             if (!mesh.isMoved()) {
@@ -123,7 +123,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is already shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         for (Mesh mesh : DialogContentManager.F_MESHES) {
             if (!mesh.isMoved()) {
@@ -139,7 +139,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is already shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         for (Mesh mesh : DialogContentManager.G_MESHES) {
             if (!mesh.isMoved()) {
@@ -155,7 +155,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is already shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         for (Mesh mesh : DialogContentManager.H_MESHES) {
             if (!mesh.isMoved()) {
@@ -172,7 +172,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is already shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         CustomFrame.appendToLog(nbMoved + " meshes have been shifted.");
         CustomFrame.appendToLog("-----------------------");
@@ -200,7 +200,7 @@ public class MeshMover {
                 CustomFrame.appendToLog(mesh.getFile().getName()
                         + " is not shifted");
             }
-            mesh.clear();
+            mesh.unload();
         }
         CustomFrame.appendToLog(nbMoved + " meshes have been unshifted.");
         CustomFrame.appendToLog("-----------------------");

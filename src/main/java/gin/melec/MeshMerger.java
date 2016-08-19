@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -66,6 +64,7 @@ public class MeshMerger {
             @Override
             public void run() {
                 CustomFrame.appendToLog("Working on " + mesh1.getFile().getName());
+                mesh1.findPrimers();
                 mesh1.createBorders(DialogContentManager.ACTIVE_SPLIT);
                 final List<Border> tmpBorders = new ArrayList();
                 for (Border border : mesh1.getBorders()) {
@@ -92,6 +91,7 @@ public class MeshMerger {
                     tmpSplit = new DepthSplit(DialogContentManager.ACTIVE_SPLIT);
                 }
                 CustomFrame.appendToLog("Working on " + mesh2.getFile().getName());
+                mesh2.findPrimers();
                 mesh2.createBorders(tmpSplit);
                 final List<Border> tmpBorders = new ArrayList();
                 for (Border border : mesh2.getBorders()) {
@@ -141,8 +141,8 @@ public class MeshMerger {
             }
             CustomFrame.appendToLog("Done");
             CustomFrame.appendToLog("-----------------------");
-            mesh1.clear();
-            mesh2.clear();
+            mesh1.unload();
+            mesh2.unload();
         }
     }
 
@@ -254,14 +254,22 @@ public class MeshMerger {
                 mesh.incremVertices(vertices.size());
                 vertices.addAll(mesh.getVertices());
                 faces.addAll(mesh.getFaces());
+                mesh.unload();
             }
+            Runtime.getRuntime().gc();
             message = message.concat("are compatible");
             CustomFrame.appendToLog(message);
-            for (Couple couple:couples) {
+
+            List<Vertex> endPoints = new ArrayList();
+            List<Face> endFaces = new ArrayList();
+            for (Couple couple:coupleToFuse) {
                 couple.alignFlats();
                 couple.merge();
+                endPoints.addAll(couple.getEndPoints());
+                endFaces.addAll(couple.getEndFaces());
                 faces.addAll(couple.getNewFaces());
             }
+            faces.addAll(getFillHoles(endPoints, endFaces));
             try {
                 ObjWriter.writeResult(vertices, faces, "Mesh-"+i+".obj", saveDirectory);
             } catch (IOException ex) {
@@ -271,6 +279,53 @@ public class MeshMerger {
             couples.removeAll(coupleToFuse);
             i++;
         }
+    }
+
+    private static List<Face> getFillHoles(List<Vertex> endPoints, List<Face> endFaces) {
+        List<Face> result = new ArrayList();
+        Set<Vertex> alreadyChecked = new HashSet();
+
+        for (Vertex startVertex: endPoints) {
+            List<Vertex> quatuor = new ArrayList();
+            if (alreadyChecked.add(startVertex)) {
+                boolean notFind = true;
+                quatuor.add(startVertex);
+                Vertex currentVertex = null, prevVertex = startVertex;
+                for (Face face: endFaces) {
+                    if (face.include(prevVertex)) {
+                        currentVertex = face.getFirstNeighbour(prevVertex);
+                        if (!endPoints.contains(currentVertex)) {
+                            currentVertex = face.getSecondNeighbour(prevVertex);
+                        }
+                        notFind = false;
+                        break;
+                    }
+                }
+                // End of initialisation
+
+                while (currentVertex != startVertex && !notFind) {
+                    quatuor.add(currentVertex);
+                    alreadyChecked.add(currentVertex);
+                    notFind = true;
+                    for (Face face: endFaces) {
+                        if (face.include(currentVertex) && !face.include(prevVertex)) {
+                            prevVertex = currentVertex;
+                            currentVertex = face.getFirstNeighbour(prevVertex);
+                            if (!endPoints.contains(currentVertex)) {
+                                currentVertex = face.getSecondNeighbour(prevVertex);
+                            }
+                            notFind = false;
+                            break;
+                        }
+                    }
+                }
+                if (!notFind) {
+                    result.add(new Face(quatuor.get(0), quatuor.get(1), quatuor.get(3)));
+                    result.add(new Face(quatuor.get(1), quatuor.get(2), quatuor.get(3)));
+                }
+            }
+        }
+        return result;
     }
 
     private static void getCouplesAndMeshToFuse(Set<Mesh> meshResult, Set<Couple> coupleResult,

@@ -202,4 +202,49 @@ public class Couple{
     public double getSimilarity() {
         return this.similarity;
     }
+
+    public List<Vertex> getEndPoints() {
+        List<Vertex> result = new ArrayList();
+        if (flat1.getElements().size() == 1) {
+            // Only one element means it is circular, no need for hole filling.
+            return result;
+        }
+        for (Object obj: this.flat1.getElements()) {
+            if (obj instanceof List) {
+                List<Vertex> currList = (List<Vertex>) obj;
+                result.add(currList.get(0));
+                result.add(currList.get(currList.size() - 1));
+            }
+        }
+        for (Object obj: this.flat2.getElements()) {
+            if (obj instanceof List) {
+                List<Vertex> currList = (List<Vertex>) obj;
+                result.add(currList.get(0));
+                result.add(currList.get(currList.size() - 1));
+            }
+        }
+        return result;
+    }
+
+    public List<Face> getEndFaces() {
+        List<Vertex> endPoints = this.getEndPoints();
+        List<Face> result = new ArrayList();
+
+        if (!endPoints.isEmpty()) {
+            for (Face face: this.newFaces) {
+                Vertex v1 = face.getVertex1();
+                Vertex v2 = face.getVertex2();
+                Vertex v3 = face.getVertex3();
+
+                if (endPoints.contains(v1) && endPoints.contains(v2)) {
+                    result.add(face);
+                } else if (endPoints.contains(v1) || endPoints.contains(v2)) {
+                    if (endPoints.contains(v3)) {
+                        result.add(face);
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

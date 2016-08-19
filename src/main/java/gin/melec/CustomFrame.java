@@ -9,7 +9,6 @@ import ij.IJ;
 import ij.Prefs;
 import ij.io.DirectoryChooser;
 import ij.macro.MacroRunner;
-import java.awt.Cursor;
 import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -947,6 +946,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 }
             };
             thread.start();
+            this.autoMergeBtn.setEnabled(false);
+            this.mergeBtn.setEnabled(false);
         } else if (source == autoMergeBtn) {
             Thread thread = new Thread() {
                 {
@@ -959,6 +960,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 }
             };
             thread.start();
+            this.autoMergeBtn.setEnabled(false);
             this.mergeBtn.setEnabled(false);
         } else if (source == helpAddBtn) {
             IJ.showMessage("To add a mesh for manual merging, select it from\n"
@@ -1043,6 +1045,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         Prefs.set("SOC.verticalSplit", x);
         Prefs.set("SOC.horizontalSplit", y);
         Prefs.set("SOC.depthSplit", z);
+        Prefs.savePreferences();
         DialogContentManager.setSplits(x, y, z);
         if (DialogContentManager.setActiveSplits(obj1Field.getText(),
                 obj2Field.getText()) && setParameters()) {
@@ -1061,6 +1064,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             DialogContentManager.setWorkingDir(dirField.getText());
             listMeshes();
             this.mergeBtn.setEnabled(true);
+            this.autoMergeBtn.setEnabled(true);
         }
     }
 
@@ -1082,6 +1086,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         Prefs.set("SOC.width", widthValue);
         Prefs.set("SOC.height", heightValue);
         Prefs.set("SOC.depth", depthValue);
+        Prefs.savePreferences();
 
         // Check for sparsed Cubes (Borders of the meshes)
 
@@ -1089,7 +1094,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         MeshMerger.workOnCubes(this.dirField.getText());
 
+        this.autoMergeBtn.setEnabled(true);
         this.mergeBtn.setEnabled(true);
+        appendToLog("Done");
     }
 
     protected void addObjToMerge(List source) {
@@ -1306,6 +1313,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         Prefs.set("SOC.window", AbstractSplit.WINDOW);
         Prefs.set("SOC.pairing", Linker.PAIRING_SET);
         Prefs.set("SOC.tailSize", Border.TAIL_SIZE);
+        Prefs.savePreferences();
 
         return true;
     }

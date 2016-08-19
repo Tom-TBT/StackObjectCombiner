@@ -108,7 +108,7 @@ public class Border {
         this.connector = new Connector(vertexList.get(startSequence), this, stopEdge);
         int i = startSequence;
         while ( i < endSequence) {
-            this.vertexSequence.add(vertexList.get(i));
+                this.vertexSequence.add(vertexList.get(i));
             i++;
         }
     }

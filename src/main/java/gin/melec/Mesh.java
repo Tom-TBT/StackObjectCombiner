@@ -405,7 +405,7 @@ public class Mesh {
      * Clear the faces and the vertices of the mesh. It is used to release
      * memory because of the size of these arrays.
      */
-    void clear() {
+    private void clear() {
         this.faces.clear();
         this.vertices.clear();
     }

@@ -129,7 +129,7 @@ public class Linker {
             links.add(new Link(nextOrigSpot, nextDestSpot));
 
             List<Vertex> subListOrig = new ArrayList(origSequence.
-                    subList(origSequence.indexOf(prevOrigSpot), j + 1));
+                    subList(origSequence.indexOf(prevOrigSpot), j + 1)); // j+1 because we want to include vertex at pos j
             List<Vertex> subListDest;
             if (prevDestSpot.equals(nextDestSpot)) {
                 subListDest = new ArrayList();
@@ -138,8 +138,8 @@ public class Linker {
                 links.addAll(getLinksFromSubsets(subListOrig, subListDest));
             } else {
                 subListDest = new ArrayList(destSequence.
-                        subList(destSequence.indexOf(prevDestSpot) + 1,
-                                destSequence.indexOf(nextDestSpot)));
+                        subList(destSequence.indexOf(prevDestSpot),
+                                destSequence.indexOf(nextDestSpot)+1));
                 if (!subListDest.isEmpty()) {
                     links.addAll(getLinksFromSubsets(subListOrig, subListDest));
                 }
@@ -147,7 +147,7 @@ public class Linker {
 
             j += PAIRING_SET;
         }
-        SetIndexToLinks(links, origSequence, destSequence);
+        setIndexToLinks(links, origSequence, destSequence);
         Set<Link> tmpLinks = new TreeSet(links);
         links = new TreeSet();
         for (Link link : tmpLinks) {
@@ -178,7 +178,7 @@ public class Linker {
         }
 
         links.addAll(newLinks);
-        SetIndexToLinks(links, origSequence, destSequence);
+        setIndexToLinks(links, origSequence, destSequence);
         tmpLinks = new TreeSet(links);
         links = new TreeSet();
         for (Link link : tmpLinks) {
@@ -288,7 +288,7 @@ public class Linker {
      * @param origSequence , the sequence containing the origin of the links.
      * @param destSequence , the sequence containing the origin of the links.
      */
-    private static void SetIndexToLinks(Set<Link> links,
+    private static void setIndexToLinks(Set<Link> links,
             List<Vertex> origSequence, List<Vertex> destSequence) {
         for (Link link : links) {
             link.setIndexOrigin(origSequence.indexOf(link.getOrigin()));
