@@ -410,7 +410,7 @@ public class Mesh {
         this.vertices.clear();
     }
 
-    void addBorders(List<Border> borders) {
+    void setBorders(List<Border> borders) {
         this.borders = borders;
     }
 

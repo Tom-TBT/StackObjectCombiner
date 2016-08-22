@@ -70,9 +70,17 @@ public class MeshMerger {
                 for (Border border : mesh1.getBorders()) {
                     tmpBorders.addAll(border.separateSubBorders());
                 }
-                mesh1.addBorders(tmpBorders);
-                CustomFrame.appendToLog(mesh1.getBorders().size() + " borders detected for "
-                    + mesh1.getFile().getName());
+                mesh1.setBorders(tmpBorders);
+                int numberOfCircular = 0;
+                for (Border border:mesh1.getBorders()) {
+                    if(border.isCircular()) {
+                        numberOfCircular++;
+                    }
+                }
+                CustomFrame.appendToLog(mesh1.getBorders().size() +
+                        " borders detected for "+ mesh1.getFile().getName()+
+                        ", "+(mesh1.getBorders().size()-numberOfCircular) +
+                        " linears and "+numberOfCircular+" circulars");
             }
         };
         Thread thread2 = new Thread() {
@@ -97,9 +105,17 @@ public class MeshMerger {
                 for (Border border : mesh2.getBorders()) {
                     tmpBorders.addAll(border.separateSubBorders());
                 }
-                mesh2.addBorders(tmpBorders);
-                CustomFrame.appendToLog(mesh2.getBorders().size() + " borders detected for "
-                    + mesh2.getFile().getName());
+                mesh2.setBorders(tmpBorders);
+                int numberOfCircular = 0;
+                for (Border border:mesh2.getBorders()) {
+                    if(border.isCircular()) {
+                        numberOfCircular++;
+                    }
+                }
+                CustomFrame.appendToLog(mesh2.getBorders().size() +
+                        " borders detected for "+ mesh2.getFile().getName()+
+                        ", "+(mesh2.getBorders().size()-numberOfCircular) +
+                        " linears and "+numberOfCircular+" circulars");
             }
         };
         thread1.start();
@@ -128,19 +144,20 @@ public class MeshMerger {
             final List<Face> newFaces = new ArrayList();
             CustomFrame.appendToLog("Computing the new faces");
             for (Border[] couple : couples) {
-                if (couple[0].distanceTo(couple[1]) < 100) {
-//                    double dis = couple[0].distanceTo(couple[1]);
+                if (couple[0].distanceTo(couple[1]) < 500) {
                     couple[0].alignOn(couple[1]);
                     newFaces.addAll(Linker.createFacesBetween(couple[0].getVertexSequence(), couple[1].getVertexSequence(), couple[0].isCircular()));
                 }
             }
-            try {
-                ObjWriter.exportFusion(mesh1, mesh2, newFaces);
-            } catch (IOException ex) {
-                IJ.handleException(ex);
+            if (newFaces.isEmpty()) {
+                CustomFrame.appendToLog("No borders have been found compatible.");
+            } else {
+                try {
+                    ObjWriter.exportFusion(mesh1, mesh2, newFaces);
+                } catch (IOException ex) {
+                    IJ.handleException(ex);
+                }
             }
-            CustomFrame.appendToLog("Done");
-            CustomFrame.appendToLog("-----------------------");
             mesh1.unload();
             mesh2.unload();
         }
@@ -168,18 +185,20 @@ public class MeshMerger {
         }
         final List<List<Border>> orderCloserFromB1s = orderCloserBorders(borders1,
                 borders2);
-        for (int i = 0; i < orderCloserFromB1s.size(); i++) {
-            final Border border1 = borders1.get(i);
-            final Border border2 = orderCloserFromB1s.get(i).get(0);
-            final Border[] borderArray = new Border[2];
-            if (interchanged) {
-                borderArray[0] = border2;
-                borderArray[1] = border1;
-            } else {
-                borderArray[0] = border1;
-                borderArray[1] = border2;
+        if (orderCloserFromB1s != null) {
+            for (int i = 0; i < orderCloserFromB1s.size(); i++) {
+                final Border border1 = borders1.get(i);
+                final Border border2 = orderCloserFromB1s.get(i).get(0);
+                final Border[] borderArray = new Border[2];
+                if (interchanged) {
+                    borderArray[0] = border2;
+                    borderArray[1] = border1;
+                } else {
+                    borderArray[0] = border1;
+                    borderArray[1] = border2;
+                }
+                result.add(borderArray);
             }
-            result.add(borderArray);
         }
         return result;
     }
@@ -213,9 +232,10 @@ public class MeshMerger {
                     }
                 }
             }
-            result.add(distances);
+            if (!distances.isEmpty())
+                result.add(distances);
         }
-        return result;
+        return result.isEmpty()?null:result;
     }
 
     public static void workOnCubes(String workingDir) {
@@ -262,12 +282,23 @@ public class MeshMerger {
 
             List<Vertex> endPoints = new ArrayList();
             List<Face> endFaces = new ArrayList();
+            String toPrint = null;
             for (Couple couple:coupleToFuse) {
+                if (toPrint == null) {
+                    toPrint = couple.getMesh1().toString() + " with " + couple.getMesh2().toString();
+                } else {
+                    toPrint = toPrint.concat("  "+couple.getMesh1().toString() + " with " + couple.getMesh2().toString());
+                    CustomFrame.appendToLog(toPrint);
+                    toPrint = null;
+                }
                 couple.alignFlats();
                 couple.merge();
                 endPoints.addAll(couple.getEndPoints());
                 endFaces.addAll(couple.getEndFaces());
                 faces.addAll(couple.getNewFaces());
+            }
+            if (toPrint != null) {
+                CustomFrame.appendToLog(toPrint);
             }
             faces.addAll(getFillHoles(endPoints, endFaces));
             try {

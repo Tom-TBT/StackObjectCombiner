@@ -1047,9 +1047,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         Prefs.set("SOC.depthSplit", z);
         Prefs.savePreferences();
         DialogContentManager.setSplits(x, y, z);
-        if (DialogContentManager.setActiveSplits(obj1Field.getText(),
+        if (DialogContentManager.setActiveSplit(obj1Field.getText(),
                 obj2Field.getText()) && setParameters()) {
             this.mergeBtn.setEnabled(false);
+            this.autoMergeBtn.setEnabled(false);
             MeshMerger.merge();
             obj1Field.setText("");
             obj2Field.setText("");
@@ -1065,11 +1066,16 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             listMeshes();
             this.mergeBtn.setEnabled(true);
             this.autoMergeBtn.setEnabled(true);
+            appendToLog("Done");
         }
+        appendToLog("-----------------------");
     }
 
     protected void autoMerge(){
         if (!setParameters()) {
+            this.autoMergeBtn.setEnabled(true);
+            this.mergeBtn.setEnabled(true);
+            appendToLog("-----------------------");
             return;
         }
         appendToLog("Starting the automatic merging");
@@ -1097,6 +1103,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         this.autoMergeBtn.setEnabled(true);
         this.mergeBtn.setEnabled(true);
         appendToLog("Done");
+        appendToLog("-----------------------");
     }
 
     protected void addObjToMerge(List source) {

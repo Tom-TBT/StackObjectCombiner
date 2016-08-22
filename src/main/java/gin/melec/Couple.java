@@ -83,7 +83,7 @@ public class Couple{
      * @return
      */
     private double valueDistance(double val1, double val2) {
-        return (Math.abs(val1-val2)*2)/(val1+val2);
+        return (Math.abs(val1-val2))/(val1+val2);
     }
 
     private void computeSimilarity() {

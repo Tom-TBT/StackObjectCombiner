@@ -209,6 +209,7 @@ public class Border {
             }
         }
         if (isCircular) { // the border is circular so no need to split it
+            this.circular = true;
             this.prepare();
             result.add(this);
         }
@@ -268,9 +269,6 @@ public class Border {
         y = y / vertexSequence.size();
         z = z / vertexSequence.size();
         this.center = new Vertex(0, x, y, z);
-
-        this.circular = this.getFirstVertex().getNeighbours()
-                .contains(this.getLastVertex());
 
         if (this.isCircular() && this.isClockwise()) {
             this.revertSequence();

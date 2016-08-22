@@ -307,7 +307,7 @@ public class DialogContentManager {
 
     }
 
-    protected static boolean setActiveSplits(final String obj1, final String obj2) {
+    protected static boolean setActiveSplit(final String obj1, final String obj2) {
         ACTIVE_MESH_1 = getMesh(obj1);
         ACTIVE_MESH_2 = getMesh(obj2);
 
