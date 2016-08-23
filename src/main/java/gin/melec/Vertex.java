@@ -141,6 +141,28 @@ public class Vertex implements Comparable<Vertex>{
     }
 
     /**
+     * Distance to the vertex, according only to two dimensions. The split give
+     * the orientation of the plane, and so which dimension won't be used.
+     * @param vertex
+     * @param split
+     * @return
+     */
+    public final double distanceTo(final Vertex vertex, AbstractSplit split) {
+        double result = 0;
+        if (split instanceof WidthSplit) {
+            result = Math.sqrt(Math.pow((double) this.z - (double) vertex.z, 2)
+                + Math.pow((double) this.y - (double) vertex.y, 2));
+        } else if (split instanceof HeightSplit) {
+            result = Math.sqrt(Math.pow((double) this.x - (double) vertex.x, 2)
+                + Math.pow((double) this.z - (double) vertex.z, 2));
+        } else if (split instanceof DepthSplit) {
+            result = Math.sqrt(Math.pow((double) this.x - (double) vertex.x, 2)
+                + Math.pow((double) this.y - (double) vertex.y, 2));
+        }
+        return result;
+    }
+
+    /**
      * Find the closer vertex to this vertex between two candidates.
      * @param candidate1 , the first candidate.
      * @param candidate2 , the second candidate.

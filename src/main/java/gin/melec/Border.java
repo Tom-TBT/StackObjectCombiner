@@ -34,6 +34,7 @@ import java.util.Set;
 public class Border {
 
     protected static int TAIL_SIZE = 4;
+    protected static double CENTER_DISTANCE = 70;
 
     /**
      * The split that initiate this border.
@@ -275,32 +276,61 @@ public class Border {
         }
     }
 
+    protected final double centerDistance(final Border border) {
+        Vertex centerThis = this.getCenter();
+        Vertex centerOther = border.getCenter();
+        return centerThis.distanceTo(centerOther, split);
+    }
+
+    protected final double cumulEndsDistance(final Border border) {
+        Vertex endOneThis = this.getFirstVertex();
+        Vertex endTwoThis = this.getLastVertex();
+        Vertex endOneOther = border.getFirstVertex();
+        Vertex endTwoOther = border.getLastVertex();
+
+        double result;
+
+        if (endOneOther.distanceTo(endOneThis) > endOneOther.distanceTo(endTwoThis)) {
+            result = endOneOther.distanceTo(endTwoThis, split) + endTwoOther.distanceTo(endOneThis, split);
+        } else {
+            result = endOneOther.distanceTo(endOneThis, split) + endTwoOther.distanceTo(endTwoThis, split);
+        }
+        return result;
+    }
+
+    protected final double lenghtSimilarity(final Border border) {
+        return 1 - Couple.valueDistance(this.cumulLenght,border.cumulLenght);
+    }
+
     /**
-     * Compute the distance between two borders. The distance depend of the
-     * lenght of the two borders, the distance between their first and last
-     * vertex if the border is not circular, and it finally depend of the
-     * distance between their centers.
-     *
+     * Compute the similarity of two borders. The two borders must fulfill
+     * first two criterions. Their lenght similarity must be higher than the
+     * MIN_AFFINITY cste in Couple. Also the distance between the centers
+     * (end points if it's a linear border) must be less than CENTER_DISTANCE of
+     * Border.
+     * If one of the criterion is not respected, the similarity is equal to 0,
+     * otherwise the similarity is the lenghtSimilarity divided by centerDistance.
      * @param border , the border to compare to this one.
-     * @return the distance between the two borders.
+     * @return the similarity between the two borders.
      */
-    protected final double distanceTo(final Border border) {
+    protected final double similarityTo(final Border border) {
         double result = 0;
 
-        result += Math.abs(this.cumulLenght - border.cumulLenght);
-        result += this.center.distanceTo(border.center);
-        if (!this.circular && !border.circular) {
-            // Compute the distance between the first plus the last vertex of
-            // the two borders.
-            result += Math.min(this.getFirstVertex().
-                    distanceTo(border.getFirstVertex())
-                    + this.getLastVertex()
-                    .distanceTo(border.getLastVertex()), // And
-                    this.getFirstVertex()
-                    .distanceTo(border.getLastVertex())
-                    + this.getLastVertex()
-                    .distanceTo(border.getFirstVertex()));
+        if ((this.isCircular() && border.isCircular())
+                || (!this.isCircular() && !border.isCircular())) {
+            double landmarkDistance;
+            double lenghtSimilarity = lenghtSimilarity(border);
+            if (this.isCircular()) {
+                landmarkDistance = centerDistance(border);
+            } else {
+                landmarkDistance = cumulEndsDistance(border) / 2;
+            }
+            if (lenghtSimilarity > Couple.MIN_AFFINITY
+                    && landmarkDistance < CENTER_DISTANCE) {
+                result = lenghtSimilarity / landmarkDistance;
+            }
         }
+
         return result;
     }
 

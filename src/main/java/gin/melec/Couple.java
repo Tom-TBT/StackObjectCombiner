@@ -82,7 +82,7 @@ public class Couple{
      * @param val2
      * @return
      */
-    private double valueDistance(double val1, double val2) {
+    protected static double valueDistance(double val1, double val2) {
         return (Math.abs(val1-val2))/(val1+val2);
     }
 

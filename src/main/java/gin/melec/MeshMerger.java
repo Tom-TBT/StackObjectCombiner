@@ -144,7 +144,7 @@ public class MeshMerger {
             final List<Face> newFaces = new ArrayList();
             CustomFrame.appendToLog("Computing the new faces");
             for (Border[] couple : couples) {
-                if (couple[0].distanceTo(couple[1]) < 500) {
+                if (couple[0].similarityTo(couple[1]) != 0) {
                     couple[0].alignOn(couple[1]);
                     newFaces.addAll(Linker.createFacesBetween(couple[0].getVertexSequence(), couple[1].getVertexSequence(), couple[0].isCircular()));
                 }
@@ -217,19 +217,16 @@ public class MeshMerger {
         for (Border border1 : borders1) {
             final List<Border> distances = new ArrayList();
             for (Border border2 : borders2) {
-                if ((border1.isCircular() && border2.isCircular())
-                        || (!border1.isCircular() && !border2.isCircular())) {
-                    if (distances.isEmpty()) {
-                        distances.add(border2);
-                    } else {
-                        int i = 0;
-                        final double distance = border2.distanceTo(border1);
-                        while (i < distances.size() && distance
-                                > distances.get(i).distanceTo(border1)) {
-                            i++;
-                        }
-                        distances.add(i, border2);
+                if (distances.isEmpty()) {
+                    distances.add(border2);
+                } else {
+                    int i = 0;
+                    final double distance = border2.similarityTo(border1);
+                    while (i < distances.size() && distance
+                            < distances.get(i).similarityTo(border1)) {
+                        i++;
                     }
+                    distances.add(i, border2);
                 }
             }
             if (!distances.isEmpty())
