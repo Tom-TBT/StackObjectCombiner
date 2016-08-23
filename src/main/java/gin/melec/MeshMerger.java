@@ -142,9 +142,13 @@ public class MeshMerger {
             final Set<Border[]> couples = pairBorders(mesh1.getBorders(),
                     mesh2.getBorders());
             final List<Face> newFaces = new ArrayList();
-            CustomFrame.appendToLog("Computing the new faces");
+            CustomFrame.appendToLog("Pairing the borders");
+            int compatibleLinear = 0;
+            int compatibleCircular = 0;
             for (Border[] couple : couples) {
                 if (couple[0].similarityTo(couple[1]) != 0) {
+                    if (couple[0].isCircular()) compatibleCircular++;
+                    else compatibleLinear++;
                     couple[0].alignOn(couple[1]);
                     newFaces.addAll(Linker.createFacesBetween(couple[0].getVertexSequence(), couple[1].getVertexSequence(), couple[0].isCircular()));
                 }
@@ -152,14 +156,16 @@ public class MeshMerger {
             if (newFaces.isEmpty()) {
                 CustomFrame.appendToLog("No borders have been found compatible.");
             } else {
+                CustomFrame.appendToLog(compatibleLinear+" linear and "+compatibleCircular+" circular borders have been merged");
                 try {
                     ObjWriter.exportFusion(mesh1, mesh2, newFaces);
                 } catch (IOException ex) {
                     IJ.handleException(ex);
                 }
             }
-            mesh1.unload();
-            mesh2.unload();
+            mesh1.unloadEverything();
+            mesh2.unloadEverything();
+            Runtime.getRuntime().gc();
         }
     }
 
@@ -271,7 +277,7 @@ public class MeshMerger {
                 mesh.incremVertices(vertices.size());
                 vertices.addAll(mesh.getVertices());
                 faces.addAll(mesh.getFaces());
-                mesh.unload();
+                mesh.unloadEverything();
             }
             Runtime.getRuntime().gc();
             message = message.concat("are compatible");

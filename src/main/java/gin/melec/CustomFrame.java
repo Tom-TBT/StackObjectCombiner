@@ -141,6 +141,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         autoMergeBtn.addActionListener(this);
         namePatternCBox.addActionListener(this);
 
+        namePatternCBox.addActionListener(this);
+
         helpAddBtn.addActionListener(this);
         helpMergeBtn.addActionListener(this);
         helpDirBtn.addActionListener(this);
@@ -182,7 +184,8 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         depth.setText(Double.toString(depthValue));
 
         namePatternCBox.setSelected(false);
-        DialogContentManager.USE_NAME_PATTERN = false;
+        namePatternField.setEnabled(namePatternCBox.isSelected());
+        DialogContentManager.USE_NAME_PATTERN = namePatternCBox.isSelected();
 
         memoryField.setText(Double.toString(Prefs.get("SOC.memoryWatch", DialogContentManager.MEMORY_WATCHER)));
         minAffinityField.setText(Double.toString(Prefs.get("SOC.minAffinity", Couple.MIN_AFFINITY)));
@@ -193,7 +196,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         centerDistField.setText(Double.toString(Prefs.get("SOC.centerDistance", Border.CENTER_DISTANCE)));
 
 
-        logText.setText("               === Welcome to the Stack Object Combiner ===\n");
+        logText.setText("               === Welcome to the Stack Object Combiner ===\n \n");
         System.out.println(logText.getWidth() - logText.getText().length());
     }
 
@@ -901,7 +904,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             dirField.setText(directory);
             DialogContentManager.setWorkingDir(directory);
             listMeshes();
-        }   else if (source == actualiseBtn) {
+        }  else if (source == actualiseBtn) {
             String directory = dirField.getText();
             if (directory.length() != 0) {
                 DialogContentManager.setWorkingDir(directory);
@@ -909,33 +912,40 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             }
         }   else if (source == shiftBtn) {
             try {
-                double x = ParseDouble(xValueField.getText());
-                double y = ParseDouble(yValueField.getText());
-                double z = ParseDouble(zValueField.getText());
+
+                double x = parseDouble(xValueField.getText());
+                double y = parseDouble(yValueField.getText());
+                double z = parseDouble(zValueField.getText());
                 Prefs.set("SOC.verticalSplit", x);
                 Prefs.set("SOC.horizontalSplit", y);
                 Prefs.set("SOC.depthSplit", z);
                 DialogContentManager.setSplits(x, y, z);
                 if (x != -1 && y != -1 && z != -1) {
+                    startAction();
                     Prefs.savePreferences();
                     MeshMover.moveMeshes();
+                    endAction(true);
                 } else {
-                    IJ.showMessage("Please enter numeric values for the shifts.");
+                    IJ.showMessage("Please enter positive numeric values for the shifts.");
                 }
-            } catch (NumberFormatException ex) {
-                IJ.handleException(ex);
             } catch (ParseException ex) {
                 IJ.handleException(ex);
+                endAction(false);
             } catch (IOException ex) {
                 IJ.handleException(ex);
+                endAction(false);
             }
         }   else if (source == unshiftBtn) {
            try {
+               startAction();
                MeshMover.unshiftMeshes();
+               endAction(true);
            } catch (ParseException ex) {
                IJ.handleException(ex);
+               endAction(false);
            } catch (IOException ex) {
                IJ.handleException(ex);
+               endAction(false);
            }
         }
             else if (source == clearLogBtn) {
@@ -957,33 +967,17 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             gList.setEnabled(true);
             hList.setEnabled(true);
         } else if (source == mergeBtn) {
-            Thread thread = new Thread() {
-                {
-                    setPriority(Thread.NORM_PRIORITY);
-                }
-
+            Thread thread = new Thread() {{setPriority(Thread.NORM_PRIORITY);}
                 @Override
-                public void run() {
-                    merge();
-                }
+                public void run() {merge();}
             };
             thread.start();
-            this.autoMergeBtn.setEnabled(false);
-            this.mergeBtn.setEnabled(false);
         } else if (source == autoMergeBtn) {
-            Thread thread = new Thread() {
-                {
-                    setPriority(Thread.NORM_PRIORITY);
-                }
-
+            Thread thread = new Thread() {{setPriority(Thread.NORM_PRIORITY);}
                 @Override
-                public void run() {
-                    autoMerge();
-                }
+                public void run() {autoMerge();}
             };
             thread.start();
-            this.autoMergeBtn.setEnabled(false);
-            this.mergeBtn.setEnabled(false);
         } else if (source == helpAddBtn) {
             IJ.showMessage("To add a mesh for manual merging, select it from\n"
                     + "one of the lists.\n \n"
@@ -1014,7 +1008,11 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                     + "You can check the Automatic Save/Naming box to save\n"
                     + "automatically the resulting meshes.\n \n"
                     + "Parameters\n"
-                    + "#Tail lenght : The lenght (in vertices) that will be\n"
+                    + "#Center distance : The maximum distance of centers of the\n"
+                    + "borders to be merged.\n"
+                    + "#Border min affinity : The minimum correspondance required for\n"
+                    + "two borders lenght to be merged. (parameter of autoMerge)\n"
+                    + "#Tail lenght : The number of vertices that will be\n"
                     + "removed from non-circular borders.");
         } else if (source == helpAutoMerge) {
             IJ.showMessage("Click on the AutoMerge button to merge all\n"
@@ -1040,6 +1038,28 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
+    private boolean startAction() {
+        this.autoMergeBtn.setEnabled(false);
+        this.mergeBtn.setEnabled(false);
+        this.shiftBtn.setEnabled(false);
+        this.unshiftBtn.setEnabled(false);
+        if (!setParameters()) {
+            endAction(false);
+            return false;
+        }
+        return true;
+    }
+
+    private void endAction(boolean terminatedOK) {
+        if (terminatedOK) appendToLog("Done");
+        else appendToLog("Interrupted");
+        this.autoMergeBtn.setEnabled(true);
+        this.mergeBtn.setEnabled(true);
+        this.shiftBtn.setEnabled(true);
+        this.unshiftBtn.setEnabled(true);
+        appendToLog("-----------------------");
+    }
+
     private void addObj() {
         if (aList.getSelectedItem() != null) {
             addObjToMerge(aList);
@@ -1061,71 +1081,64 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     }
 
     private void merge() {
-        double x = ParseDouble(xValueField.getText());
-        double y = ParseDouble(yValueField.getText());
-        double z = ParseDouble(zValueField.getText());
-        Prefs.set("SOC.verticalSplit", x);
-        Prefs.set("SOC.horizontalSplit", y);
-        Prefs.set("SOC.depthSplit", z);
-        Prefs.savePreferences();
-        DialogContentManager.setSplits(x, y, z);
-        if (DialogContentManager.setActiveSplit(obj1Field.getText(),
-                obj2Field.getText()) && setParameters()) {
-            this.mergeBtn.setEnabled(false);
-            this.autoMergeBtn.setEnabled(false);
-            MeshMerger.merge();
-            obj1Field.setText("");
-            obj2Field.setText("");
-            aList.setEnabled(true);
-            bList.setEnabled(true);
-            cList.setEnabled(true);
-            dList.setEnabled(true);
-            eList.setEnabled(true);
-            fList.setEnabled(true);
-            gList.setEnabled(true);
-            hList.setEnabled(true);
-            DialogContentManager.setWorkingDir(dirField.getText());
-            listMeshes();
-            this.mergeBtn.setEnabled(true);
-            this.autoMergeBtn.setEnabled(true);
-            appendToLog("Done");
+        if (startAction()) {
+            double x = parseDouble(xValueField.getText());
+            double y = parseDouble(yValueField.getText());
+            double z = parseDouble(zValueField.getText());
+            Prefs.set("SOC.verticalSplit", x);
+            Prefs.set("SOC.horizontalSplit", y);
+            Prefs.set("SOC.depthSplit", z);
+            Prefs.savePreferences();
+            DialogContentManager.setSplits(x, y, z);
+            if (DialogContentManager.setActiveSplit(obj1Field.getText(),
+                    obj2Field.getText()) && setParameters()) {
+                this.mergeBtn.setEnabled(false);
+                this.autoMergeBtn.setEnabled(false);
+                MeshMerger.merge();
+                obj1Field.setText("");
+                obj2Field.setText("");
+                aList.setEnabled(true);
+                bList.setEnabled(true);
+                cList.setEnabled(true);
+                dList.setEnabled(true);
+                eList.setEnabled(true);
+                fList.setEnabled(true);
+                gList.setEnabled(true);
+                hList.setEnabled(true);
+                DialogContentManager.setWorkingDir(dirField.getText());
+                listMeshes();
+                this.mergeBtn.setEnabled(true);
+                this.autoMergeBtn.setEnabled(true);
+            }
+            endAction(true);
         }
-        appendToLog("-----------------------");
     }
 
     protected void autoMerge(){
-        if (!setParameters()) {
-            this.autoMergeBtn.setEnabled(true);
-            this.mergeBtn.setEnabled(true);
-            appendToLog("-----------------------");
-            return;
+        if (startAction()) {
+            appendToLog("Starting the automatic merging");
+            double x = parseDouble(xValueField.getText());
+            double y = parseDouble(yValueField.getText());
+            double z = parseDouble(zValueField.getText());
+            double widthValue = parseDouble(width.getText());
+            double heightValue = parseDouble(height.getText());
+            double depthValue = parseDouble(depth.getText());
+
+            Prefs.set("SOC.verticalSplit", x);
+            Prefs.set("SOC.horizontalSplit", y);
+            Prefs.set("SOC.depthSplit", z);
+            Prefs.set("SOC.width", widthValue);
+            Prefs.set("SOC.height", heightValue);
+            Prefs.set("SOC.depth", depthValue);
+            Prefs.savePreferences();
+
+            // Check for sparsed Cubes (Borders of the meshes)
+
+            DialogContentManager.generateCubes(x, y, z, widthValue, heightValue, depthValue);
+
+            MeshMerger.workOnCubes(this.dirField.getText());
+            endAction(true);
         }
-        appendToLog("Starting the automatic merging");
-        double x = ParseDouble(xValueField.getText());
-        double y = ParseDouble(yValueField.getText());
-        double z = ParseDouble(zValueField.getText());
-        double widthValue = ParseDouble(width.getText());
-        double heightValue = ParseDouble(height.getText());
-        double depthValue = ParseDouble(depth.getText());
-
-        Prefs.set("SOC.verticalSplit", x);
-        Prefs.set("SOC.horizontalSplit", y);
-        Prefs.set("SOC.depthSplit", z);
-        Prefs.set("SOC.width", widthValue);
-        Prefs.set("SOC.height", heightValue);
-        Prefs.set("SOC.depth", depthValue);
-        Prefs.savePreferences();
-
-        // Check for sparsed Cubes (Borders of the meshes)
-
-        DialogContentManager.generateCubes(x, y, z, widthValue, heightValue, depthValue);
-
-        MeshMerger.workOnCubes(this.dirField.getText());
-
-        this.autoMergeBtn.setEnabled(true);
-        this.mergeBtn.setEnabled(true);
-        appendToLog("Done");
-        appendToLog("-----------------------");
     }
 
     protected void addObjToMerge(List source) {
@@ -1193,7 +1206,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         logText.append(msg + "\n");
     }
 
-    double ParseDouble(String strNumber) {
+    double parseDouble(String strNumber) {
         if (strNumber != null && strNumber.length() > 0) {
             try {
                 return Double.parseDouble(strNumber);
@@ -1203,7 +1216,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
         else return 0;
     }
-    int ParseInt(String strNumber) {
+    int parseInt(String strNumber) {
         if (strNumber != null && strNumber.length() > 0) {
             try {
                 return Integer.parseInt(strNumber);
@@ -1285,7 +1298,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
     private boolean setParameters() {
         int tmpInt;
         double tmpDouble;
-        tmpInt = ParseInt(tailField.getText());
+        tmpInt = parseInt(tailField.getText());
         if (tmpInt < 0) {
             IJ.showMessage("The tail lenght must be a positive integer.");
             appendToLog("Parameter error: Merging aborted");
@@ -1293,7 +1306,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else {
             Border.TAIL_SIZE = tmpInt;
         }
-        tmpInt = ParseInt(pairingField.getText());
+        tmpInt = parseInt(pairingField.getText());
         if (tmpInt < 1) {
             IJ.showMessage("The vertex pairing value must be bigger than 1.");
             appendToLog("Parameter error: Merging aborted");
@@ -1301,7 +1314,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else {
             Linker.PAIRING_SET = tmpInt;
         }
-        tmpDouble = ParseDouble(windowField.getText());
+        tmpDouble = parseDouble(windowField.getText());
         if (tmpDouble < 0) {
             IJ.showMessage("The distance window must be a positive number.");
             appendToLog("Parameter error: Merging aborted");
@@ -1309,7 +1322,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else {
             AbstractSplit.WINDOW = tmpDouble;
         }
-        tmpDouble = ParseDouble(minAffinityField.getText());
+        tmpDouble = parseDouble(minAffinityField.getText());
         if (tmpDouble < 0 || tmpDouble > 1) {
             IJ.showMessage("The border min affinity value must be between 0 and 1.");
             appendToLog("Parameter error: Merging aborted");
@@ -1317,7 +1330,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else {
             Couple.MIN_AFFINITY = tmpDouble;
         }
-        tmpDouble = ParseDouble(memoryField.getText());
+        tmpDouble = parseDouble(memoryField.getText());
         if (tmpDouble < 0) {
             IJ.showMessage("The memory watch must be a positive number.");
             appendToLog("Parameter error: Merging aborted");
@@ -1325,7 +1338,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else {
             DialogContentManager.MEMORY_WATCHER = tmpDouble;
         }
-        tmpDouble = ParseDouble(centerDistField.getText());
+        tmpDouble = parseDouble(centerDistField.getText());
         if (tmpDouble < 0) {
             IJ.showMessage("The center distance must be a positive number.");
             appendToLog("Parameter error: Merging aborted");
@@ -1333,7 +1346,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else {
             Border.CENTER_DISTANCE = tmpDouble;
         }
-        tmpInt = ParseInt(borderSepField.getText());
+        tmpInt = parseInt(borderSepField.getText());
         if (tmpInt < 0) {
             IJ.showMessage("The border separation value must be a positive integer.");
             appendToLog("Parameter error: Merging aborted");

@@ -281,6 +281,18 @@ public class Mesh {
         this.clear();
     }
 
+    public final void unloadEverything() {
+        this.unload();
+        this.borders.clear();
+        this.backFlats.clear();
+        this.frontFlats.clear();
+        this.upFlats.clear();
+        this.downFlats.clear();
+        this.rightFlats.clear();
+        this.leftFlats.clear();
+        this.primers.clear();
+    }
+
     public final void reload() throws ParseException, IOException {
         if (!inMemory) {
             this.importMesh(false);
