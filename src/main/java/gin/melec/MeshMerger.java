@@ -16,8 +16,6 @@
  */
 package gin.melec;
 
-import static gin.melec.CustomFrame.appendToLog;
-import ij.IJ;
 import ij.gui.GenericDialog;
 import java.io.File;
 import java.io.IOException;
@@ -45,17 +43,11 @@ public class MeshMerger {
         private static final MeshMerger INSTANCE = new MeshMerger();
     }
 
-    public static void merge() {
+    public static void merge() throws ParseException, IOException, InterruptedException {
         final Mesh mesh1 = DialogContentManager.ACTIVE_MESH_1;
         final Mesh mesh2 = DialogContentManager.ACTIVE_MESH_2;
-        try {
-            mesh1.importMesh(true);
-            mesh2.importMesh(true);
-        } catch (ParseException ex) {
-            IJ.handleException(ex);
-        } catch (IOException ex) {
-            IJ.handleException(ex);
-        }
+        mesh1.importMesh(true);
+        mesh2.importMesh(true);
 
         Thread thread1 = new Thread() {
             {
@@ -121,12 +113,8 @@ public class MeshMerger {
         };
         thread1.start();
         thread2.start();
-        try {
-            thread1.join();
-            thread2.join();
-        } catch (InterruptedException ex) {
-            IJ.handleException(ex);
-        }
+        thread1.join();
+        thread2.join();
 
         boolean bordersDetected = true;
         if (mesh1.getBorders().isEmpty()) {
@@ -158,11 +146,7 @@ public class MeshMerger {
                 CustomFrame.appendToLog("No borders have been found compatible.");
             } else {
                 CustomFrame.appendToLog(compatibleLinear+" linear and "+compatibleCircular+" circular borders have been merged");
-                try {
-                    ObjWriter.exportFusion(mesh1, mesh2, newFaces);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                ObjWriter.exportFusion(mesh1, mesh2, newFaces);
             }
             mesh1.unloadEverything();
             mesh2.unloadEverything();
@@ -242,7 +226,7 @@ public class MeshMerger {
         return result.isEmpty()?null:result;
     }
 
-    public static void workOnCubes(String workingDir) {
+    public static void workOnCubes(String workingDir) throws ParseException, IOException {
         DialogContentManager.CUBE_A.detectMeshBorders();
         DialogContentManager.CUBE_B.detectMeshBorders();
         DialogContentManager.CUBE_C.detectMeshBorders();
@@ -252,6 +236,7 @@ public class MeshMerger {
         DialogContentManager.CUBE_G.detectMeshBorders();
         DialogContentManager.CUBE_H.detectMeshBorders();
 
+        CustomFrame.appendToLog("Pairing the borders");
         java.util.List<Couple> couples = createCouples();
 
         File saveDirectory = new File(workingDir + "SOC - AutoMerge Result");
@@ -267,13 +252,9 @@ public class MeshMerger {
             List<Face> faces = new ArrayList();
             String message = "The meshes ";
             for (Mesh mesh: meshToFuse) {
-                try {
-                    mesh.reload();
-                } catch (ParseException ex) {
-                    IJ.handleException(ex);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+
+                mesh.reload();
+
                 message = message.concat(mesh.toString() + ", ");
                 mesh.incremVertices(vertices.size());
                 vertices.addAll(mesh.getVertices());
@@ -289,9 +270,9 @@ public class MeshMerger {
             String toPrint = null;
             for (Couple couple:coupleToFuse) {
                 if (toPrint == null) {
-                    toPrint = couple.getMesh1().toString() + " with " + couple.getMesh2().toString();
+                    toPrint = couple.toString();
                 } else {
-                    toPrint = toPrint.concat("  "+couple.getMesh1().toString() + " with " + couple.getMesh2().toString());
+                    toPrint = toPrint.concat("  "+couple.toString());
                     CustomFrame.appendToLog(toPrint);
                     toPrint = null;
                 }
@@ -305,21 +286,18 @@ public class MeshMerger {
                 CustomFrame.appendToLog(toPrint);
             }
             faces.addAll(getFillHoles(endPoints, endFaces));
-            try {
-                String newName = "Mesh-"+i+".obj";
-                if (!ObjWriter.AUTOSAVE) {
-                    final GenericDialog gDial = new GenericDialog("Enter the name of the "
-                        + "new mesh");
-                    gDial.addStringField("Name", newName, 30);
-                    gDial.hideCancelButton();
-                    gDial.showDialog();
-                    newName = gDial.getNextString();
-                }
-                ObjWriter.writeResult(vertices, faces, newName, saveDirectory);
-            } catch (IOException ex) {
-                CustomFrame.appendToLog("Error while writing the new file");
-                IJ.handleException(ex);
+
+            String newName = "Mesh-"+i+".obj";
+            if (!ObjWriter.AUTOSAVE) {
+                final GenericDialog gDial = new GenericDialog("Enter the name of the "
+                    + "new mesh");
+                gDial.addStringField("Name", newName, 30);
+                gDial.hideCancelButton();
+                gDial.showDialog();
+                newName = gDial.getNextString();
             }
+            ObjWriter.writeResult(vertices, faces, newName, saveDirectory);
+
             couples.removeAll(coupleToFuse);
             i++;
         }

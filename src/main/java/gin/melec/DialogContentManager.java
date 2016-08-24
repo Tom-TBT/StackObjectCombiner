@@ -81,13 +81,13 @@ public class DialogContentManager {
 
     protected static Mesh ACTIVE_MESH_2;
 
-    public static void setWorkingDir(final String dir) {
+    public static void setWorkingDir(final String dir) throws IOException {
         WORKING_DIR = new File(dir);
         setObjFilters();
         getFiles(OBJ_FILTERS);
     }
 
-    private static void getFiles(final FilenameFilter[] objFilters) {
+    private static void getFiles(final FilenameFilter[] objFilters) throws IOException {
         File[] listing;
         A_MESHES.clear();
         B_MESHES.clear();
@@ -101,89 +101,57 @@ public class DialogContentManager {
         listing = WORKING_DIR.listFiles(objFilters[0]);
         for (File file : listing) {
             if (file.isFile()) {
-                try {
-                    final Mesh mesh = new Mesh(file);
-                    A_MESHES.add(mesh);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                final Mesh mesh = new Mesh(file);
+                A_MESHES.add(mesh);
             }
         }
         listing = WORKING_DIR.listFiles(objFilters[1]);
         for (File file : listing) {
             if (file.isFile()) {
-                try {
-                    final Mesh mesh = new Mesh(file);
-                    B_MESHES.add(mesh);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                final Mesh mesh = new Mesh(file);
+                B_MESHES.add(mesh);
             }
         }
         listing = WORKING_DIR.listFiles(objFilters[2]);
         for (File file : listing) {
             if (file.isFile()) {
-                try {
-                    final Mesh mesh = new Mesh(file);
-                    C_MESHES.add(mesh);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                final Mesh mesh = new Mesh(file);
+                C_MESHES.add(mesh);
             }
         }
         listing = WORKING_DIR.listFiles(objFilters[3]);
         for (File file : listing) {
             if (file.isFile()) {
-                try {
-                    final Mesh mesh = new Mesh(file);
-                    D_MESHES.add(mesh);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                final Mesh mesh = new Mesh(file);
+                D_MESHES.add(mesh);
             }
         }
         listing = WORKING_DIR.listFiles(objFilters[4]);
         for (File file : listing) {
             if (file.isFile()) {
-                try {
-                    final Mesh mesh = new Mesh(file);
-                    E_MESHES.add(mesh);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                final Mesh mesh = new Mesh(file);
+                E_MESHES.add(mesh);
             }
         }
         listing = WORKING_DIR.listFiles(objFilters[5]);
         for (File file : listing) {
             if (file.isFile()) {
-                try {
-                    final Mesh mesh = new Mesh(file);
-                    F_MESHES.add(mesh);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                final Mesh mesh = new Mesh(file);
+                F_MESHES.add(mesh);
             }
         }
         listing = WORKING_DIR.listFiles(objFilters[6]);
         for (File file : listing) {
             if (file.isFile()) {
-                try {
-                    final Mesh mesh = new Mesh(file);
-                    G_MESHES.add(mesh);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                final Mesh mesh = new Mesh(file);
+                G_MESHES.add(mesh);
             }
         }
         listing = WORKING_DIR.listFiles(objFilters[7]);
         for (File file : listing) {
             if (file.isFile()) {
-                try {
-                    final Mesh mesh = new Mesh(file);
-                    H_MESHES.add(mesh);
-                } catch (IOException ex) {
-                    IJ.handleException(ex);
-                }
+                final Mesh mesh = new Mesh(file);
+                H_MESHES.add(mesh);
             }
         }
     }

@@ -17,9 +17,6 @@
  */
 package gin.melec;
 
-import java.awt.geom.Line2D;
-import java.util.TreeSet;
-import org.apache.commons.math3.geometry.euclidean.twod.SubLine;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /**

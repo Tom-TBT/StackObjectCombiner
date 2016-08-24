@@ -82,29 +82,15 @@ public class Cube {
         meshes = new ArrayList<Mesh>();
     }
 
-    public void reloadMeshes() {
+    public void reloadMeshes() throws ParseException, IOException {
         for (Mesh mesh: this.meshes) {
-            try {
-                mesh.reload();
-            } catch (ParseException ex) {
-                IJ.handleException(ex);
-            } catch (IOException ex) {
-                IJ.handleException(ex);
-            }
+        mesh.reload();
         }
     }
 
-    protected void detectMeshBorders() {
+    protected void detectMeshBorders() throws ParseException, IOException {
         for (Mesh mesh : meshes) {
-            try {
-                mesh.importMesh(true);
-            } catch (ParseException ex) {
-                CustomFrame.appendToLog("Parsing exception while reading "+mesh.toString());
-                IJ.handleException(ex);
-            } catch (IOException ex) {
-                CustomFrame.appendToLog("IO exception while reading "+mesh.toString());
-                IJ.handleException(ex);
-            }
+            mesh.importMesh(true);
             CustomFrame.appendToLog("Detecting and preparing borders for "+mesh.getFile().getName());
             mesh.findPrimers();
             mesh.createBorders(leftSplit);

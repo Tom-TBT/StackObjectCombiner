@@ -168,4 +168,20 @@ public class FlatBorder{
     public Mesh getParentMesh() {
         return parentMesh;
     }
+
+    @Override
+    public String toString() {
+        int compteur = 0;
+        boolean isCircular = false;
+        if (this.elements.size() == 1) {
+            return "(1 circular)";
+        } else {
+            for (Object o: this.elements) {
+                if (o instanceof List) {
+                    compteur++;
+                }
+            }
+            return "("+compteur+" linear)";
+        }
+    }
 }

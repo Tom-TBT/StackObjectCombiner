@@ -6,8 +6,6 @@
 package gin.melec;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
-import org.apache.commons.math3.geometry.euclidean.twod.SubLine;
-import java.util.TreeSet;
 
 /**
  *

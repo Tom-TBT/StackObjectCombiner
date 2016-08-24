@@ -21,6 +21,8 @@ import java.text.Collator;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.text.DefaultCaret;
@@ -887,7 +889,21 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
                 @Override
                 public void run() {
-                    merge();
+                    try {
+                        merge();
+                    } catch (ParseException ex) {
+                        appendToLog("Parse exception :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    } catch (IOException ex) {
+                        appendToLog("IO exception :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    } catch (InterruptedException ex) {
+                        appendToLog("Thread interrupted :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    }
                 }
             };
             thread.start();
@@ -902,17 +918,26 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             + " containing the .obj files");
             String directory = dc.getDirectory();
             dirField.setText(directory);
-            DialogContentManager.setWorkingDir(directory);
+           try {
+               DialogContentManager.setWorkingDir(directory);
+           } catch (IOException ex) {
+               appendToLog("IO exception while reading directory :\n"+ex.getMessage());
+               IJ.handleException(ex);
+           }
             listMeshes();
         }  else if (source == actualiseBtn) {
             String directory = dirField.getText();
             if (directory.length() != 0) {
-                DialogContentManager.setWorkingDir(directory);
+                try {
+                    DialogContentManager.setWorkingDir(directory);
+                } catch (IOException ex) {
+                    appendToLog("IO exception while reading directory :\n"+ex.getMessage());
+                    IJ.handleException(ex);
+                }
                 listMeshes();
             }
         }   else if (source == shiftBtn) {
             try {
-
                 double x = parseDouble(xValueField.getText());
                 double y = parseDouble(yValueField.getText());
                 double z = parseDouble(zValueField.getText());
@@ -929,9 +954,11 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                     IJ.showMessage("Please enter positive numeric values for the shifts.");
                 }
             } catch (ParseException ex) {
+                appendToLog("Parse exception :\n"+ex.getMessage());
                 IJ.handleException(ex);
                 endAction(false);
             } catch (IOException ex) {
+                appendToLog("IO exception :\n"+ex.getMessage());
                 IJ.handleException(ex);
                 endAction(false);
             }
@@ -941,9 +968,11 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                MeshMover.unshiftMeshes();
                endAction(true);
            } catch (ParseException ex) {
+               appendToLog("Parse exception :\n"+ex.getMessage());
                IJ.handleException(ex);
                endAction(false);
            } catch (IOException ex) {
+               appendToLog("IO exception :\n"+ex.getMessage());
                IJ.handleException(ex);
                endAction(false);
            }
@@ -969,13 +998,39 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         } else if (source == mergeBtn) {
             Thread thread = new Thread() {{setPriority(Thread.NORM_PRIORITY);}
                 @Override
-                public void run() {merge();}
+                public void run() {try {
+                    merge();
+                    } catch (ParseException ex) {
+                        appendToLog("Parse exception :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    } catch (IOException ex) {
+                        appendToLog("IO exception :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    } catch (InterruptedException ex) {
+                        appendToLog("Thread interrupted :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    }
+                }
             };
             thread.start();
         } else if (source == autoMergeBtn) {
             Thread thread = new Thread() {{setPriority(Thread.NORM_PRIORITY);}
                 @Override
-                public void run() {autoMerge();}
+                public void run() {try {
+                    autoMerge();
+                    } catch (ParseException ex) {
+                        appendToLog("Parse exception :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    } catch (IOException ex) {
+                        appendToLog("IO exception :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    }
+                }
             };
             thread.start();
         } else if (source == helpAddBtn) {
@@ -1080,7 +1135,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
-    private void merge() {
+    private void merge() throws ParseException, IOException, InterruptedException {
         if (startAction()) {
             double x = parseDouble(xValueField.getText());
             double y = parseDouble(yValueField.getText());
@@ -1124,7 +1179,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
-    protected void autoMerge(){
+    protected void autoMerge() throws ParseException, IOException{
         if (startAction()) {
             appendToLog("Starting the automatic merging");
             double x = parseDouble(xValueField.getText());

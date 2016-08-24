@@ -247,4 +247,10 @@ public class Couple{
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        return getMesh1().toString() + " with " + getMesh2().toString()
+                +" "+ getFlat1().toString();
+    }
 }
