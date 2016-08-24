@@ -34,7 +34,7 @@ import java.util.Set;
 public class Border {
 
     protected static int TAIL_SIZE = 4;
-    protected static double CENTER_DISTANCE = 70;
+    protected static double CENTER_DISTANCE = 40;
 
     /**
      * The split that initiate this border.

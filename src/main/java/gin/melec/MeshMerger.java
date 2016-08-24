@@ -18,6 +18,7 @@ package gin.melec;
 
 import static gin.melec.CustomFrame.appendToLog;
 import ij.IJ;
+import ij.gui.GenericDialog;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -305,7 +306,16 @@ public class MeshMerger {
             }
             faces.addAll(getFillHoles(endPoints, endFaces));
             try {
-                ObjWriter.writeResult(vertices, faces, "Mesh-"+i+".obj", saveDirectory);
+                String newName = "Mesh-"+i+".obj";
+                if (!ObjWriter.AUTOSAVE) {
+                    final GenericDialog gDial = new GenericDialog("Enter the name of the "
+                        + "new mesh");
+                    gDial.addStringField("Name", newName, 30);
+                    gDial.hideCancelButton();
+                    gDial.showDialog();
+                    newName = gDial.getNextString();
+                }
+                ObjWriter.writeResult(vertices, faces, newName, saveDirectory);
             } catch (IOException ex) {
                 CustomFrame.appendToLog("Error while writing the new file");
                 IJ.handleException(ex);

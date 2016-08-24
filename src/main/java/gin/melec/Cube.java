@@ -99,8 +99,10 @@ public class Cube {
             try {
                 mesh.importMesh(true);
             } catch (ParseException ex) {
+                CustomFrame.appendToLog("Parsing exception while reading "+mesh.toString());
                 IJ.handleException(ex);
             } catch (IOException ex) {
+                CustomFrame.appendToLog("IO exception while reading "+mesh.toString());
                 IJ.handleException(ex);
             }
             CustomFrame.appendToLog("Detecting and preparing borders for "+mesh.getFile().getName());

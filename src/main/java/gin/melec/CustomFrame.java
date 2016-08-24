@@ -1085,6 +1085,13 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             double x = parseDouble(xValueField.getText());
             double y = parseDouble(yValueField.getText());
             double z = parseDouble(zValueField.getText());
+
+            if (x <= 0 || y <= 0 || z <= 0) {
+                IJ.showMessage("The x, y and z shifts cannot be 0 value.");
+                endAction(false);
+                return;
+            }
+
             Prefs.set("SOC.verticalSplit", x);
             Prefs.set("SOC.horizontalSplit", y);
             Prefs.set("SOC.depthSplit", z);
@@ -1109,8 +1116,11 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 listMeshes();
                 this.mergeBtn.setEnabled(true);
                 this.autoMergeBtn.setEnabled(true);
+                endAction(true);
+            } else {
+                appendToLog("Merging require two meshes");
+                endAction(false);
             }
-            endAction(true);
         }
     }
 
@@ -1123,6 +1133,19 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             double widthValue = parseDouble(width.getText());
             double heightValue = parseDouble(height.getText());
             double depthValue = parseDouble(depth.getText());
+
+            if (x <= 0 || y <= 0 || z <= 0) {
+                IJ.showMessage("The x, y and z shifts cannot be 0 value.");
+                endAction(false);
+                return;
+            } else {
+                if (widthValue <= x || heightValue <= y || depthValue <= z) {
+                    IJ.showMessage("The width, height and depth cannot be smaller than\n"
+                            + "the shift's positions.");
+                    endAction(false);
+                    return;
+                }
+            }
 
             Prefs.set("SOC.verticalSplit", x);
             Prefs.set("SOC.horizontalSplit", y);
@@ -1216,6 +1239,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
         else return 0;
     }
+
     int parseInt(String strNumber) {
         if (strNumber != null && strNumber.length() > 0) {
             try {

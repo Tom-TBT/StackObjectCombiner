@@ -311,6 +311,10 @@ public class DialogContentManager {
         ACTIVE_MESH_1 = getMesh(obj1);
         ACTIVE_MESH_2 = getMesh(obj2);
 
+        if (ACTIVE_MESH_1== null || ACTIVE_MESH_2== null) {
+            return false;
+        }
+
         if (!ACTIVE_MESH_1.isMoved() || !ACTIVE_MESH_2.isMoved()) {
             IJ.error("At least one of the mesh haven't been shifted.\n"
                     + "Please use the Shift function of the plugin");

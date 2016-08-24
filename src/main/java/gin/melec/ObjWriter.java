@@ -70,7 +70,6 @@ public class ObjWriter {
             }
             for (Vertex vertex : mesh.getVertices()) {
                 prW.write(vertex.toString() + "\n");
-
             }
             for (Face face : mesh.getFaces()) {
                 prW.write(face.toString() + "\n");
