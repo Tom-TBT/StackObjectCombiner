@@ -81,12 +81,22 @@ public class DialogContentManager {
 
     protected static Mesh ACTIVE_MESH_2;
 
+    /**
+     * Set the working dir of the plugin.
+     * @param dir, the dir to set as working directory.
+     * @throws IOException
+     */
     public static void setWorkingDir(final String dir) throws IOException {
         WORKING_DIR = new File(dir);
         setObjFilters();
         getFiles(OBJ_FILTERS);
     }
 
+    /**
+     * Look for the files in the working directory. The files are filtered.
+     * @param objFilters, the filters used to take only the files we are interested in.
+     * @throws IOException
+     */
     private static void getFiles(final FilenameFilter[] objFilters) throws IOException {
         File[] listing;
         A_MESHES.clear();
@@ -156,6 +166,9 @@ public class DialogContentManager {
         }
     }
 
+    /**
+     * Call the unload function of all the meshes contained inside the cubes.
+     */
     public static void unloadMeshes() {
         List<Mesh> allMeshes = new ArrayList();
         allMeshes.addAll(CUBE_A.getMeshes());
@@ -174,9 +187,8 @@ public class DialogContentManager {
 
     /**
      * This method create FilenameFilters we need to filter the .obj files with
-     * the prefix A_, B_, C_ or D_.
-     *
-     * @return the filenameFilters.
+     * the prefix A_, B_, C_ or D_. The files can also be filtered according to
+     * a pattern name.
      */
     public static void setObjFilters() {
         OBJ_FILTERS[0] = new FilenameFilter() {
@@ -275,6 +287,12 @@ public class DialogContentManager {
 
     }
 
+    /**
+     * Set the split that will be used to merge the two objects.
+     * @param obj1
+     * @param obj2
+     * @return true if the split has been correctly set.
+     */
     protected static boolean setActiveSplit(final String obj1, final String obj2) {
         ACTIVE_MESH_1 = getMesh(obj1);
         ACTIVE_MESH_2 = getMesh(obj2);
@@ -345,6 +363,15 @@ public class DialogContentManager {
         return result;
     }
 
+    /**
+     * Create the cubes corresponding to these positions and add their meshes.
+     * @param xPos
+     * @param yPos
+     * @param zPos
+     * @param width
+     * @param height
+     * @param depth
+     */
     public static void generateCubes(double xPos, double yPos, double zPos, double width,
             double height, double depth) {
         // Here we displace from half a pixel the different positions

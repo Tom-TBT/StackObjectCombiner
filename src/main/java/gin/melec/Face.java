@@ -148,6 +148,13 @@ public class Face {
         return vertex3;
     }
 
+    /**
+     * Function that looks for the orders of the vertices in the face. The order
+     * give the normal vector of the face.
+     * @param v1, the first vertex.
+     * @param v2, the second vertex.
+     * @return true if the vertex 2 follows the vertex 1.
+     */
     public boolean vertexFollows(final Vertex v1, final Vertex v2) {
         return (this.vertex1 == v1 && this.vertex2 == v2) ||
                 (this.vertex2 == v1 && this.vertex3 == v2) ||

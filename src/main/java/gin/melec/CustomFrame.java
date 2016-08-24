@@ -21,8 +21,6 @@ import java.text.Collator;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.text.DefaultCaret;
@@ -123,6 +121,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         this.setTitle("Stack Object Combiner");
     }
 
+    /**
+     * All the things sets manually to the frame.
+     */
     private void initComponentsManually() {
         dirField.setEditable(false);
         obj1Field.setEditable(false);
@@ -202,6 +203,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         System.out.println(logText.getWidth() - logText.getText().length());
     }
 
+    /**
+     * Initiation of the components generated automatically by netbeans for the
+     * frame designed.
+     */
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -1139,6 +1144,12 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
+    /**
+     * The function of manual merging. Called by a thread.
+     * @throws ParseException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void merge() throws ParseException, IOException, InterruptedException {
         if (startAction()) {
             double x = parseDouble(xValueField.getText());
@@ -1183,6 +1194,12 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
+    /**
+     * The function of automatic merging. Called by a thread.
+     * @throws ParseException
+     * @throws IOException
+     * @throws BorderSeparationException
+     */
     protected void autoMerge() throws ParseException, IOException, BorderSeparationException{
         if (startAction()) {
             appendToLog("Starting the automatic merging");
@@ -1223,6 +1240,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
+    /**
+     * Add an object to manual merging, from the given source.
+     * @param source , the list from where the object come from.
+     */
     protected void addObjToMerge(List source) {
         String item = source.getSelectedItem();
         source.deselect(source.getSelectedIndex());
@@ -1284,6 +1305,11 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
+    /**
+     * The function called from everywhere in the plugin to print messages in the
+     * log.
+     * @param msg, the message to print.
+     */
     protected static void appendToLog(final String msg) {
         logText.append(msg + "\n");
     }
@@ -1310,6 +1336,9 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         else return 0;
     }
 
+    /**
+     * Add the meshes into the corresponding GUI list.
+     */
     private void listMeshes() {
         aList.removeAll();
         bList.removeAll();
@@ -1378,6 +1407,11 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
+    /**
+     * Function called before each merging to set the parameters entered by the
+     * user.
+     * @return true if all parameters are correct.
+     */
     private boolean setParameters() {
         int tmpInt;
         double tmpDouble;

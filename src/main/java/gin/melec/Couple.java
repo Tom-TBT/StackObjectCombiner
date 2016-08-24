@@ -56,6 +56,11 @@ public class Couple{
         }
     }
 
+    /**
+     * Check for compatibility of the couple.
+     * The compatibility relies on the perimeter and the barycenter of the flats
+     * border. If they are compatible, the intersection of the flats is computed.
+     */
     private void checkCompatible() {
         this.compatible = false;
         if (valueDistance(flat1.getPerimeter(), flat2.getPerimeter()) < 1-MIN_AFFINITY) {
@@ -86,6 +91,9 @@ public class Couple{
         return (Math.abs(val1-val2))/(val1+val2);
     }
 
+    /**
+     * Compute the intersection of the flats.
+     */
     private void computeSimilarity() {
         Area intersection = (Area)flat1.getCustomArea().clone();
         intersection.intersect((CustomArea)flat2.getCustomArea());
@@ -97,13 +105,18 @@ public class Couple{
 
     }
 
-    public static double approxArea(PathIterator i) {
+    /**
+     * Compute the area of the intersection.
+     * @param pathIt, the points delimiting the intersection.
+     * @return the area of the intersection.
+     */
+    public static double approxArea(PathIterator pathIt) {
         double a = 0.0;
         double[] coords = new double[6];
         double startX = NaN, startY = NaN;
         Line2D segment = new Line2D.Double(NaN, NaN, NaN, NaN);
-        while (! i.isDone()) {
-            int segType = i.currentSegment(coords);
+        while (! pathIt.isDone()) {
+            int segType = pathIt.currentSegment(coords);
             double x = coords[0], y = coords[1];
             switch (segType) {
             case PathIterator.SEG_CLOSE:
@@ -124,7 +137,7 @@ public class Couple{
             default:
                 throw new IllegalArgumentException("PathIterator contains curved segments");
             }
-            i.next();
+            pathIt.next();
         }
         if (Double.isNaN(a)) {
             throw new IllegalArgumentException("PathIterator contains an open path");
@@ -132,15 +145,22 @@ public class Couple{
             return 0.5 * Math.abs(a);
         }
     }
+
     private static double hexArea(Line2D seg) {
         return seg.getX1() * seg.getY2() - seg.getX2() * seg.getY1();
     }
 
+    /**
+     * Align the two flats so they can be merged.
+     */
     public void alignFlats() {
         flat1.alignOn(flat2);
-        int g=0;
     }
 
+    /**
+     * Iterate the elements of the flats and create faces between the
+     * corresponding borders. Then the new faces are stored.
+     */
     public void merge() {
         List elements1 = flat1.getElements();
         List elements2 = flat2.getElements();
@@ -203,6 +223,11 @@ public class Couple{
         return this.similarity;
     }
 
+    /**
+     * Return the end points of all the linear borders of the couple.
+     * This function is called to fill the holes at the intersection of 4 meshes.
+     * @return the end points of the couple.
+     */
     public List<Vertex> getEndPoints() {
         List<Vertex> result = new ArrayList();
         if (flat1.getElements().size() == 1) {
@@ -226,6 +251,11 @@ public class Couple{
         return result;
     }
 
+    /**
+     * Return the end faces of all the linear borders of the couple.
+     * This function is called to fill the holes at the intersection of 4 meshes.
+     * @return the end faces of the couple.
+     */
     public List<Face> getEndFaces() {
         List<Vertex> endPoints = this.getEndPoints();
         List<Face> result = new ArrayList();

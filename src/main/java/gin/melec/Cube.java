@@ -17,7 +17,6 @@
  */
 package gin.melec;
 
-import ij.IJ;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -82,12 +81,24 @@ public class Cube {
         meshes = new ArrayList<Mesh>();
     }
 
+    /**
+     * Reload all the meshes of the cube into memory.
+     * @throws ParseException
+     * @throws IOException
+     */
     public void reloadMeshes() throws ParseException, IOException {
         for (Mesh mesh: this.meshes) {
-        mesh.reload();
+            mesh.reload();
         }
     }
 
+    /**
+     * For all the meshes, it detect the borders and then separate them into
+     * flat borders.
+     * @throws ParseException
+     * @throws IOException
+     * @throws BorderSeparationException
+     */
     protected void detectMeshBorders() throws ParseException, IOException, BorderSeparationException {
         for (Mesh mesh : meshes) {
             mesh.importMesh(true);
@@ -112,6 +123,11 @@ public class Cube {
         }
     }
 
+    /**
+     * Compute the properties of all the flats contained by the mesh. For that
+     * it needs the corresponding splits.
+     * @param mesh , the mesh to compute the flat properties for.
+     */
     private void computeFlatProperties(final Mesh mesh) {
         mesh.computeLeftFlatProperties(this.leftSplit);
         mesh.computeRightFlatProperties(this.rightSplit);
@@ -121,6 +137,10 @@ public class Cube {
         mesh.computeBackFlatProperties(this.backSplit);
     }
 
+    /**
+     * Create the flats and store them into the splits.
+     * @param mesh, the mesh for which we create the flats borders.
+     */
     private void storeFlatBorders(Mesh mesh) {
         frontSplit.storeFlatBorders(mesh);
         backSplit.storeFlatBorders(mesh);
@@ -130,6 +150,10 @@ public class Cube {
         rightSplit.storeFlatBorders(mesh);
     }
 
+    /**
+     * Get the flats borders stored in the splits to put it inside the mesh.
+     * @param mesh, the mesh for which we give its flats.
+     */
     private void setFlatsToMesh(final Mesh mesh) {
         mesh.addBackFlat(this.backSplit.getFlatBorders());
         this.backSplit.clearFlatBorders();
@@ -145,6 +169,19 @@ public class Cube {
         this.downSplit.clearFlatBorders();
     }
 
+    /**
+     * Separation of the borders into flat borders. The separation is made with
+     * planes crossing the edges of the cube. When the border pass throught one
+     * of these planes, it separate it. Then fragments of border create are also
+     * assigned to an edge of the cube so that we can put together the differents
+     * fragments of one side of the cube to create the whole surface of the mesh
+     * corresponding to this side.
+     *
+     * @param currentBorder the border to be separated.
+     * @param mesh, the mesh to which the border belong.
+     * @throws BorderSeparationException, exception thrown if the separation went
+     * wrong.
+     */
     private void separateBorder(Border currentBorder, Mesh mesh) throws BorderSeparationException {
         List<Vertex> vertexList = new ArrayList(currentBorder.getVertexSequence());
 
@@ -247,6 +284,11 @@ public class Cube {
 
     }
 
+    /**
+     * Check if the given vertex is close to more than one split.
+     * @param v, the vertex to check.
+     * @return true if the vertex is close to several splits.
+     */
     private boolean vertexCloseToSeveralSplit(Vertex v) {
         int result = 0;
         if (this.frontSplit.isClose(v)) {
@@ -270,6 +312,14 @@ public class Cube {
         return result > 1;
     }
 
+    /**
+     * Retrieve the vertex from the list at the given indice. If the index is
+     * bigger than the size of the list, it will start back from the begining of
+     * the list.
+     * @param index, the index of the vertex we are looking for.
+     * @param vertexList, the list containing the vertex.
+     * @return the vertex at the index inside the list.
+     */
     private Vertex getVertexAtIndex(int index, List<Vertex> vertexList) {
         Vertex result;
         if (index < vertexList.size()) {
@@ -280,6 +330,15 @@ public class Cube {
         return result;
     }
 
+    /**
+     * Give the next plane, by checking first if the segment created by the two
+     * vertices cross the current plane.
+     * @param v1, the first vertex.
+     * @param v2, the second vertex.
+     * @param plane, the plane that might be intersected.
+     * @param currentSplit, the current split used.
+     * @return the next split of the border.
+     */
     private AbstractSplit getNextSplit(final Vertex v1, final Vertex v2, CustomPlane plane, AbstractSplit currentSplit) {
         Vector3D vect1 = new Vector3D(v1.getX(), v1.getY(), v1.getZ());
         Vector3D vect2 = new Vector3D(v2.getX(), v2.getY(), v2.getZ());
@@ -320,6 +379,9 @@ public class Cube {
         return result;
     }
 
+    /**
+     * Set the planes of the cube.
+     */
     private void setPlanes() {
         Vector3D orig= new Vector3D(x,y,z);
         Vector3D origX= new Vector3D(width,y,z);
@@ -369,6 +431,11 @@ public class Cube {
         rightDownPlane = new CustomPlane(rightSplit, downSplit, xZ, xYZ, constructedVector, 0.001);
     }
 
+    /**
+     * Give all the planes of this split.
+     * @param split
+     * @return the planes of this split.
+     */
     private CustomPlane[] getPlanes(AbstractSplit split) {
         CustomPlane[] planes = new CustomPlane[4];
         if (split == frontSplit) {
@@ -405,6 +472,9 @@ public class Cube {
         return planes;
     }
 
+    /**
+     * Create and set the edges of all the splits of the cube.
+     */
     private void setEdges() {
         Vertex cornerOrig, cornerX, cornerY, cornerZ, cornerXY, cornerXZ, cornerYZ, cornerXYZ;
         cornerOrig = new Vertex(0,(float)x,(float)y,(float)z);
@@ -447,6 +517,12 @@ public class Cube {
         this.backSplit.setLeftEdge(new Edge(true, cornerX, cornerXZ, 'Z'));
     }
 
+    /**
+     * Give the next edge, that separate the two splits given in parameter.
+     * @param previousSplit
+     * @param nextSplit
+     * @return the next edge.
+     */
     private Edge[] getNextEdge(final AbstractSplit previousSplit, final AbstractSplit nextSplit) {
         Edge[] result = new Edge[2];
         if (previousSplit == this.upSplit) {

@@ -35,6 +35,13 @@ public class Connector extends Vertex{
         this.nextEdge = nextEdge;
     }
 
+    /**
+     * Create a connector.
+     * A connector indicate to which edge we have to continue the flat border.
+     * @param v, the position of the connector.
+     * @param parent, the border that created the connector.
+     * @param nextEdge , the edge that the connector is pointing at.
+     */
     public Connector(final Vertex v, Border parent, Edge nextEdge) {
         super(v.id,v.x,v.y,v.z);
         this.parentBorder = parent;

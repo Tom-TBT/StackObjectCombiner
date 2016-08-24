@@ -43,6 +43,12 @@ public class MeshMerger {
         private static final MeshMerger INSTANCE = new MeshMerger();
     }
 
+    /**
+     * Function of manual merging.
+     * @throws ParseException
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public static void merge() throws ParseException, IOException, InterruptedException {
         final Mesh mesh1 = DialogContentManager.ACTIVE_MESH_1;
         final Mesh mesh2 = DialogContentManager.ACTIVE_MESH_2;
@@ -226,6 +232,13 @@ public class MeshMerger {
         return result.isEmpty()?null:result;
     }
 
+    /**
+     * Function of the automatic merging.
+     * @param workingDir, the dir we are working on, used to write the result.
+     * @throws ParseException
+     * @throws IOException
+     * @throws BorderSeparationException
+     */
     public static void workOnCubes(String workingDir) throws ParseException, IOException, BorderSeparationException {
         DialogContentManager.CUBE_A.detectMeshBorders();
         DialogContentManager.CUBE_B.detectMeshBorders();
@@ -303,6 +316,12 @@ public class MeshMerger {
         }
     }
 
+    /**
+     * Function that fill the holes were 4 meshes are reunited.
+     * @param endPoints, the end points of the borders.
+     * @param endFaces, the end faces of the borders.
+     * @return a list of faces filling the holes.
+     */
     private static List<Face> getFillHoles(List<Vertex> endPoints, List<Face> endFaces) {
         List<Face> result = new ArrayList();
         Set<Vertex> alreadyChecked = new HashSet();
@@ -350,6 +369,13 @@ public class MeshMerger {
         return result;
     }
 
+    /**
+     * Get the other mesh to add to the current fusing.
+     * @param meshResult, the new mesh to add to the merging.
+     * @param coupleResult, the new couples to merge.
+     * @param couples, the couples that already exist.
+     * @param initCouple, the couple that initiate the pairing of the meshes.
+     */
     private static void getCouplesAndMeshToFuse(Set<Mesh> meshResult, Set<Couple> coupleResult,
             List<Couple> couples, Couple initCouple) {
         Mesh mesh1 = initCouple.getMesh1();
@@ -374,6 +400,10 @@ public class MeshMerger {
         }
     }
 
+    /**
+     * Create all the possible couples between the different meshes.
+     * @return a list of possible couples between the meshes.
+     */
     private static java.util.List<Couple> createCouples() {
         java.util.List<Couple> result= new ArrayList();
 
@@ -396,6 +426,11 @@ public class MeshMerger {
         return result;
     }
 
+    /**
+     * If a border match several border, we keep only the one with the greatest
+     * affinity.
+     * @param couples, the couples to filter.
+     */
     private static void keepOneCouplePerBorder(List<Couple> couples) {
         Set<Couple> toRemove = new HashSet();
         Set<FlatBorder> bordersToCheck = new HashSet();
@@ -495,6 +530,10 @@ public class MeshMerger {
         return result;
     }
 
+    /**
+     * Remove from the list all the couples that are incompatible.
+     * @param couples, the couples to filter.
+     */
     private static void removeUncompatibleCouples(List<Couple> couples) {
         List<Couple> toRemove = new ArrayList();
         for (Couple couple: couples) {

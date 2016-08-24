@@ -43,6 +43,11 @@ public class Edge {
         this.connectors = new ArrayList();
     }
 
+    /**
+     * Place the connector on the edge. The connectors of the edges are ordered
+     * switch their position.
+     * @param connector, the connector to add.
+     */
     public final void addConnector(final Connector connector) {
         if (this.connectors.isEmpty()) {
             this.connectors.add(connector);
@@ -60,6 +65,13 @@ public class Edge {
 
     }
 
+    /**
+     * Check if the connector 1 is closer than the connector 2 according to the
+     * edge.
+     * @param c1, the first connector.
+     * @param c2, the second connector.
+     * @return true is c1 is closer than c2.
+     */
     private boolean isCloser(final Connector c1, final Connector c2) {
         boolean result = false;
         switch (axe){

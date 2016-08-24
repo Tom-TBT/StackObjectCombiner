@@ -1,4 +1,4 @@
-/*  Inspired from
+/*  Mostly inspired from
  *  http://paulbourke.net/geometry/polygonmesh/PolygonUtilities.java
  */
 package gin.melec;

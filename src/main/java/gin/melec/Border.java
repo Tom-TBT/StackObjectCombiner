@@ -33,11 +33,18 @@ import java.util.Set;
  */
 public class Border {
 
+    /**
+     * The tail of a linear border that will be removed (manual merging).
+     */
     protected static int TAIL_SIZE = 4;
+
+    /**
+     * The tolerance for the center distance of two borders to be similar.
+     */
     protected static double CENTER_DISTANCE = 40;
 
     /**
-     * The split that initiate this border.
+     * The split that initiated this border.
      */
     private AbstractSplit split;
 
@@ -61,6 +68,9 @@ public class Border {
      */
     private boolean circular;
 
+    /**
+     * A vertex that connect this border to the next border of the mesh.
+     */
     private Connector connector;
 
 
@@ -76,8 +86,7 @@ public class Border {
         this.vertexSequence = new LinkedList();
         this.split = split;
 
-        Vertex firstVertex = null;
-        firstVertex = split.findStarter(mesh.getPrimers());
+        Vertex firstVertex = split.findStarter(mesh.getPrimers());
         if (firstVertex == null) {
             return;
         }
@@ -99,6 +108,7 @@ public class Border {
         mesh.getPrimers().remove(secondVertex);
 
     }
+
 
     private Border() {
         this.vertexSequence = new LinkedList();
@@ -276,12 +286,24 @@ public class Border {
         }
     }
 
+    /**
+     * Compute the distance of the centers of two borders.
+     * Used for circular borders.
+     * @param border, the border to compute the distance with.
+     * @return the distance of this border with the border in parameter.
+     */
     protected final double centerDistance(final Border border) {
         Vertex centerThis = this.getCenter();
         Vertex centerOther = border.getCenter();
         return centerThis.distanceTo(centerOther, split);
     }
 
+    /**
+     * Compute the distance of the two end points of the two borders. Used for
+     * linear borders.
+     * @param border, the border to compute the distance with.
+     * @return the cumuled distance  of this border with the border in parameter.
+     */
     protected final double cumulEndsDistance(final Border border) {
         Vertex endOneThis = this.getFirstVertex();
         Vertex endTwoThis = this.getLastVertex();
@@ -298,6 +320,11 @@ public class Border {
         return result;
     }
 
+    /**
+     * Compute a similarity value with an other border.
+     * @param border, the border to compute the similarity with.
+     * @return the similarity of the two borders (see Couple.valueDistance)
+     */
     protected final double lenghtSimilarity(final Border border) {
         return 1 - Couple.valueDistance(this.cumulLenght,border.cumulLenght);
     }
@@ -378,6 +405,10 @@ public class Border {
         }
     }
 
+    /**
+     * Add the fragment to the begining of the sequence.
+     * @param firstFragment, the fragment to add to the border.
+     */
     public final void addStartingSequence(final List<Vertex> firstFragment) {
         for (int i = 0; i < firstFragment.size(); i++) {
             this.vertexSequence.add(i, firstFragment.get(i));
@@ -416,10 +447,12 @@ public class Border {
 
     }
 
+    /**
+     * Compute if the border is clockwise, so that we can orient all the borders
+     * in the same way.
+     * @return true if the border is clockwise.
+     */
     private boolean isClockwise() {
-//        List<Vector2D> twodPoints = new ArrayList<Vector2D>();
-//
-//        int i = 0, increment = 10;
         boolean isHorizontalPlane = this.getSplit() instanceof HeightSplit;
 
         // Creating the shape

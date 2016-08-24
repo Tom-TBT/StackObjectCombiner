@@ -224,6 +224,12 @@ public class Vertex implements Comparable<Vertex>{
         return result;
     }
 
+    /**
+     * Is logical next mean that the given vertex follows this vertex on the face,
+     * according to the normal vector of the face.
+     * @param vertex
+     * @return true if the vertex follows logicaly this vertex.
+     */
     public final boolean isLogicalNext(final Vertex vertex) {
         boolean result = false;
         for (Face face: this.faces) {
@@ -235,6 +241,13 @@ public class Vertex implements Comparable<Vertex>{
         return result;
     }
 
+    /**
+     * Return the other unique vertex. A vertex that is creating a border have
+     * 2 neighbours on the border. So this function retrieve the vertex that is not
+     * in parameter.
+     * @param previous, the other unique that we don't want to have.
+     * @return the other unique.
+     */
     public final Vertex getOtherUnique(Vertex previous) {
         Iterator<Vertex> it = this.uniqueNeighbours.iterator();
         Vertex result = it.next();
@@ -347,6 +360,15 @@ public class Vertex implements Comparable<Vertex>{
         return neighbSet;
     }
 
+    /**
+     * We add to a a vertex all his neighbours seen on the faces. If a vertex
+     * receive twice the same vertex, it means that the given vertex is not part
+     * of the border for this vertex. At the end of the reading of a mesh, if a
+     * vertex still have neighbours, it means that this vertex is part of the
+     * border and that it's neighbours are also part of the border.
+     * @param neighb1, the first neighbour to add.
+     * @param neighb2, the second neighbour to add.
+     */
     public final void addUnique(Vertex neighb1, Vertex neighb2) {
         //this.faces.add(face);
         if (!this.uniqueNeighbours.add(neighb1)) {

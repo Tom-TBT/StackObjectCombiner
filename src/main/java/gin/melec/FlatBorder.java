@@ -54,6 +54,11 @@ public class FlatBorder{
         }
     }
 
+    /**
+     * Get a simple sequence of the flat border. It takes all the vertices of
+     * the lists and add to it the in between corner vertices.
+     * @return a single sequence representation of the flat border.
+     */
     private List<Vertex> getSingleSequence() {
         List<Vertex> result = new ArrayList();
         for (Object o : this.elements) {
@@ -70,6 +75,12 @@ public class FlatBorder{
         return result;
     }
 
+    /**
+     * Convert a sequence of vertex into a 2D Vector sequence. (because a flat
+     * border is actually flat !! o_O)
+     * @param seq
+     * @return
+     */
     private List<Vector2D> getVectors(List<Vertex> seq) {
         List<Vector2D> result = new ArrayList();
         for (Vertex v: seq) {
@@ -78,6 +89,11 @@ public class FlatBorder{
         return result;
     }
 
+    /**
+     * Create an area from this vertex sequence and compute some geometrical
+     * properties: Perimeter, Barycentre and Area.
+     * @param split
+     */
     public void computeProperties(final AbstractSplit split) {
         this.split = split;
         List<Vertex> singleSequence = getSingleSequence();
@@ -92,6 +108,9 @@ public class FlatBorder{
         this.customArea.computeProperties(vectors);
     }
 
+    /**
+     * Revert the elements of the flat border.
+     */
     private void revertElements() {
         List newElements = new ArrayList();
         for (Object o:this.elements) {
@@ -139,6 +158,10 @@ public class FlatBorder{
         return this.elements;
     }
 
+    /**
+     * Align this flat onto a reference flat border.
+     * @param referenceFlat , the flat reference on which we align this flat.
+     */
     public void alignOn(FlatBorder referenceFlat) {
         List<Vertex> refList = (List)referenceFlat.elements.get(0);
         Vertex refVertex = refList.get(0);
@@ -172,7 +195,6 @@ public class FlatBorder{
     @Override
     public String toString() {
         int compteur = 0;
-        boolean isCircular = false;
         if (this.elements.size() == 1) {
             return "(1 circular)";
         } else {

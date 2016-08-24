@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import ij.IJ;
 
 /**
  *
@@ -111,17 +110,6 @@ public class Mesh {
     }
 
     /**
-     * Once a border is finish, this method is called to add all vertex related
-     * to the border to the garbage.
-     */
-    /**private void completeGarbage() {
-        final List<Vertex> vertexToCheck = new ArrayList(this.garbage);
-        for (Vertex vertex : vertexToCheck) {
-            vertex.addNeighbourToGarbage(this.garbage, this.primers, 10);
-        }
-    }**/
-
-    /**
      * This is the principal method for creating every borders of a mesh. It
      * first create primers (vertex of the mesh) which can potentially initiate
      * a new border. Then a border is created from the primers, and once the
@@ -156,6 +144,7 @@ public class Mesh {
     /**
      * This method shift the mesh, depending of its own splits.
      * @param splits , the splits to apply
+     * @throws java.io.IOException
      */
     protected final void shift(final List<AbstractSplit> splits) throws IOException {
         double deltaX = 0, deltaY = 0, deltaZ = 0;
@@ -213,6 +202,10 @@ public class Mesh {
         this.exportMesh(deltaX, deltaY, deltaZ);
     }
 
+    /**
+     * Unshift the mesh by looking at the values of the shift inside the file.
+     * @throws IOException
+     */
     void unshift() throws IOException {
         double deltaX , deltaY, deltaZ;
         double shifts[];
@@ -253,7 +246,9 @@ public class Mesh {
 
     /**
      * Use the ObjReader to import into the mesh the vertices and the faces.
+     * If the memory available is not enough , the memory is freed from other meshes.
      *
+     * @param checkForPrimers, if true the reader takes time to look for the primers.
      * @throws java.text.ParseException
      * @throws java.io.IOException
      */
@@ -276,11 +271,17 @@ public class Mesh {
         this.inMemory = true;
     }
 
+    /**
+     * Empty the face and vertex list of this mesh to free some memory.
+     */
     public final void unload() {
         this.inMemory = false;
         this.clear();
     }
 
+    /**
+     * Unload everything of the mesh. Used once the merging is done.
+     */
     public final void unloadEverything() {
         this.unload();
         this.borders.clear();
@@ -293,6 +294,11 @@ public class Mesh {
         this.primers.clear();
     }
 
+    /**
+     * If the mesh is not already in memory, reload it without looking for primers.
+     * @throws ParseException
+     * @throws IOException
+     */
     public final void reload() throws ParseException, IOException {
         if (!inMemory) {
             this.importMesh(false);
@@ -300,6 +306,10 @@ public class Mesh {
         }
     }
 
+    /**
+     * Replace the reference of the vertices in the borders by the new vertices
+     * loaded in the mesh.
+     */
     private void replaceVerticesInBorders() {
         List<FlatBorder> flats = new ArrayList();
         flats.addAll(this.backFlats);
@@ -323,6 +333,9 @@ public class Mesh {
         }
     }
 
+    /**
+     * Iterate of the vertices of the mesh to find those who are primers.
+     */
     public void findPrimers() {
         for (Vertex v: this.vertices) {
             if (v.isBorderVertex()) {
@@ -340,6 +353,12 @@ public class Mesh {
         this.borders = ObjReader.deserializeBorders(this.file);
     }
 
+    /**
+     * Increment the index of the vertices by a constant value. Used before the
+     * writing of combined meshes, so the faces can write the correct name of
+     * the vertices.
+     * @param increm, the constant to add to the index of the vertices.
+     */
     protected final void incremVertices(int increm) {
         for(Vertex vertex: this.vertices) {
             vertex.incrementId(increm);

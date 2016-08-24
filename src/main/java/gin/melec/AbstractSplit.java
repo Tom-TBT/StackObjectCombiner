@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 /**
- *
+ * Represent the plane passing between two parts of a 3D image.
  * @author Tom Boissonnet
  * <a href="mailto:tom.boissonnet@hotmail.fr">tom.boissonnet@hotmail.fr</a>
  */
@@ -67,6 +67,10 @@ public abstract class AbstractSplit {
         this.position = position;
     }
 
+    /**
+     * Create the flat borders from the borders located inside the mesh.
+     * @param mesh , the mesh for which we create the flatBorders.
+     */
     protected final void storeFlatBorders(Mesh mesh){
         List<FlatBorder> result = new ArrayList();
         boolean connectorFound = true;
@@ -120,6 +124,11 @@ public abstract class AbstractSplit {
         return this.flatBorders;
     }
 
+    /**
+     * Add a flat border to the list of this split.
+     * It's a temporary list used to transfert then to the concerned mesh.
+     * @param flat, the flat to add to the list.
+     */
     public void addFlatBorder(FlatBorder flat) {
         if (this.flatBorders == null) {
             this.flatBorders = new ArrayList();
@@ -127,10 +136,19 @@ public abstract class AbstractSplit {
         this.flatBorders.add(flat);
     }
 
+    /**
+     * Clear the temporary flat border list.
+     */
     public void clearFlatBorders() {
         this.flatBorders = null;
     }
 
+    /**
+     * Give the edge that come next to the edge given in parameter. The edges are
+     * given in an anticlockwise clockwise manner.
+     * @param edge, the preceding edge.
+     * @return edge following the edgegiven in parameter.
+     */
     private Edge getNextEdge(Edge edge) {
         Edge result;
         if (edge == upEdge) {
@@ -183,6 +201,11 @@ public abstract class AbstractSplit {
      */
     protected abstract boolean isClose(final Vertex vertex);
 
+    /**
+     * Give the 2D vector, by removing the unnecessary dimension of the vertex.
+     * @param vertex, the vertex from which we create the 2D vector.
+     * @return a 2D representation of the vertex.
+     */
     protected abstract Vector2D getVector(final Vertex vertex);
 
     public Edge getUpEdge() {
@@ -217,6 +240,11 @@ public abstract class AbstractSplit {
         this.leftEdge = leftEdge;
     }
 
+    /**
+     * From the list of primers, retrieve a vertex that is close to this split.
+     * @param primers, the primers of the mesh.
+     * @return a vertex close to this split.
+     */
     public Vertex findStarter(List<Vertex> primers) {
         Vertex result = null;
         for (Vertex v: primers) {
