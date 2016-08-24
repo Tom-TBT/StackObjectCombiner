@@ -88,7 +88,7 @@ public class Cube {
         }
     }
 
-    protected void detectMeshBorders() throws ParseException, IOException {
+    protected void detectMeshBorders() throws ParseException, IOException, BorderSeparationException {
         for (Mesh mesh : meshes) {
             mesh.importMesh(true);
             CustomFrame.appendToLog("Detecting and preparing borders for "+mesh.getFile().getName());
@@ -145,7 +145,7 @@ public class Cube {
         this.downSplit.clearFlatBorders();
     }
 
-    private void separateBorder(Border currentBorder, Mesh mesh) {
+    private void separateBorder(Border currentBorder, Mesh mesh) throws BorderSeparationException {
         List<Vertex> vertexList = new ArrayList(currentBorder.getVertexSequence());
 
         int i = 0;
@@ -239,7 +239,10 @@ public class Cube {
                 }
             }
         } else {
-            // TERRIBLE ERROR TODO it can happen so look for a way out
+            throw new BorderSeparationException("Error while separating the border of "+mesh.toString()+":\n"
+                    + "The first and last fragments don't correspond. \n"
+                    + "Try to change the border separation parameter, \n"
+                    + "or remove the mesh from automatic merging.");
         }
 
     }

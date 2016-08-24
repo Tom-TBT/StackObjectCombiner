@@ -1029,6 +1029,10 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                         appendToLog("IO exception :\n"+ex.getMessage());
                         IJ.handleException(ex);
                         endAction(false);
+                    } catch (BorderSeparationException ex) {
+                        appendToLog(ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
                     }
                 }
             };
@@ -1179,7 +1183,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
         }
     }
 
-    protected void autoMerge() throws ParseException, IOException{
+    protected void autoMerge() throws ParseException, IOException, BorderSeparationException{
         if (startAction()) {
             appendToLog("Starting the automatic merging");
             double x = parseDouble(xValueField.getText());

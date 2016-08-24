@@ -226,7 +226,7 @@ public class MeshMerger {
         return result.isEmpty()?null:result;
     }
 
-    public static void workOnCubes(String workingDir) throws ParseException, IOException {
+    public static void workOnCubes(String workingDir) throws ParseException, IOException, BorderSeparationException {
         DialogContentManager.CUBE_A.detectMeshBorders();
         DialogContentManager.CUBE_B.detectMeshBorders();
         DialogContentManager.CUBE_C.detectMeshBorders();
