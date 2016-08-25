@@ -942,47 +942,57 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
                 listMeshes();
             }
         }   else if (source == shiftBtn) {
-            try {
-                double x = parseDouble(xValueField.getText());
-                double y = parseDouble(yValueField.getText());
-                double z = parseDouble(zValueField.getText());
-                Prefs.set("SOC.verticalSplit", x);
-                Prefs.set("SOC.horizontalSplit", y);
-                Prefs.set("SOC.depthSplit", z);
-                DialogContentManager.setSplits(x, y, z);
-                if (x != -1 && y != -1 && z != -1) {
-                    startAction();
-                    Prefs.savePreferences();
-                    MeshMover.moveMeshes();
-                    endAction(true);
-                } else {
-                    IJ.showMessage("Please enter positive numeric values for the shifts.");
-                }
-            } catch (ParseException ex) {
-                appendToLog("Parse exception :\n"+ex.getMessage());
-                IJ.handleException(ex);
-                endAction(false);
-            } catch (IOException ex) {
-                appendToLog("IO exception :\n"+ex.getMessage());
-                IJ.handleException(ex);
-                endAction(false);
-            }
+            Thread thread = new Thread() {{setPriority(Thread.NORM_PRIORITY);}
+                @Override
+                public void run() {
+                    try {
+                        double x = parseDouble(xValueField.getText());
+                        double y = parseDouble(yValueField.getText());
+                        double z = parseDouble(zValueField.getText());
+                        Prefs.set("SOC.verticalSplit", x);
+                        Prefs.set("SOC.horizontalSplit", y);
+                        Prefs.set("SOC.depthSplit", z);
+                        DialogContentManager.setSplits(x, y, z);
+                        if (x != -1 && y != -1 && z != -1) {
+                            startAction();
+                            Prefs.savePreferences();
+                            MeshMover.moveMeshes();
+                            endAction(true);
+                        } else {
+                            IJ.showMessage("Please enter positive numeric values for the shifts.");
+                        }
+                    } catch (ParseException ex) {
+                        appendToLog("Parse exception :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    } catch (IOException ex) {
+                        appendToLog("IO exception :\n"+ex.getMessage());
+                        IJ.handleException(ex);
+                        endAction(false);
+                    }
+                }};
+            thread.start();
         }   else if (source == unshiftBtn) {
-           try {
-               startAction();
-               MeshMover.unshiftMeshes();
-               endAction(true);
-           } catch (ParseException ex) {
-               appendToLog("Parse exception :\n"+ex.getMessage());
-               IJ.handleException(ex);
-               endAction(false);
-           } catch (IOException ex) {
-               appendToLog("IO exception :\n"+ex.getMessage());
-               IJ.handleException(ex);
-               endAction(false);
-           }
-        }
-            else if (source == clearLogBtn) {
+           Thread thread = new Thread() {{setPriority(Thread.NORM_PRIORITY);}
+                @Override
+                public void run() {
+                    try {
+                       startAction();
+                       MeshMover.unshiftMeshes();
+                       endAction(true);
+                    } catch (ParseException ex) {
+                       appendToLog("Parse exception :\n"+ex.getMessage());
+                       IJ.handleException(ex);
+                       endAction(false);
+                    } catch (IOException ex) {
+                       appendToLog("IO exception :\n"+ex.getMessage());
+                       IJ.handleException(ex);
+                       endAction(false);
+                    }
+                }
+            };
+            thread.start();
+        } else if (source == clearLogBtn) {
             logText.setText("");
         } else if (source == addObjBtn) {
             addObj();

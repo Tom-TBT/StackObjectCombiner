@@ -175,7 +175,6 @@ public class MeshMover {
             mesh.unload();
         }
         CustomFrame.appendToLog(nbMoved + " meshes have been shifted.");
-        CustomFrame.appendToLog("-----------------------");
     }
     static void unshiftMeshes() throws ParseException, IOException {
         int nbMoved = 0;
@@ -203,6 +202,5 @@ public class MeshMover {
             mesh.unload();
         }
         CustomFrame.appendToLog(nbMoved + " meshes have been unshifted.");
-        CustomFrame.appendToLog("-----------------------");
     }
 }
