@@ -92,25 +92,6 @@ public class Face {
     }
 
     /**
-     * Return the vertex contained by this face, that is not given as a
-     * parameter.
-     * @param v1, the first vertex that is checked.
-     * @param v2, the second vertex that is checked.
-     * @return the vertex of this face that is not v1 and v2.
-     */
-    Vertex getThirdVertex(Vertex v1, Vertex v2) {
-        Vertex result;
-        if (!this.vertex1.equals(v1) && !this.vertex1.equals(v2)) {
-            result = this.vertex1;
-        } else if (!this.vertex2.equals(v1) && !this.vertex2.equals(v2)) {
-            result = this.vertex2;
-        } else {
-            result = this.vertex3;
-        }
-        return result;
-    }
-
-    /**
      * Check if the face contain or not the vertex given by it's id.
      *
      * @param vertex , the vertex to check.

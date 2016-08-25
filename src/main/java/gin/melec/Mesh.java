@@ -84,7 +84,6 @@ public class Mesh {
      * Public constructor for a mesh.
      *
      * @param file , the file containing the mesh.
-     * @param splits , the splits of the mesh.
      * @throws java.io.IOException
      */
     public Mesh(final File file)

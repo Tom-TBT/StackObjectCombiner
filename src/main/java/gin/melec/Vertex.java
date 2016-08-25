@@ -63,11 +63,6 @@ public class Vertex implements Comparable<Vertex>{
      */
     protected float z;
 
-    /**
-     * The faces to who the vertex belong.
-     */
-    private final transient Set<Face> faces;
-
     private Set<Vertex> uniqueNeighbours;
 
     /**
@@ -83,7 +78,6 @@ public class Vertex implements Comparable<Vertex>{
         this.x = x;
         this.y = y;
         this.z = z;
-        this.faces = new HashSet();
         this.uniqueNeighbours = new HashSet();
     }
 
@@ -96,37 +90,6 @@ public class Vertex implements Comparable<Vertex>{
     public final String toString() {
         return "v " + DF.format(this.x) + " " + DF.format(this.y) + " "
                 + DF.format(this.z);
-    }
-
-    /**
-     * Recursive function to add every neighbor and their neighbor
-     * to the garbage of the mesh the vertices belong to.
-     * @param garbage , the garbage where vertices are added.
-     * @param primers, the set containing all the vertices that can be added.
-     */
-    public final void addNeighbourToGarbage(final Set garbage, final Set primers) {
-        garbage.add(this);
-        for (Vertex neighbour : this.getNeighbours()) {
-            if (!garbage.contains(neighbour) && primers.contains(neighbour)) {
-                neighbour.addNeighbourToGarbage(garbage, primers);
-            }
-        }
-    }
-
-    /**
-     * Give the neighbour of this vertex with the given id.
-     * @param idNeighbour , the id of the neighbour.
-     * @return the vertex with the corresponding id.
-     */
-    public final Vertex getNeighbour(final int idNeighbour) {
-        Vertex result = null;
-        for (Vertex candidat : this.getNeighbours()) {
-            if (candidat.id == idNeighbour) {
-                result = candidat;
-                break;
-            }
-        }
-        return result;
     }
 
     /**
@@ -163,85 +126,6 @@ public class Vertex implements Comparable<Vertex>{
     }
 
     /**
-     * Find the closer vertex to this vertex between two candidates.
-     * @param candidate1 , the first candidate.
-     * @param candidate2 , the second candidate.
-     * @return the closer of the two vertex.
-     */
-    public final Vertex whichCloser(final Vertex candidate1
-            , final Vertex candidate2) {
-        Vertex result;
-        if (candidate2 != null && candidate1 != null
-               && (this.distanceTo(candidate2) < this.distanceTo(candidate1))) {
-            result = candidate2;
-        } else {
-            result = candidate1;
-        }
-        return result;
-    }
-
-    /**
-     * This method check if the Vertex belong to a border or not. This is
-     * checked by regarding if their is a circularity in his neighbours.
-     * @return true if it belong to a border, else false.
-     */
-    public final boolean belongToBorder() {
-        boolean result = true;
-        final List<Vertex> tmpNeighbours = new ArrayList();
-        final List<Face> facesRemaining = new ArrayList();
-        tmpNeighbours.addAll(this.getNeighbours());
-        facesRemaining.addAll(this.faces);
-
-        final Vertex firstVertex = tmpNeighbours.get(0);
-        Vertex currentVertex = firstVertex;
-        Face currentFace = firstVertex.getFaceIncluding(facesRemaining);
-        facesRemaining.remove(currentFace);
-        while (currentFace != null) {
-            currentVertex = currentFace.getThirdVertex(this, currentVertex);
-            currentFace = currentVertex.getFaceIncluding(facesRemaining);
-            facesRemaining.remove(currentFace);
-            if (currentVertex.equals(firstVertex)) {
-                result = false;
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Give the face containing the vertex. The face is only search in a subset.
-     * @param facesRemaining , the subset of faces.
-     * @return the face containing the vertex.
-     */
-    public final Face getFaceIncluding(final Collection<Face> facesRemaining) {
-        Face result = null;
-        for (Face face : facesRemaining) {
-            if (face.include(this)) {
-                result = face;
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Is logical next mean that the given vertex follows this vertex on the face,
-     * according to the normal vector of the face.
-     * @param vertex
-     * @return true if the vertex follows logicaly this vertex.
-     */
-    public final boolean isLogicalNext(final Vertex vertex) {
-        boolean result = false;
-        for (Face face: this.faces) {
-            if (face.include(vertex)) {
-                result = face.vertexFollows(this, vertex);
-                break;
-            }
-        }
-        return result;
-    }
-
-    /**
      * Return the other unique vertex. A vertex that is creating a border have
      * 2 neighbours on the border. So this function retrieve the vertex that is not
      * in parameter.
@@ -264,6 +148,53 @@ public class Vertex implements Comparable<Vertex>{
      */
     public final void incrementId(final int idShift) {
         this.id += idShift;
+    }
+
+    /**
+     * We add to a a vertex all his neighbours seen on the faces. If a vertex
+     * receive twice the same vertex, it means that the given vertex is not part
+     * of the border for this vertex. At the end of the reading of a mesh, if a
+     * vertex still have neighbours, it means that this vertex is part of the
+     * border and that it's neighbours are also part of the border.
+     * @param neighb1, the first neighbour to add.
+     * @param neighb2, the second neighbour to add.
+     */
+    public final void addUnique(Vertex neighb1, Vertex neighb2) {
+        if (!this.uniqueNeighbours.add(neighb1)) {
+            this.uniqueNeighbours.remove(neighb1);
+        }
+        if (!this.uniqueNeighbours.add(neighb2)) {
+            this.uniqueNeighbours.remove(neighb2);
+        }
+    }
+
+    public final boolean isBorderVertex() {
+        boolean result = !this.uniqueNeighbours.isEmpty();
+        if (!result) {
+            this.uniqueNeighbours = null;
+        }
+        return result;
+    }
+
+    public final Set<Vertex> getUniqueNeighbours() {
+        return this.uniqueNeighbours;
+    }
+
+    /**
+     * Return the closer vertex from a list to this one.
+     * @param vertexSequence , the list of vertex to be compared.
+     * @return the closer vertex of this vertex.
+     */
+    public final Vertex findCloserIn(List<Vertex> vertexSequence) {
+        Vertex result = null;
+        for (Vertex vertex : vertexSequence) {
+            if (result == null) {
+                result = vertex;
+            } else if (this.distanceTo(vertex) < this.distanceTo(result)){
+                result = vertex;
+            }
+        }
+        return result;
     }
 
     @Override
@@ -346,77 +277,5 @@ public class Vertex implements Comparable<Vertex>{
      */
     public final void setZ(double z) {
         this.z = (float)z;
-    }
-    /**
-     * Getter of the attribute neighbours.
-     * @return the neighbours of the vertex.
-     */
-    public final Set<Vertex> getNeighbours() {
-        Set<Vertex> neighbSet = new HashSet();
-        for (Face face : this.getFaces()) {
-            neighbSet.add(face.getFirstNeighbour(this));
-            neighbSet.add(face.getSecondNeighbour(this));
-        }
-        return neighbSet;
-    }
-
-    /**
-     * We add to a a vertex all his neighbours seen on the faces. If a vertex
-     * receive twice the same vertex, it means that the given vertex is not part
-     * of the border for this vertex. At the end of the reading of a mesh, if a
-     * vertex still have neighbours, it means that this vertex is part of the
-     * border and that it's neighbours are also part of the border.
-     * @param neighb1, the first neighbour to add.
-     * @param neighb2, the second neighbour to add.
-     */
-    public final void addUnique(Vertex neighb1, Vertex neighb2) {
-        //this.faces.add(face);
-        if (!this.uniqueNeighbours.add(neighb1)) {
-            this.uniqueNeighbours.remove(neighb1);
-        }
-        if (!this.uniqueNeighbours.add(neighb2)) {
-            this.uniqueNeighbours.remove(neighb2);
-        }
-    }
-
-    public final void addFace(Face face) {
-        this.faces.add(face);
-    }
-
-    public final boolean isBorderVertex() {
-        boolean result = !this.uniqueNeighbours.isEmpty();
-        if (!result) {
-            this.uniqueNeighbours = null;
-        }
-        return result;
-    }
-
-    /**
-     * Getter of the attribute faces.
-     * @return the faces of the vertex.
-     */
-    public final Set<Face> getFaces() {
-        return faces;
-    }
-
-    public final Set<Vertex> getUniqueNeighbours() {
-        return this.uniqueNeighbours;
-    }
-
-    /**
-     * Return the closer vertex from a list to this one.
-     * @param vertexSequence , the list of vertex to be compared.
-     * @return the closer vertex of this vertex.
-     */
-    public final Vertex findCloserIn(List<Vertex> vertexSequence) {
-        Vertex result = null;
-        for (Vertex vertex : vertexSequence) {
-            if (result == null) {
-                result = vertex;
-            } else if (this.distanceTo(vertex) < this.distanceTo(result)){
-                result = vertex;
-            }
-        }
-        return result;
     }
 }

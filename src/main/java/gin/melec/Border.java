@@ -97,12 +97,11 @@ public class Border {
         Vertex secondVertex = it.next();
         for (Face face: mesh.getFaces()) {
             if (face.include(firstVertex) && face.include(secondVertex)) {
-                firstVertex.addFace(face);
+                if (!face.vertexFollows(firstVertex, secondVertex)) {
+                    secondVertex = it.next();
+                }
                 break;
             }
-        }
-        if (!firstVertex.isLogicalNext(secondVertex)) {
-            secondVertex = it.next();
         }
         this.addNextVertex(secondVertex);
         mesh.getPrimers().remove(secondVertex);
@@ -216,7 +215,7 @@ public class Border {
             if (!this.split.isClose(vertex)) {
                 this.changeFirstVertex(vertex);
                 isCircular = false;
-                //break;
+                break;
             }
         }
         if (isCircular) { // the border is circular so no need to split it
@@ -437,7 +436,6 @@ public class Border {
                 }
             }
             this.changeFirstVertex(firstVertexThis);
-//            border.isClockwise();
         } else if (!this.isCircular() && !border.isCircular()) {
             if (this.getFirstVertex().distanceTo(border.getFirstVertex())
                     > this.getLastVertex().distanceTo(border.getFirstVertex())) {

@@ -20,7 +20,7 @@ public class DialogContentManager {
 
     public static boolean USE_NAME_PATTERN = false;
 
-    public static double MEMORY_WATCHER = 400; // the millions correspond to Megabytes
+    public static double MEMORY_WATCHER = 400;
 
     /**
      * The filters for the obj files.
@@ -274,7 +274,6 @@ public class DialogContentManager {
     }
 
     protected static void setSplits(double x, double y, double z) {
-        //ALL_SPLITS.clear();
         if (x != 0) {
             WIDTH_SPLIT.setPosition(x - 0.5);
         }
@@ -284,7 +283,6 @@ public class DialogContentManager {
         if (z != 0) {
             DEPTH_SPLIT.setPosition(z - 0.5);
         }
-
     }
 
     /**

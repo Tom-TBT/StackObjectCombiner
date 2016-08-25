@@ -379,7 +379,7 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
 
         tailField.setToolTipText("");
 
-        tailLabel.setText("Tail lenght");
+        tailLabel.setText("Tail length");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -1230,8 +1230,6 @@ public class CustomFrame extends JFrame implements ActionListener, ItemListener,
             Prefs.set("SOC.height", heightValue);
             Prefs.set("SOC.depth", depthValue);
             Prefs.savePreferences();
-
-            // Check for sparsed Cubes (Borders of the meshes)
 
             DialogContentManager.generateCubes(x, y, z, widthValue, heightValue, depthValue);
 

@@ -33,12 +33,12 @@ public class Cube {
     public static int BORDER_SEPARATION = 5;
 
     private final List<Mesh> meshes;
-    private final double x;
-    private final double y;
-    private final double z;
-    private final double width;
-    private final double height;
-    private final double depth;
+    private final double xMin;
+    private final double yMin;
+    private final double zMin;
+    private final double xMax;
+    private final double yMax;
+    private final double zMax;
     private final WidthSplit leftSplit;
     private final WidthSplit rightSplit;
     private final HeightSplit backSplit;
@@ -58,23 +58,21 @@ public class Cube {
     private CustomPlane rightUpPlane;
     private CustomPlane rightDownPlane;
 
-    public Cube(final double x,final double y, final double z, final double width,
-            final double height, final double depth) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.width = width;
-        this.height = height;
-        this.depth = depth;
-        // width height and depth are not good names. Here it represent the position
-        // of the end of the cube
+    public Cube(final double xMin,final double yMin, final double zMin, final double xMax,
+            final double yMax, final double zMax) {
+        this.xMin = xMin;
+        this.yMin = yMin;
+        this.zMin = zMin;
+        this.xMax = xMax;
+        this.yMax = yMax;
+        this.zMax = zMax;
 
-        leftSplit = new WidthSplit(x);
-        rightSplit = new WidthSplit(width);
-        backSplit = new HeightSplit(y);
-        frontSplit = new HeightSplit(height);
-        upSplit = new DepthSplit(z);
-        downSplit = new DepthSplit(depth);
+        leftSplit = new WidthSplit(xMin);
+        rightSplit = new WidthSplit(xMax);
+        backSplit = new HeightSplit(yMin);
+        frontSplit = new HeightSplit(yMax);
+        upSplit = new DepthSplit(zMin);
+        downSplit = new DepthSplit(zMax);
 
         setEdges();
         setPlanes();
@@ -217,7 +215,7 @@ public class Cube {
             currSplit = this.rightSplit;
         }
 
-        AbstractSplit nextSplit = null;
+        AbstractSplit nextSplit;
         CustomPlane[] planes = getPlanes(currSplit);
 
         List<Integer> crossingPositions = new ArrayList();
@@ -267,7 +265,7 @@ public class Cube {
                     }
                     border.setSplit(splitList.get(i));
                     border.getVertexSequence().add(vertexList.get(crossingPositions.get(i)));
-                    //border.getConnector().setVertex(border.getFirstVertex());
+
                     startEdge = edges[1];
                     i++;
                     if (i == crossingPositions.size()) {
@@ -383,14 +381,14 @@ public class Cube {
      * Set the planes of the cube.
      */
     private void setPlanes() {
-        Vector3D orig= new Vector3D(x,y,z);
-        Vector3D origX= new Vector3D(width,y,z);
-        Vector3D origY= new Vector3D(x,height,z);
-        Vector3D origZ= new Vector3D(x,y,depth);
-        Vector3D xZ = new Vector3D(width, y,depth);
-        Vector3D xY = new Vector3D(width,height, z);
-        Vector3D yZ = new Vector3D(x,height,depth);
-        Vector3D xYZ = new Vector3D(width,height,depth);
+        Vector3D orig= new Vector3D(xMin,yMin,zMin);
+        Vector3D origX= new Vector3D(xMax,yMin,zMin);
+        Vector3D origY= new Vector3D(xMin,yMax,zMin);
+        Vector3D origZ= new Vector3D(xMin,yMin,zMax);
+        Vector3D xZ = new Vector3D(xMax, yMin,zMax);
+        Vector3D xY = new Vector3D(xMax,yMax, zMin);
+        Vector3D yZ = new Vector3D(xMin,yMax,zMax);
+        Vector3D xYZ = new Vector3D(xMax,yMax,zMax);
 
         Vector3D constructedVector;
 
@@ -477,14 +475,14 @@ public class Cube {
      */
     private void setEdges() {
         Vertex cornerOrig, cornerX, cornerY, cornerZ, cornerXY, cornerXZ, cornerYZ, cornerXYZ;
-        cornerOrig = new Vertex(0,(float)x,(float)y,(float)z);
-        cornerX = new Vertex(0,(float)width,(float)y,(float)z);
-        cornerY = new Vertex(0,(float)x,(float)height,(float)z);
-        cornerZ = new Vertex(0,(float)x,(float)y,(float)depth);
-        cornerXY = new Vertex(0,(float)width,(float)height,(float)z);
-        cornerXZ = new Vertex(0,(float)width,(float)y,(float)depth);
-        cornerYZ = new Vertex(0,(float)x,(float)height,(float)depth);
-        cornerXYZ = new Vertex(0,(float)width,(float)height,(float)depth);
+        cornerOrig = new Vertex(0,(float)xMin,(float)yMin,(float)zMin);
+        cornerX = new Vertex(0,(float)xMax,(float)yMin,(float)zMin);
+        cornerY = new Vertex(0,(float)xMin,(float)yMax,(float)zMin);
+        cornerZ = new Vertex(0,(float)xMin,(float)yMin,(float)zMax);
+        cornerXY = new Vertex(0,(float)xMax,(float)yMax,(float)zMin);
+        cornerXZ = new Vertex(0,(float)xMax,(float)yMin,(float)zMax);
+        cornerYZ = new Vertex(0,(float)xMin,(float)yMax,(float)zMax);
+        cornerXYZ = new Vertex(0,(float)xMax,(float)yMax,(float)zMax);
 
         this.upSplit.setUpEdge(new Edge(false, cornerOrig, cornerX, 'X'));
         this.upSplit.setRightEdge(new Edge(false, cornerX, cornerXY, 'Y'));
